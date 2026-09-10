@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import Screen from '../components/Screen'
-import Button from '../components/Button'
-import Stepper from '../components/Stepper'
-import Toggle from '../components/Toggle'
-import SessionCode from '../components/SessionCode'
-import PlayerList from '../components/PlayerList'
+import Screen from '../ui/Screen'
+import Button from '../ui/Button'
+import Panel from '../ui/Panel'
+import Chip from '../ui/Chip'
+import Stepper from '../ui/Stepper'
+import Toggle from '../ui/Toggle'
+import Segmented from '../ui/Segmented'
+import { Alert } from '../ui/Field'
+import JoinCodeDisplay from '../ui/JoinCodeDisplay'
+import PlayerRoster from '../ui/PlayerRoster'
 import { useLobby } from '../hooks/useLobby'
 import { supabase, readableError } from '../lib/supabase'
 import { loadIdentity, clearIdentity } from '../lib/identity'
-import { PACKS, getPack } from '../data/packs'
+import { PACKS, DIFFICULTIES, getPack, getDifficulty, playersFor } from '../data/packs'
 
 const MIN_PLAYERS = 3
 
@@ -17,6 +21,10 @@ function formatSeconds(total) {
   const m = Math.floor(total / 60)
   const s = total % 60
   return `${m}:${String(s).padStart(2, '0')}`
+}
+
+function LiveChip({ live }) {
+  return live ? <Chip tone="lime">Live</Chip> : <Chip tone="steel">Reconnecting</Chip>
 }
 
 export default function Lobby() {
@@ -44,6 +52,7 @@ export default function Lobby() {
     seeded.current = true
     setDraft({
       player_pack: session.player_pack,
+      difficulty: session.difficulty,
       num_imposters: session.num_imposters,
       ai_hints_enabled: session.ai_hints_enabled,
       discussion_seconds: session.discussion_seconds,
@@ -60,6 +69,7 @@ export default function Lobby() {
         p_session_id: session.id,
         p_player_id: identity.playerId,
         p_player_pack: draft.player_pack,
+        p_difficulty: draft.difficulty,
         p_num_imposters: draft.num_imposters,
         p_ai_hints_enabled: draft.ai_hints_enabled,
         p_discussion_seconds: draft.discussion_seconds,
@@ -71,8 +81,6 @@ export default function Lobby() {
     return () => clearTimeout(timer)
   }, [draft, isHost, session?.id, identity?.playerId])
 
-  // The game moved on without this screen. Step 4 will route to the peek screen;
-  // for now just make it obvious rather than sitting on a dead lobby.
   const gameStarted = session && session.status !== 'waiting'
 
   async function leave() {
@@ -91,12 +99,11 @@ export default function Lobby() {
   if (status === 'loading') {
     return (
       <Screen back="/imposter" title="Loading lobby…">
-        <div className="space-y-2" aria-hidden="true">
+        <div className="space-y-3" aria-hidden="true">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-14 animate-pulse rounded-xl border border-pitch-700 bg-pitch-900"
-            />
+            <div key={i} className="frame metal-steel animate-pulse" style={{ '--fw': '3px' }}>
+              <div className="frame-inner enamel-ink-deep h-16" />
+            </div>
           ))}
         </div>
       </Screen>
@@ -106,9 +113,9 @@ export default function Lobby() {
   if (status === 'missing') {
     return (
       <Screen back="/imposter" title="That lobby is gone">
-        <p className="text-[15px] leading-relaxed text-chalk-400">
-          Either the code was mistyped, or the host closed the game. Ask them to
-          start a new one.
+        <p className="max-w-[38ch] text-body leading-relaxed text-chalk-1">
+          Either the code was mistyped, or the host closed the game. Ask them to start
+          a new one.
         </p>
         <Button
           fullWidth
@@ -128,9 +135,10 @@ export default function Lobby() {
   if (!identity) {
     return (
       <Screen back="/imposter" title="You are not in this lobby">
-        <p className="text-[15px] leading-relaxed text-chalk-400">
-          This browser has no seat in game <strong>{upperCode}</strong>. Join it
-          with your display name and you are in.
+        <p className="max-w-[38ch] text-body leading-relaxed text-chalk-1">
+          This browser has no seat in game{' '}
+          <span className="display text-[1.3rem] tracking-[0.12em] text-lime">{upperCode}</span>.
+          Join it with your display name and you are in.
         </p>
         <Button
           fullWidth
@@ -152,27 +160,15 @@ export default function Lobby() {
   const enoughPlayers = players.length >= MIN_PLAYERS
   const canStart = ratioOk && enoughPlayers
 
-  const liveDot = (
-    <span className="flex items-center gap-1.5 text-xs font-medium text-chalk-600">
-      <span
-        aria-hidden="true"
-        className={`h-1.5 w-1.5 rounded-full ${
-          live ? 'bg-lime-400' : 'animate-pulse bg-chalk-600'
-        }`}
-      />
-      {live ? 'Live' : 'Reconnecting'}
-    </span>
-  )
-
   // ---- Non-host waiting room --------------------------------------------
 
   if (!isHost) {
     const pack = getPack(session.player_pack)
+    const difficulty = getDifficulty(session.difficulty)
 
     return (
       <Screen
-        back={null}
-        action={liveDot}
+        status={<LiveChip live={live} />}
         title="You're in"
         subtitle={
           gameStarted
@@ -180,40 +176,31 @@ export default function Lobby() {
             : 'Waiting for the host to kick off.'
         }
       >
-        <div className="mb-6 rounded-tile border border-pitch-700 bg-pitch-900 p-5">
-          <dl className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <dt className="text-chalk-600">Pack</dt>
-              <dd className="mt-0.5 font-semibold text-chalk-100">{pack.name}</dd>
-            </div>
-            <div>
-              <dt className="text-chalk-600">Imposters</dt>
-              <dd className="tabular mt-0.5 font-semibold text-chalk-100">
-                {session.num_imposters}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-chalk-600">Discussion</dt>
-              <dd className="tabular mt-0.5 font-semibold text-chalk-100">
-                {formatSeconds(session.discussion_seconds)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-chalk-600">AI hints</dt>
-              <dd className="mt-0.5 font-semibold text-chalk-100">
-                {session.ai_hints_enabled ? 'On' : 'Off'}
-              </dd>
-            </div>
+        <Panel title="Match settings" className="mb-6">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+            {[
+              ['Pack', pack.name],
+              ['Mode', difficulty.name],
+              ['Imposters', String(session.num_imposters)],
+              ['Discussion', formatSeconds(session.discussion_seconds)],
+              ['Voting', formatSeconds(session.voting_seconds)],
+              ['AI hints', session.ai_hints_enabled ? 'On' : 'Off'],
+            ].map(([k, v]) => (
+              <div key={k}>
+                <dt className="display text-[0.95rem] tracking-[0.18em] text-chalk-2 engraved">
+                  {k}
+                </dt>
+                <dd className="display tabular text-[1.6rem] leading-none tracking-[0.04em] text-gold-hi engraved">
+                  {v}
+                </dd>
+              </div>
+            ))}
           </dl>
-        </div>
+        </Panel>
 
-        <PlayerList
-          players={players}
-          youId={identity.playerId}
-          minPlayers={MIN_PLAYERS}
-        />
+        <PlayerRoster players={players} youId={identity.playerId} minPlayers={MIN_PLAYERS} />
 
-        <Button variant="ghost" fullWidth className="mt-8" onClick={leave}>
+        <Button variant="quiet" fullWidth className="mt-8" onClick={leave}>
           Leave game
         </Button>
       </Screen>
@@ -223,125 +210,139 @@ export default function Lobby() {
   // ---- Host setup --------------------------------------------------------
 
   const set = (patch) => setDraft((prev) => ({ ...prev, ...patch }))
+  const inPlay = playersFor(draft?.player_pack, draft?.difficulty).length
+  const squadSize = playersFor(draft?.player_pack, 'you_know_ball').length
 
   return (
     <Screen
-      back={null}
-      action={liveDot}
+      status={<LiveChip live={live} />}
       title="Game setup"
       subtitle="Players can join while you sort the settings."
     >
       <div className="mb-7">
-        <SessionCode code={session.code} />
+        <JoinCodeDisplay code={session.code} />
       </div>
 
       <div className="space-y-7">
-        <section>
-          <h2 className="mb-3 text-sm font-bold tracking-[0.14em] text-chalk-600 uppercase">
-            Player pack
-          </h2>
-          <div className="space-y-2">
+        <Panel title="Player pack">
+          <ul className="divide-y divide-ink-3" role="list">
             {PACKS.map((pack) => {
               const selected = draft?.player_pack === pack.id
               return (
-                <button
-                  key={pack.id}
-                  type="button"
-                  onClick={() => set({ player_pack: pack.id })}
-                  aria-pressed={selected}
-                  className={`w-full rounded-xl border p-4 text-left transition-colors ${
-                    selected
-                      ? 'border-lime-400 bg-lime-400/5'
-                      : 'border-pitch-700 bg-pitch-900 hover:border-pitch-600'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-bold text-chalk-100">{pack.name}</span>
-                    <span className="shrink-0 text-[10px] font-bold tracking-[0.1em] text-chalk-600 uppercase">
-                      {pack.difficulty}
+                <li key={pack.id}>
+                  <button
+                    type="button"
+                    onClick={() => set({ player_pack: pack.id })}
+                    aria-pressed={selected}
+                    className="group flex w-full items-center gap-3 py-2.5 text-left transition-colors first:pt-1 last:pb-1"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={
+                        selected
+                          ? 'disc metal-gold shrink-0 text-[1rem]'
+                          : 'inline-block h-8 w-8 shrink-0 rounded-full border border-dashed border-ink-4 transition-colors group-hover:border-gold-lo'
+                      }
+                    >
+                      {selected ? '✓' : ''}
                     </span>
-                  </div>
-                  <p className="mt-1 text-sm leading-snug text-chalk-400">
-                    {pack.blurb}
-                  </p>
-                  <p className="tabular mt-2 text-xs text-chalk-600">
-                    {pack.players.length} players
-                  </p>
-                </button>
+
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`display block text-[1.4rem] leading-none tracking-[0.05em] engraved ${
+                          selected ? 'text-gold-hi' : 'text-chalk-1 group-hover:text-chalk-0'
+                        }`}
+                      >
+                        {pack.name}
+                      </span>
+                      <span className="mt-0.5 block text-small leading-snug text-chalk-1">
+                        {pack.blurb}
+                      </span>
+                    </span>
+
+                    {selected && <Chip tone="lime">Selected</Chip>}
+                  </button>
+                </li>
               )
             })}
-          </div>
-        </section>
+          </ul>
 
-        <Stepper
-          label="Imposters"
-          hint={`${players.length} in the lobby`}
-          value={imposters}
-          onChange={(v) => set({ num_imposters: v })}
-          min={1}
-          max={4}
-          warning={
-            !ratioOk && enoughPlayers
-              ? `Imposters have to be outnumbered. With ${players.length} players you can have at most ${Math.max(1, Math.ceil(players.length / 2) - 1)}.`
-              : null
-          }
-        />
+          <div className="hairline metal-steel my-4" aria-hidden="true" />
 
-        <Stepper
-          label="Discussion timer"
-          hint="60s to 5 min"
-          value={draft?.discussion_seconds ?? 180}
-          onChange={(v) => set({ discussion_seconds: v })}
-          min={60}
-          max={300}
-          step={30}
-          format={formatSeconds}
-        />
+          <Segmented
+            label="How deep"
+            hint={`${inPlay} of ${squadSize} in play`}
+            options={DIFFICULTIES.map((d) => ({ id: d.id, name: d.name, meta: d.level }))}
+            value={draft?.difficulty ?? 'casual'}
+            onChange={(v) => set({ difficulty: v })}
+          />
+          <p className="mt-2 text-small leading-snug text-chalk-1" data-testid="difficulty-blurb">
+            {getDifficulty(draft?.difficulty).blurb}
+          </p>
+        </Panel>
 
-        <Stepper
-          label="Voting timer"
-          hint="30s minimum"
-          value={draft?.voting_seconds ?? 60}
-          onChange={(v) => set({ voting_seconds: v })}
-          min={30}
-          max={180}
-          step={15}
-          format={formatSeconds}
-        />
+        <Panel title="Rules" bodyClassName="space-y-6">
+          <Stepper
+            label="Imposters"
+            hint={`${players.length} in the lobby`}
+            value={imposters}
+            onChange={(v) => set({ num_imposters: v })}
+            min={1}
+            max={4}
+            warning={
+              !ratioOk && enoughPlayers
+                ? `Imposters have to be outnumbered. With ${players.length} players you can have at most ${Math.max(1, Math.ceil(players.length / 2) - 1)}.`
+                : null
+            }
+          />
 
-        <div className="rounded-xl border border-pitch-700 bg-pitch-900 p-4">
+          <Stepper
+            label="Discussion timer"
+            hint="60s to 5 min"
+            value={draft?.discussion_seconds ?? 180}
+            onChange={(v) => set({ discussion_seconds: v })}
+            min={60}
+            max={300}
+            step={30}
+            format={formatSeconds}
+          />
+
+          <Stepper
+            label="Voting timer"
+            hint="30s minimum"
+            value={draft?.voting_seconds ?? 60}
+            onChange={(v) => set({ voting_seconds: v })}
+            min={30}
+            max={180}
+            step={15}
+            format={formatSeconds}
+          />
+
           <Toggle
             label="AI hints for imposters"
             description="Gives each imposter a vague clue about the player instead of nothing at all. Easier for them, harder for you."
             checked={draft?.ai_hints_enabled ?? false}
             onChange={(v) => set({ ai_hints_enabled: v })}
           />
-        </div>
+        </Panel>
 
-        <PlayerList
-          players={players}
-          youId={identity.playerId}
-          minPlayers={MIN_PLAYERS}
-        />
+        <PlayerRoster players={players} youId={identity.playerId} minPlayers={MIN_PLAYERS} />
       </div>
 
-      {saveError && (
-        <p role="alert" className="mt-5 text-sm text-flag-500">
-          {saveError}
-        </p>
-      )}
+      {saveError && <Alert>{saveError}</Alert>}
 
-      <div className="sticky bottom-0 -mx-5 mt-8 border-t border-pitch-800 bg-pitch-950/95 px-5 pt-4 pb-5 backdrop-blur">
-        <Button
-          size="lg"
-          fullWidth
-          disabled={!canStart}
-          onClick={() => setStartNotice(true)}
-        >
+      {/* the whistle: pinned to the thumb */}
+      <div
+        className="sticky bottom-0 z-30 -mx-5 mt-8 bg-ink-0 px-5 pt-3"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
+        <div className="hairline metal-steel mb-3" aria-hidden="true" />
+
+        <Button size="lg" fullWidth disabled={!canStart} onClick={() => setStartNotice(true)}>
           Start game
         </Button>
 
-        <p className="mt-2.5 text-center text-sm text-chalk-600">
+        <p className="mt-2.5 text-center text-small text-chalk-1">
           {!enoughPlayers
             ? `Need ${MIN_PLAYERS - players.length} more player${
                 MIN_PLAYERS - players.length === 1 ? '' : 's'
@@ -352,7 +353,7 @@ export default function Lobby() {
         </p>
 
         {startNotice && (
-          <p role="status" className="mt-3 text-center text-sm text-lime-400">
+          <p role="status" className="mt-2 text-center text-small font-medium text-lime">
             Lobby is good to go. The round engine lands in the next step.
           </p>
         )}
@@ -360,7 +361,7 @@ export default function Lobby() {
         <button
           type="button"
           onClick={leave}
-          className="mt-3 w-full text-sm font-medium text-chalk-600 transition-colors hover:text-flag-500"
+          className="display mt-2 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
         >
           Close lobby
         </button>

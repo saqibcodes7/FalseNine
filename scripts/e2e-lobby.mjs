@@ -74,8 +74,8 @@ await host.screenshot({ path: `${OUT}/03-create.png`, fullPage: true })
 await host.getByRole('button', { name: 'Create game' }).click()
 
 await host.waitForURL('**/imposter/lobby/**', { timeout: 15000 })
-await host.waitForSelector('text=Join code')
-const code = (await host.locator('p.tabular').first().innerText()).trim()
+await host.waitForSelector('[data-testid="join-code"]')
+const code = (await host.getAttribute('[data-testid="join-code"]', 'data-code')).trim()
 check('lobby shows a 5-char join code', /^[A-Z0-9]{5}$/.test(code), code)
 await host.screenshot({ path: `${OUT}/04-host-setup.png`, fullPage: true })
 
@@ -147,15 +147,45 @@ check('dropping back to 1 imposter re-enables start',
   await host.getByRole('button', { name: 'Start game' }).isEnabled())
 
 // ---------- Settings persist to the server ----------
-await host.getByRole('button', { name: 'World Cup Legends' }).click()
+await host.getByRole('button', { name: 'World Cup Heroes' }).click()
 await host.getByRole('button', { name: 'Increase Discussion timer' }).click()
 await host.waitForTimeout(1200) // let the debounced save land
 await joiners[0].page.reload({ waitUntil: 'networkidle' })
-await joiners[0].page.waitForSelector('text=World Cup Legends')
-const packSeen = await joiners[0].page.getByText('World Cup Legends').isVisible()
+await joiners[0].page.waitForSelector('text=World Cup Heroes')
+const packSeen = await joiners[0].page.getByText('World Cup Heroes').isVisible()
 const timeSeen = (await joiners[0].page.locator('dd').allInnerTexts()).join('|')
 check('host settings reached the other players', packSeen && timeSeen.includes('3:30'), timeSeen)
 await joiners[0].page.screenshot({ path: `${OUT}/10-settings-synced.png`, fullPage: true })
+
+// ---------- Difficulty: the mode selector, its count, and it reaching the room ----------
+const modeGroup = host.getByRole('radiogroup', { name: 'How deep' })
+check(
+  'a fresh lobby starts on Casual',
+  (await modeGroup.getByRole('radio', { name: /Casual/ }).getAttribute('aria-checked')) === 'true',
+)
+const casualCount = await host.getByText(/of \d+ in play/).innerText()
+await modeGroup.getByRole('radio', { name: /You Know Ball/ }).click()
+const hardCount = await host.getByText(/of \d+ in play/).innerText()
+const [casualN, squadN] = casualCount.match(/\d+/g).map(Number)
+const [hardN] = hardCount.match(/\d+/g).map(Number)
+check(
+  'You Know Ball opens the whole squad',
+  hardN === squadN && casualN < hardN,
+  `${casualCount} -> ${hardCount}`,
+)
+check(
+  'the mode blurb follows the selection',
+  /whole squad/i.test(await host.getByTestId('difficulty-blurb').innerText()),
+)
+await host.screenshot({ path: `${OUT}/10b-difficulty-hard.png`, fullPage: true })
+await host.waitForTimeout(1200) // debounced save
+await joiners[0].page.reload({ waitUntil: 'networkidle' })
+await joiners[0].page.waitForSelector('text=You Know Ball')
+check(
+  'the chosen mode reached the waiting room',
+  await joiners[0].page.getByText('You Know Ball').isVisible(),
+)
+await joiners[0].page.screenshot({ path: `${OUT}/10c-mode-synced.png`, fullPage: true })
 
 // ---------- Unknown lobby ----------
 const lost = await hostCtx.newPage()

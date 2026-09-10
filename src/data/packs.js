@@ -4,40 +4,89 @@ import worldCup from './world_cup.json'
 
 /**
  * Player packs, bundled into the build as static JSON (Phase 1 of the roadmap).
- * The `id` is what gets written to `sessions.player_pack`, so if you rename one
- * you will orphan any lobby created before the rename. Add, don't rename.
  *
- * These lists were written from general football knowledge and are not tied to
- * a live data source, so give them a read before launch — squads move on.
+ * A pack is a squad. Every footballer in it sits in one of three tiers, and the
+ * difficulty the host picks decides how deep into the squad the game reaches:
+ *
+ *   casual         the starting XI            household names
+ *   ball_aware     starting XI + the bench    anyone who watches regularly
+ *   you_know_ball  the whole squad            the niche ones too
+ *
+ * Tiers are cumulative, so You Know Ball plays with all three lists. Packs are
+ * meant to be equally hard at the same difficulty; the pack picks the era and
+ * the competition, the difficulty picks how obscure it gets.
+ *
+ * `id` is what gets written to `sessions.player_pack` and
+ * `sessions.difficulty`, so if you rename one you will orphan any lobby created
+ * before the rename. Add, don't rename.
+ *
+ * The lists were written from general football knowledge and a read of the
+ * summer 2026 window, not a live data source. Give them a read before launch;
+ * squads move on.
  */
 export const PACKS = [
   {
     id: 'premier_league',
     name: 'Premier League',
-    blurb: 'Current top-flight regulars. The safe opener.',
-    difficulty: 'Easy',
-    players: premierLeague,
+    blurb: 'The 2026/27 top flight, club by club.',
+    tiers: premierLeague,
   },
   {
     id: 'champions_league',
     name: 'Champions League',
-    blurb: 'Europe-wide. Harder if your football stops at Dover.',
-    difficulty: 'Medium',
-    players: championsLeague,
+    blurb: "Europe's big clubs, minus the English ones.",
+    tiers: championsLeague,
   },
   {
     id: 'world_cup',
-    name: 'World Cup Legends',
-    blurb: 'All-time greats. Rewards the one who watches the old finals.',
-    difficulty: 'Hard',
-    players: worldCup,
+    name: 'World Cup Heroes',
+    blurb: 'Legends of every World Cup since 1954.',
+    tiers: worldCup,
+  },
+]
+
+export const DIFFICULTIES = [
+  {
+    id: 'casual',
+    name: 'Casual',
+    level: 'Easy',
+    blurb: 'Starting XI only. Names the whole table knows.',
+  },
+  {
+    id: 'ball_aware',
+    name: 'Ball Aware',
+    level: 'Regular',
+    blurb: 'Starting XI plus the bench. For people who actually watch.',
+  },
+  {
+    id: 'you_know_ball',
+    name: 'You Know Ball',
+    level: 'Hard',
+    blurb: 'The whole squad, niche ones included.',
   },
 ]
 
 export const DEFAULT_PACK_ID = 'premier_league'
+export const DEFAULT_DIFFICULTY_ID = 'casual'
 
 export function getPack(id) {
   return PACKS.find((pack) => pack.id === id) || PACKS[0]
+}
+
+export function getDifficulty(id) {
+  return DIFFICULTIES.find((d) => d.id === id) || DIFFICULTIES[0]
+}
+
+/**
+ * The footballers in play for a pack at a difficulty: every tier up to and
+ * including the chosen one. Unknown ids fall back to the defaults rather than
+ * throwing, since a stale lobby row should degrade to an easy game, not a
+ * blank screen.
+ */
+export function playersFor(packId, difficultyId) {
+  const pack = getPack(packId)
+  const depth = DIFFICULTIES.findIndex((d) => d.id === getDifficulty(difficultyId).id)
+  return DIFFICULTIES.slice(0, depth + 1).flatMap((d) => pack.tiers[d.id] ?? [])
 }
 
 /**

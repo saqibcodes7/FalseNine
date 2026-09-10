@@ -1,65 +1,147 @@
+/* Self-hosted type. Latin subset only, seven files, ~90kB of woff2. */
+@import '@fontsource/teko/latin-500.css';
+@import '@fontsource/teko/latin-600.css';
+@import '@fontsource/teko/latin-700.css';
+@import '@fontsource/saira/latin-400.css';
+@import '@fontsource/saira/latin-500.css';
+@import '@fontsource/saira/latin-600.css';
+@import '@fontsource/saira/latin-700.css';
+
 @import 'tailwindcss';
+@import './ui/materials.css';
 
-/*
-  False Nine brand tokens.
-  Everything visual keys off these — change a value here and it changes
-  everywhere, which is what keeps your design work from being scattered
-  across a hundred hardcoded hex codes.
-*/
+/* ============================================================================
+   False Nine design tokens
+
+   Every colour here was sampled from the four pieces of reference art, then
+   rebuilt in OKLCH so steps are perceptually even. Neutrals are tinted toward
+   the navy of the card backs (hue 250) rather than being flat grey, which is
+   what makes the HTML surfaces sit in the same world as the paintings.
+
+   Three materials come out of these tokens (see ui/materials.css):
+     metal   — bevelled frames and rims: gold, copper, silver, steel
+     enamel  — deep inset fills: ink, navy, red, malachite, lime
+     engrave — text cut into either of the above
+   ========================================================================== */
 @theme {
-  --color-pitch-950: #050706; /* page background */
-  --color-pitch-900: #0b0f0d; /* raised surface */
-  --color-pitch-800: #141a17; /* card */
-  --color-pitch-700: #1f2723; /* border / hairline */
-  --color-pitch-600: #2e3a34; /* stronger border */
+  /* ---- Surfaces: ink, tinted toward navy ---- */
+  --color-ink-0: oklch(13% 0.012 250); /* page ground */
+  --color-ink-1: oklch(17% 0.014 250); /* raised */
+  --color-ink-2: oklch(22% 0.016 250); /* dark enamel */
+  --color-ink-3: oklch(30% 0.018 250); /* hairline */
+  --color-ink-4: oklch(40% 0.02 250); /* strong hairline */
 
-  --color-chalk-100: #f2f5f3; /* primary text */
-  --color-chalk-400: #9aa8a1; /* secondary text */
-  --color-chalk-600: #5d6b64; /* muted / disabled text */
+  --color-navy: oklch(30% 0.09 262); /* the Coming Soon card's royal blue */
+  --color-navy-deep: oklch(22% 0.07 262);
 
-  --color-lime-400: #c6ff2e; /* brand, primary action */
-  --color-lime-300: #d7ff6b; /* brand hover */
-  --color-lime-600: #8fc400; /* brand pressed */
+  /* ---- Text: chalk, warm off-white, never pure ---- */
+  --color-chalk-0: oklch(95% 0.012 90);
+  --color-chalk-1: oklch(76% 0.018 90);
+  --color-chalk-2: oklch(58% 0.016 90);
 
-  --color-flag-500: #ff4d4d; /* errors, red card */
+  /* ---- Metals: highlight / base / shadow ---- */
+  --color-gold-hi: oklch(91% 0.1 92);
+  --color-gold: oklch(77% 0.12 86);
+  --color-gold-lo: oklch(47% 0.09 76);
 
-  --font-display: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  --color-copper-hi: oklch(83% 0.1 58);
+  --color-copper: oklch(65% 0.13 50);
+  --color-copper-lo: oklch(41% 0.09 45);
 
-  --radius-tile: 1.25rem;
+  --color-silver-hi: oklch(94% 0.005 250);
+  --color-silver: oklch(75% 0.008 250);
+  --color-silver-lo: oklch(45% 0.01 250);
+
+  --color-steel-hi: oklch(54% 0.012 250);
+  --color-steel: oklch(37% 0.012 250);
+  --color-steel-lo: oklch(21% 0.012 250);
+
+  /* ---- Enamels ---- */
+  --color-red: oklch(43% 0.16 25); /* the imposter's shirt */
+  --color-red-deep: oklch(33% 0.13 25);
+  --color-malachite: oklch(46% 0.1 172); /* tic-tac-toe stone */
+
+  /* ---- The whistle: logo lime, exactly as drawn (#befa0d) ---- */
+  --color-lime: oklch(90.5% 0.235 127);
+  --color-lime-deep: oklch(77% 0.21 127);
+  --color-on-lime: oklch(20% 0.04 130);
+
+  /* ---- Signals ---- */
+  --color-flag: oklch(66% 0.2 25); /* errors on dark ground */
+
+  /* ---- Foil: three hues from the imposter card's swirl, used sparingly ---- */
+  --color-foil-violet: oklch(60% 0.18 305);
+  --color-foil-teal: oklch(72% 0.12 200);
+  --color-foil-amber: oklch(76% 0.15 60);
+
+  /* ---- Type ---- */
+  --font-display: 'Teko', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-ui: 'Saira', 'Segoe UI', system-ui, sans-serif;
+
+  /* Fixed rem scale, ratio ≈ 1.33. App UI, not a marketing page. */
+  --text-meta: 0.75rem; /* chips, captions */
+  --text-small: 0.875rem;
+  --text-body: 1rem;
+  --text-lead: 1.125rem;
+  --text-title: 1.75rem; /* Teko: section and plate labels */
+  --text-headline: 2.5rem; /* Teko: screen titles, card names */
+  --text-display: 3.5rem; /* Teko: join codes, timers */
+
+  /* ---- Radii: deliberately not the same everywhere ---- */
+  --radius-card: 18px;
+  --radius-plate: 9px;
+  --radius-field: 6px;
+  --radius-chip: 4px;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-press: 110ms;
+  --dur-state: 240ms;
+  --dur-reveal: 640ms;
 }
 
 @layer base {
   html {
-    background-color: var(--color-pitch-950);
-    /* Stops iOS bumping font sizes on rotate. */
+    background-color: var(--color-ink-0);
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
-    background-color: var(--color-pitch-950);
-    color: var(--color-chalk-100);
-    font-family: var(--font-sans);
+    background-color: var(--color-ink-0);
+    color: var(--color-chalk-0);
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    /* Light type on dark reads lighter than it is; give it room. */
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    /* Respect notches and home indicators — this gets played on phones. */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right)
-      env(safe-area-inset-bottom) env(safe-area-inset-left);
+    font-kerning: normal;
   }
 
-  /* A single consistent focus ring, keyboard-only. */
-  :focus-visible {
-    outline: 2px solid var(--color-lime-400);
-    outline-offset: 2px;
-    border-radius: 0.35rem;
+  /* Display type defaults: tall engraved capitals, tight leading. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
-  /* Session codes and anything else that must be read out loud. */
   .tabular {
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.12em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+    border-radius: var(--radius-chip);
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-on-lime);
   }
 }
 

@@ -5,7 +5,11 @@
 -- deletes lobbies and pokes at the secret tables directly.
 --
 --   psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
+--   psql "$DATABASE_URL" -f supabase/migrations/0002_difficulty.sql
 --   psql "$DATABASE_URL" -f supabase/tests/0001_smoke.sql
+--
+-- Runs against the full migration set: 0002 changed the two settings RPCs to
+-- take a difficulty, so the calls below pass one.
 --
 -- Every check prints PASS or FAIL. Scan for FAIL.
 -- ============================================================================
@@ -14,7 +18,7 @@
 
 \echo '=== 1. create_session as anon ==='
 set role anon;
-select * from create_session('Saqib', 'premier_league', 1, true, 180, 60) \gset host_
+select * from create_session('Saqib', 'premier_league', 'casual', 1, true, 180, 60) \gset host_
 \echo 'session code:' :'host_code'
 reset role;
 
@@ -94,9 +98,9 @@ select id from players where is_host \gset h_
 
 \echo '=== 11. host can change settings ==='
 set role anon;
-select update_session_settings(:'s_id', :'h_id', 'world_cup', 2, false, 240, 45);
+select update_session_settings(:'s_id', :'h_id', 'world_cup', 'ball_aware', 2, false, 240, 45);
 reset role;
-select player_pack, num_imposters, ai_hints_enabled, discussion_seconds, voting_seconds from sessions;
+select player_pack, difficulty, num_imposters, ai_hints_enabled, discussion_seconds, voting_seconds from sessions;
 
 \echo '=== 12. a non-host cannot change settings ==='
 set role anon;
@@ -104,7 +108,7 @@ do $$ begin
   perform update_session_settings(
     (select id from sessions limit 1),
     (select id from players where display_name = 'Amir'),
-    'premier_league', 1, true, 300, 90);
+    'premier_league', 'casual', 1, true, 300, 90);
   raise notice 'FAIL: non-host changed settings';
 exception when insufficient_privilege then raise notice 'PASS: %', sqlerrm;
 end $$;
@@ -112,7 +116,7 @@ end $$;
 \echo '=== 13. out-of-range timers rejected ==='
 do $$ begin
   perform update_session_settings((select id from sessions limit 1), (select id from players where is_host),
-    'world_cup', 2, false, 30, 45);
+    'world_cup', 'ball_aware', 2, false, 30, 45);
   raise notice 'FAIL: 30s discussion accepted';
 exception when check_violation then raise notice 'PASS: discussion_seconds range enforced';
 end $$;

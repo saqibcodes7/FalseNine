@@ -1,6 +1,6 @@
 /**
- * The mini-game tiles on the landing page. Flip `status` to 'live' and give the
- * tile a `path` when a game is ready to ship.
+ * The cards in the binder. `art` names a file in /public/assets/art (webp +
+ * png). Flip `status` to 'live' and give the card a `path` when a game ships.
  */
 export const GAMES = [
   {
@@ -10,16 +10,16 @@ export const GAMES = [
     players: '3 to 12 players',
     status: 'live',
     path: '/imposter',
-    accent: 'lime',
+    art: 'imposter',
   },
   {
     id: 'tic-tac-toe',
     name: 'Football Tic-Tac-Toe',
-    tagline: 'Name a player who played for both clubs. Three in a row wins.',
+    tagline: 'Name a player who fits both. Three in a row wins.',
     players: '2 players',
     status: 'soon',
     path: null,
-    accent: 'slate',
+    art: 'tictactoe',
   },
   {
     id: 'heads-up',
@@ -28,6 +28,6 @@ export const GAMES = [
     players: '2 to 8 players',
     status: 'soon',
     path: null,
-    accent: 'slate',
+    art: 'coming-soon',
   },
 ]

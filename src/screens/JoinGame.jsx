@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import Screen from '../components/Screen'
-import Button from '../components/Button'
-import Field from '../components/Field'
+import Screen from '../ui/Screen'
+import Button from '../ui/Button'
+import Field, { Alert } from '../ui/Field'
+import Panel from '../ui/Panel'
 import { supabase, readableError, isSupabaseConfigured } from '../lib/supabase'
 import { saveIdentity } from '../lib/identity'
 
@@ -70,52 +71,50 @@ export default function JoinGame() {
       title="Join game"
       subtitle="Ask the host for the code on their screen."
     >
-      <form onSubmit={handleSubmit} noValidate className="space-y-5">
-        <Field
-          label="Join code"
-          placeholder="ABC12"
-          value={code}
-          // Uppercase as they type; the server is case-insensitive either way,
-          // but seeing it match the host's screen removes the doubt.
-          onChange={(e) => {
-            setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))
-            if (error) setError(null)
-          }}
-          inputClassName="tabular text-center text-2xl font-bold uppercase"
-          maxLength={5}
-          autoFocus={!code}
-          autoCapitalize="characters"
-          autoCorrect="off"
-          spellCheck={false}
-          inputMode="text"
-          enterKeyHint="next"
-        />
+      <form onSubmit={handleSubmit} noValidate>
+        <Panel title="Your seat" bodyClassName="space-y-5">
+          <Field
+            label="Join code"
+            placeholder="ABC12"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))
+              if (error) setError(null)
+            }}
+            // The code reads like the scoreboard on the host's screen.
+            variant="code"
+            maxLength={5}
+            autoFocus={!code}
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
+            inputMode="text"
+            enterKeyHint="next"
+          />
 
-        <Field
-          label="Your display name"
-          placeholder="e.g. Saqib"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value)
-            if (error) setError(null)
-          }}
-          hint="20 characters max. Has to be different from everyone else in the lobby."
-          maxLength={20}
-          autoFocus={Boolean(code)}
-          autoComplete="nickname"
-          enterKeyHint="go"
-        />
+          <Field
+            label="Your display name"
+            placeholder="e.g. Saqib"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (error) setError(null)
+            }}
+            hint="20 characters max. Has to be different from everyone else in the lobby."
+            maxLength={20}
+            autoFocus={Boolean(code)}
+            autoComplete="nickname"
+            enterKeyHint="go"
+          />
 
-        {error && (
-          <p role="alert" className="text-sm text-flag-500">
-            {error}
-          </p>
-        )}
+          {error && <Alert>{error}</Alert>}
+        </Panel>
 
         <Button
           type="submit"
           size="lg"
           fullWidth
+          className="mt-6"
           disabled={busy || code.length !== 5 || !name.trim()}
         >
           {busy ? 'Joining…' : 'Join game'}

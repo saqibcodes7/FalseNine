@@ -17,3 +17,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 e2e-shots/
+
+# Claude Code local permissions, per machine
+.claude/settings.local.json

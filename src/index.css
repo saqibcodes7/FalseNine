@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+
+/*
+  False Nine brand tokens.
+  Everything visual keys off these — change a value here and it changes
+  everywhere, which is what keeps your design work from being scattered
+  across a hundred hardcoded hex codes.
+*/
+@theme {
+  --color-pitch-950: #050706; /* page background */
+  --color-pitch-900: #0b0f0d; /* raised surface */
+  --color-pitch-800: #141a17; /* card */
+  --color-pitch-700: #1f2723; /* border / hairline */
+  --color-pitch-600: #2e3a34; /* stronger border */
+
+  --color-chalk-100: #f2f5f3; /* primary text */
+  --color-chalk-400: #9aa8a1; /* secondary text */
+  --color-chalk-600: #5d6b64; /* muted / disabled text */
+
+  --color-lime-400: #c6ff2e; /* brand, primary action */
+  --color-lime-300: #d7ff6b; /* brand hover */
+  --color-lime-600: #8fc400; /* brand pressed */
+
+  --color-flag-500: #ff4d4d; /* errors, red card */
+
+  --font-display: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+
+  --radius-tile: 1.25rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-pitch-950);
+    /* Stops iOS bumping font sizes on rotate. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--color-pitch-950);
+    color: var(--color-chalk-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* Respect notches and home indicators — this gets played on phones. */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* A single consistent focus ring, keyboard-only. */
+  :focus-visible {
+    outline: 2px solid var(--color-lime-400);
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  /* Session codes and anything else that must be read out loud. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

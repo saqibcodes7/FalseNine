@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+.vercel
+
+# Local env files — never commit real keys
+.env
+.env.local
+.env.*.local
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+e2e-shots/

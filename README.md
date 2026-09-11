@@ -27,8 +27,9 @@ You have to do this bit yourself, it needs your login.
 3. Paste in the whole of `supabase/migrations/0001_init.sql` and run it.
    It creates the tables, turns on Realtime, locks down Row Level Security and
    adds the `create_session` / `join_session` functions.
-   Then do the same with `supabase/migrations/0002_difficulty.sql` in a second
-   query. Migrations run in number order, each one exactly once.
+   Then do the same with `supabase/migrations/0002_difficulty.sql` and
+   `supabase/migrations/0003_round_engine.sql`, one query each, in that order.
+   Migrations run in number order, each one exactly once.
 4. Go to **Project Settings → API** and copy the **Project URL** and the
    **anon public** key.
 
@@ -63,14 +64,19 @@ than failing silently.
 ```
 src/
   screens/       one file per screen, routed in App.jsx
+    Lobby.jsx      host setup and the waiting room; hands over to Game.jsx at kick-off
+    Game.jsx       picks the phase screen from sessions.status
+    game/          one file per phase: Peek, Discussion, Voting, Reveal, Salvage, Ended
   ui/            the design system — every primitive the screens are built from
     materials.css  metal frames, enamel plates, engraving, backdrop, foil, flip
     brand/         logo.svg (full lock-up) and mark.svg (the 9), traced from logo.png
   hooks/
-    useLobby.js  live session + player list over Realtime, with a poll fallback
+    useLobby.js    live session, players, rounds and votes over Realtime, with a poll fallback
+    useCountdown.js counts down to the server's deadline and nudges tick()
   lib/
     supabase.js  the client, plus the column lists the browser may read
     identity.js  which player this browser is, per lobby, in localStorage
+    game.js      pure helpers that read the game state: tallies, who is left, what is next
   data/
     packs.js     the three player packs, each in three tiers (see below)
     games.js     the cards in the binder
@@ -78,10 +84,11 @@ public/assets/
   card-back-*.png, logo.png   your source paintings (not loaded by the app)
   art/                        sliced art layers the GameCard renders
 supabase/
-  migrations/    the schema. 0001 is steps 1-3, 0002 adds the difficulty
-  tests/         psql smoke tests for the migration
+  migrations/    the schema. 0001 is steps 1-3, 0002 the difficulty, 0003 the round engine
+  tests/         psql smoke tests, one per migration
 scripts/
   e2e-lobby.mjs      browser test of the whole create/join/lobby flow
+  e2e-game.mjs       plays two whole games in four phone-sized browsers
   mock-postgrest.mjs offline stand-in for Supabase's REST layer
   slice-art.py       cuts the paintings into art layers (re-run after a re-export)
 ```
@@ -162,13 +169,17 @@ the browser cannot invent its own rows.
 ```bash
 psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
 psql "$DATABASE_URL" -f supabase/migrations/0002_difficulty.sql
+psql "$DATABASE_URL" -f supabase/migrations/0003_round_engine.sql
 psql "$DATABASE_URL" -f supabase/tests/0001_smoke.sql
 psql "$DATABASE_URL" -f supabase/tests/0002_smoke.sql
+psql "$DATABASE_URL" -f supabase/tests/0003_smoke.sql
 ```
 
-17 checks in the first file, 7 in the second. They confirm the join flow works
-and, more importantly, that the anon role genuinely cannot read the secret
-tables or write to anything directly.
+17, 7 and 46 checks. The first two confirm the join flow works and, more
+importantly, that the anon role genuinely cannot read the secret tables or
+write to anything directly. The third plays three games through the RPCs:
+ties, majority skips, timer expiry, elimination, the salvage guess with close
+spellings, the parity win, and that nothing secret leaks on the way.
 
 **The lobby flow.** With the dev server running:
 
@@ -180,8 +191,20 @@ Needs Playwright's browser once: `npx playwright install chromium`.
 
 22 checks across four browser contexts at phone size: the ratio guard, the
 duplicate-name refusal, an invite link prefilling the code, host settings and
-the chosen difficulty reaching the other players, and the dead-end screens. Screenshots land in
-`e2e-shots/`. It creates real lobbies, so point it at a dev project.
+the chosen difficulty reaching the other players, and the dead-end screens.
+Screenshots land in `e2e-shots/`. It creates real lobbies, so point it at a dev
+project.
+
+**Whole games.** Also with the dev server running:
+
+```bash
+npm run test:game
+```
+
+22 checks. Four phones play a game with a tied vote, a found imposter and a
+failed salvage guess; then three phones play one where the imposter steals it
+with a surname. With `PGHOST` set it also winds the discussion clock down in
+the database to prove the deadline moves every phone on.
 
 ---
 
@@ -199,26 +222,61 @@ prefix, so it stays server-side.
 
 ---
 
+## How a game runs
+
+Everything after Start game is a `sessions.status` that every phone follows
+over Realtime, and every transition is a database function (migration 0003).
+The browser never writes a row itself.
+
+```
+waiting → peeking → discussion → voting → reveal ─┬→ discussion
+                       ▲            └─ skip / tie ─┘  ├→ salvage → ended
+                       └────────────────────────────  └→ ended
+```
+
+- **Start.** The host's phone sends the names for the chosen pack and mode;
+  the server picks one and deals the roles. Not even the host's phone knows
+  which name was picked.
+- **Peek.** Tap the card. The first tap fetches your role (`get_my_card`, the
+  only route a role ever takes out of the database) and counts you as having
+  looked. When the last active player has looked the discussion starts by
+  itself; the host can start it early.
+- **Discussion.** A server deadline on `rounds.ends_at`; every phone counts
+  down to the same instant and nudges `tick()` at zero, which checks its own
+  clock before doing anything. Everyone pressing Vote now opens the vote early.
+- **Vote.** One vote each, for another active player or a skip. The vote
+  closes as soon as the result cannot change: everyone has voted, skips have a
+  strict majority, or one player has a strict majority. A skip majority or a
+  tie goes straight back to discussion with nobody out.
+- **Reveal.** Who went out and what they were, in the brief's wording for an
+  imposter. The breakdown of the vote is public here whatever the host chose.
+  The host taps Continue.
+- **Salvage.** If that was the last imposter, they get one typed guess. Lower
+  case, no accents, one edit for short names and two for long, and a bare
+  surname counts. Compared on the server, so the name never travels to the
+  imposter's phone.
+- **Full time.** Winner, how, the footballer, and every role on the sheet.
+
+Three things the brief left open, settled with Saqib:
+
+- **Live votes are the host's call.** Off (default) shows "4 of 6 have voted"
+  until the reveal; on shows who picked whom as it happens.
+- **Imposters win at parity.** The moment they are no longer outnumbered the
+  game ends, the same rule the setup screen enforces. Without it a 1 v 1 ties
+  forever.
+- **The host carries on from a reveal**, even if they were the one voted out.
+
+Still as before: nobody can join once the game has started, a refresh keeps
+your seat (it is in localStorage), leaving mid-game marks you out, and the
+lobby caps at 12.
+
 ## What is next
 
 | Step | |
 |---|---|
-| 4 | Round engine: peeking → discussion → voting → reveal, one round |
-| 5 | Multi-round looping and imposter elimination tracking |
-| 6 | Salvage guess for the last imposter voted out |
-| 7 | AI hints via a serverless function |
+| 7 | AI hints via a serverless function (`ai_hints_enabled` and `player_secrets.hint_text` are already in place) |
 | 8 | Card component with your artwork, responsive pass |
 | 9 | Deploy and test across real devices |
-
-A few things step 4 will need a decision on:
-
-- **Votes are readable live.** Any client can watch votes land in real time
-  rather than seeing them all at the tally. If you want the simultaneous-reveal
-  moment, that becomes a function returning counts only.
-- **Nobody can rejoin a game in progress.** `join_session` refuses once the
-  status leaves `waiting`. If someone's phone dies mid-game they are out, unless
-  we add a rejoin path keyed on their stored player id.
-- **The lobby caps at 12.** Arbitrary, easy to change in `join_session`.
 
 ## Packs and difficulty
 

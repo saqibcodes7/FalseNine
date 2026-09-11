@@ -11,6 +11,7 @@ import { Alert } from '../ui/Field'
 import JoinCodeDisplay from '../ui/JoinCodeDisplay'
 import PlayerRoster from '../ui/PlayerRoster'
 import { useLobby } from '../hooks/useLobby'
+import Game from './Game'
 import { supabase, readableError } from '../lib/supabase'
 import { loadIdentity, clearIdentity } from '../lib/identity'
 import { PACKS, DIFFICULTIES, getPack, getDifficulty, playersFor } from '../data/packs'
@@ -33,7 +34,7 @@ export default function Lobby() {
   const upperCode = (code || '').toUpperCase()
 
   const identity = useMemo(() => loadIdentity(upperCode), [upperCode])
-  const { session, players, status, live } = useLobby(upperCode)
+  const { session, players, rounds, votes, status, live, clockOffset } = useLobby(upperCode)
 
   const isHost = Boolean(
     identity && session && session.host_player_id === identity.playerId,
@@ -44,7 +45,8 @@ export default function Lobby() {
   // realtime echo overwrite the draft would just fight the person typing.
   const [draft, setDraft] = useState(null)
   const [saveError, setSaveError] = useState(null)
-  const [startNotice, setStartNotice] = useState(false)
+  const [startError, setStartError] = useState(null)
+  const [starting, setStarting] = useState(false)
   const seeded = useRef(false)
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function Lobby() {
       difficulty: session.difficulty,
       num_imposters: session.num_imposters,
       ai_hints_enabled: session.ai_hints_enabled,
+      votes_visible: session.votes_visible,
       discussion_seconds: session.discussion_seconds,
       voting_seconds: session.voting_seconds,
     })
@@ -62,7 +65,7 @@ export default function Lobby() {
 
   // Push settings after the host stops fiddling, rather than on every tap.
   useEffect(() => {
-    if (!isHost || !draft || !session || !identity) return undefined
+    if (!isHost || !draft || !session || !identity || session.status !== 'waiting') return undefined
 
     const timer = setTimeout(async () => {
       const { error } = await supabase.rpc('update_session_settings', {
@@ -72,6 +75,7 @@ export default function Lobby() {
         p_difficulty: draft.difficulty,
         p_num_imposters: draft.num_imposters,
         p_ai_hints_enabled: draft.ai_hints_enabled,
+        p_votes_visible: draft.votes_visible,
         p_discussion_seconds: draft.discussion_seconds,
         p_voting_seconds: draft.voting_seconds,
       })
@@ -79,9 +83,20 @@ export default function Lobby() {
     }, 400)
 
     return () => clearTimeout(timer)
-  }, [draft, isHost, session?.id, identity?.playerId])
+  }, [draft, isHost, session?.id, session?.status, identity?.playerId])
 
-  const gameStarted = session && session.status !== 'waiting'
+  async function startGame() {
+    if (!draft || starting) return
+    setStarting(true)
+    setStartError(null)
+    const { error } = await supabase.rpc('start_game', {
+      p_session_id: session.id,
+      p_player_id: identity.playerId,
+      p_candidates: playersFor(draft.player_pack, draft.difficulty),
+    })
+    setStarting(false)
+    if (error) setStartError(readableError(error, 'Could not start the game.'))
+  }
 
   async function leave() {
     if (session && identity) {
@@ -152,6 +167,22 @@ export default function Lobby() {
     )
   }
 
+  // ---- The game itself, once the host has started it ---------------------
+
+  if (session.status !== 'waiting') {
+    return (
+      <Game
+        session={session}
+        players={players}
+        rounds={rounds}
+        votes={votes}
+        identity={identity}
+        live={live}
+        clockOffset={clockOffset}
+      />
+    )
+  }
+
   // ---- Shared state ------------------------------------------------------
 
   const imposters = draft?.num_imposters ?? session.num_imposters
@@ -170,11 +201,7 @@ export default function Lobby() {
       <Screen
         status={<LiveChip live={live} />}
         title="You're in"
-        subtitle={
-          gameStarted
-            ? 'The host has started the game.'
-            : 'Waiting for the host to kick off.'
-        }
+        subtitle="Waiting for the host to kick off."
       >
         <Panel title="Match settings" className="mb-6">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
@@ -185,6 +212,7 @@ export default function Lobby() {
               ['Discussion', formatSeconds(session.discussion_seconds)],
               ['Voting', formatSeconds(session.voting_seconds)],
               ['AI hints', session.ai_hints_enabled ? 'On' : 'Off'],
+              ['Live votes', session.votes_visible ? 'Shown' : 'Hidden'],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="display text-[0.95rem] tracking-[0.18em] text-chalk-2 engraved">
@@ -324,6 +352,13 @@ export default function Lobby() {
             checked={draft?.ai_hints_enabled ?? false}
             onChange={(v) => set({ ai_hints_enabled: v })}
           />
+
+          <Toggle
+            label="Show votes as they land"
+            description="On: everyone watches who voted for whom during the vote. Off: only the count shows until the reveal."
+            checked={draft?.votes_visible ?? false}
+            onChange={(v) => set({ votes_visible: v })}
+          />
         </Panel>
 
         <PlayerRoster players={players} youId={identity.playerId} minPlayers={MIN_PLAYERS} />
@@ -338,8 +373,8 @@ export default function Lobby() {
       >
         <div className="hairline metal-steel mb-3" aria-hidden="true" />
 
-        <Button size="lg" fullWidth disabled={!canStart} onClick={() => setStartNotice(true)}>
-          Start game
+        <Button size="lg" fullWidth disabled={!canStart || starting} onClick={startGame}>
+          {starting ? 'Dealing…' : 'Start game'}
         </Button>
 
         <p className="mt-2.5 text-center text-small text-chalk-1">
@@ -352,11 +387,7 @@ export default function Lobby() {
               : `Ready with ${players.length} players.`}
         </p>
 
-        {startNotice && (
-          <p role="status" className="mt-2 text-center text-small font-medium text-lime">
-            Lobby is good to go. The round engine lands in the next step.
-          </p>
-        )}
+        {startError && <Alert>{startError}</Alert>}
 
         <button
           type="button"

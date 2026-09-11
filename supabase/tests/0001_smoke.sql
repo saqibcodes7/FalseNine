@@ -6,10 +6,11 @@
 --
 --   psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
 --   psql "$DATABASE_URL" -f supabase/migrations/0002_difficulty.sql
+--   psql "$DATABASE_URL" -f supabase/migrations/0003_round_engine.sql
 --   psql "$DATABASE_URL" -f supabase/tests/0001_smoke.sql
 --
--- Runs against the full migration set: 0002 changed the two settings RPCs to
--- take a difficulty, so the calls below pass one.
+-- Runs against the full migration set. The settings RPCs have grown a
+-- parameter per migration, so the calls below use named arguments.
 --
 -- Every check prints PASS or FAIL. Scan for FAIL.
 -- ============================================================================
@@ -18,7 +19,8 @@
 
 \echo '=== 1. create_session as anon ==='
 set role anon;
-select * from create_session('Saqib', 'premier_league', 'casual', 1, true, 180, 60) \gset host_
+select * from create_session(p_display_name => 'Saqib', p_player_pack => 'premier_league', p_difficulty => 'casual',
+  p_num_imposters => 1, p_ai_hints_enabled => true, p_discussion_seconds => 180, p_voting_seconds => 60) \gset host_
 \echo 'session code:' :'host_code'
 reset role;
 
@@ -98,7 +100,9 @@ select id from players where is_host \gset h_
 
 \echo '=== 11. host can change settings ==='
 set role anon;
-select update_session_settings(:'s_id', :'h_id', 'world_cup', 'ball_aware', 2, false, 240, 45);
+select update_session_settings(p_session_id => :'s_id', p_player_id => :'h_id', p_player_pack => 'world_cup',
+  p_difficulty => 'ball_aware', p_num_imposters => 2, p_ai_hints_enabled => false, p_votes_visible => null,
+  p_discussion_seconds => 240, p_voting_seconds => 45);
 reset role;
 select player_pack, difficulty, num_imposters, ai_hints_enabled, discussion_seconds, voting_seconds from sessions;
 
@@ -106,17 +110,20 @@ select player_pack, difficulty, num_imposters, ai_hints_enabled, discussion_seco
 set role anon;
 do $$ begin
   perform update_session_settings(
-    (select id from sessions limit 1),
-    (select id from players where display_name = 'Amir'),
-    'premier_league', 'casual', 1, true, 300, 90);
+    p_session_id => (select id from sessions limit 1),
+    p_player_id => (select id from players where display_name = 'Amir'),
+    p_player_pack => 'premier_league', p_difficulty => 'casual', p_num_imposters => 1,
+    p_ai_hints_enabled => true, p_votes_visible => null, p_discussion_seconds => 300, p_voting_seconds => 90);
   raise notice 'FAIL: non-host changed settings';
 exception when insufficient_privilege then raise notice 'PASS: %', sqlerrm;
 end $$;
 
 \echo '=== 13. out-of-range timers rejected ==='
 do $$ begin
-  perform update_session_settings((select id from sessions limit 1), (select id from players where is_host),
-    'world_cup', 'ball_aware', 2, false, 30, 45);
+  perform update_session_settings(
+    p_session_id => (select id from sessions limit 1), p_player_id => (select id from players where is_host),
+    p_player_pack => 'world_cup', p_difficulty => 'ball_aware', p_num_imposters => 2,
+    p_ai_hints_enabled => false, p_votes_visible => null, p_discussion_seconds => 30, p_voting_seconds => 45);
   raise notice 'FAIL: 30s discussion accepted';
 exception when check_violation then raise notice 'PASS: discussion_seconds range enforced';
 end $$;

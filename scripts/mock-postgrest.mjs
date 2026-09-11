@@ -54,12 +54,12 @@ async function handleRpc(name, body, res) {
 
   try {
     const { rows } = await pool.query(`select * from public.${name}(${named})`, args)
-    // Supabase returns a table-returning function as an array of rows, and a
-    // void function as null. Mirror that so the client code sees what it will
-    // see in production.
-    if (rows.length === 1 && Object.keys(rows[0]).length === 1) {
-      const only = Object.values(rows[0])[0]
-      if (only === null) return send(res, 200, null)
+    // PostgREST returns a table-returning function as an array of rows, and a
+    // scalar or void function as the bare value (null for void). Postgres
+    // names a scalar result after the function, which is how we tell the two
+    // apart here. Mirror it so the client sees what it will see in production.
+    if (rows.length === 1 && Object.keys(rows[0]).length === 1 && name in rows[0]) {
+      return send(res, 200, rows[0][name])
     }
     return send(res, 200, rows)
   } catch (err) {

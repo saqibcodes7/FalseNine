@@ -54,8 +54,15 @@ export function readableError(error, fallback = 'Something went wrong.') {
 
 /** Every column the browser is allowed to read from `sessions`. */
 export const SESSION_COLUMNS =
-  'id, code, host_player_id, player_pack, difficulty, num_imposters, ai_hints_enabled, discussion_seconds, voting_seconds, status, current_round, created_at, started_at'
+  'id, code, host_player_id, player_pack, difficulty, num_imposters, ai_hints_enabled, votes_visible, discussion_seconds, voting_seconds, status, current_round, created_at, started_at, winner, salvage_player_id, salvage_guess, salvage_correct, revealed_target, ended_at'
 
 /** Every column the browser is allowed to read from `players`. */
 export const PLAYER_COLUMNS =
-  'id, session_id, display_name, is_host, is_active, has_peeked, joined_at'
+  'id, session_id, display_name, is_host, is_active, has_peeked, vote_ready, revealed_role, eliminated_in_round, joined_at'
+
+/** One row per phase per round. `ends_at` is the server's deadline for timed phases. */
+export const ROUND_COLUMNS =
+  'id, session_id, round_number, phase, started_at, ends_at, result, eliminated_player_id'
+
+/** Votes are readable; whether the UI shows them before the tally is the host's call. */
+export const VOTE_COLUMNS = 'id, round_id, session_id, voter_id, voted_for_id, is_skip, created_at'

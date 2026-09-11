@@ -10,6 +10,7 @@ import Segmented from '../ui/Segmented'
 import Logo from '../ui/Logo'
 import JoinCodeDisplay from '../ui/JoinCodeDisplay'
 import PlayerRoster from '../ui/PlayerRoster'
+import VoteSheet from '../ui/VoteSheet'
 import GameCard from '../ui/GameCard'
 import TimerDisplay from '../ui/TimerDisplay'
 import RoleCard from '../ui/RoleCard'
@@ -51,9 +52,9 @@ const SWATCHES = [
 ]
 
 const ROSTER = [
-  { id: 'a', display_name: 'Saqib', is_host: true },
-  { id: 'b', display_name: 'Amir', is_host: false },
-  { id: 'c', display_name: 'Priya', is_host: false },
+  { id: 'a', display_name: 'Saqib', is_host: true, is_active: true },
+  { id: 'b', display_name: 'Amir', is_host: false, is_active: true },
+  { id: 'c', display_name: 'Priya', is_host: false, is_active: true },
 ]
 
 export default function Kit() {
@@ -211,6 +212,22 @@ export default function Kit() {
         <div className="grid gap-6 md:grid-cols-2">
           <JoinCodeDisplay code="KADU6" />
           <PlayerRoster players={ROSTER} youId="b" minPlayers={4} />
+        </div>
+      </Section>
+
+      <Section title="The vote">
+        <div className="grid gap-6 md:grid-cols-2">
+          <VoteSheet candidates={ROSTER} youId="b" onCast={() => {}} onSkip={() => {}} />
+          <PlayerRoster
+            players={[
+              ...ROSTER.slice(0, 2),
+              { ...ROSTER[2], is_active: false, revealed_role: 'imposter' },
+            ]}
+            youId="b"
+            minPlayers={0}
+            title="The table"
+            marks={(p) => (p.id === 'a' ? [{ tone: 'lime', text: 'Voted' }] : [])}
+          />
         </div>
       </Section>
 

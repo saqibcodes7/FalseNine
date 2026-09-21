@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 /*
- * The join code as a five-cell scoreboard: a gold frame, black enamel, one
- * lime Teko character per cell. Sized to be read across a pub table.
+ * The join code, set as five cells so it can be read out across a table and
+ * typed in without ambiguity. Tabular figures, gold, one recess per letter.
  */
 export default function JoinCodeDisplay({ code }) {
   const [copied, setCopied] = useState(false)
@@ -20,40 +20,36 @@ export default function JoinCodeDisplay({ code }) {
   }
 
   return (
-    <div className="frame metal-gold" style={{ '--fw': '4px' }}>
-      <div className="frame-inner enamel-ink-deep px-4 pt-3 pb-4 text-center">
-        <p className="display text-[1.05rem] tracking-[0.22em] text-gold engraved">
-          Join code
-        </p>
+    <div className="surface accent-gold p-4 text-center" style={{ '--tint': '7%' }}>
+      <p className="eyebrow">Join code</p>
 
-        <p
-          className="tabular mt-2 grid grid-cols-5 gap-1.5"
-          data-testid="join-code"
-          data-code={code}
-          aria-label={`Join code ${chars.join(' ')}`}
-        >
-          {chars.map((ch, i) => (
-            <span
-              key={i}
-              className="display flex h-[3.6rem] items-center justify-center rounded-[5px] bg-ink-0 pt-[0.2em] text-[3rem] leading-none text-lime shadow-[inset_0_2px_6px_oklch(0%_0_0/.7),inset_0_0_0_1px_oklch(30%_.018_250)]"
-            >
-              {ch}
-            </span>
-          ))}
-        </p>
+      <p
+        className="tabular mt-3 grid grid-cols-5 gap-1.5"
+        data-testid="join-code"
+        data-code={code}
+        aria-label={`Join code ${chars.join(' ')}`}
+      >
+        {chars.map((ch, i) => (
+          <span
+            key={i}
+            className="surface-sunken flex h-[3.4rem] items-center justify-center text-[1.9rem] font-bold text-gold"
+          >
+            {ch}
+          </span>
+        ))}
+      </p>
 
-        <p className="mt-3 text-small text-chalk-1">
-          Others enter this on the Join Game screen.
-        </p>
+      <p className="mt-3 text-footnote text-text-3">
+        Others enter this on the Join Game screen.
+      </p>
 
-        <button
-          type="button"
-          onClick={copy}
-          className="display mt-2 text-[1.1rem] tracking-[0.1em] text-gold engraved underline decoration-gold-lo underline-offset-[5px] transition-colors hover:text-gold-hi"
-        >
-          {copied ? 'Link copied' : 'Copy invite link'}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={copy}
+        className="pressable mt-1.5 inline-flex h-11 items-center px-3 text-subhead font-semibold text-gold transition-colors hover:text-gold-soft"
+      >
+        {copied ? 'Link copied' : 'Copy invite link'}
+      </button>
     </div>
   )
 }

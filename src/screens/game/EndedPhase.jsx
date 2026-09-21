@@ -49,9 +49,9 @@ export default function EndedPhase({ session, players, me, isHost, status }) {
           title="Who was who"
           marks={(p) =>
             p.revealed_role === 'imposter'
-              ? [{ tone: 'red', text: 'Imposter' }]
+              ? [{ tone: 'flag', text: 'Imposter' }]
               : p.revealed_role === 'civilian'
-                ? [{ tone: 'silver', text: 'Civilian' }]
+                ? [{ tone: 'neutral', text: 'Civilian' }]
                 : []
           }
         />

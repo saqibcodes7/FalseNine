@@ -89,7 +89,7 @@ export default function Game({ session, players, rounds, votes, identity, live, 
 
   const status = (
     <span className="flex items-center gap-2">
-      {!live && <Chip tone="steel">Reconnecting</Chip>}
+      {!live && <Chip tone="neutral">Reconnecting</Chip>}
       <Chip tone="gold" data-testid="phase">
         {session.status === 'ended' || session.status === 'salvage'
           ? PHASE_LABEL[session.status]
@@ -110,7 +110,7 @@ export default function Game({ session, players, rounds, votes, identity, live, 
   if (!phase || !me) {
     return (
       <Screen status={status} title="One moment">
-        <p className="text-body text-chalk-1">Catching up with the table…</p>
+        <p className="text-body text-text-2">Catching up with the table…</p>
       </Screen>
     )
   }

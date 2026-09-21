@@ -1,8 +1,9 @@
 import { Alert } from './Field'
 
 /*
- * A numeric control built like a scoreboard: two steel keys either side of an
- * enamel readout with Teko digits. `format` turns raw seconds into "3:00".
+ * A number you change with your thumb: the label and its hint on one line,
+ * then a recessed readout flanked by two round keys. The value is tabular so
+ * it never shifts as it counts.
  */
 export default function Stepper({
   label,
@@ -20,71 +21,49 @@ export default function Stepper({
   const atMin = value <= min
   const atMax = value >= max
 
-  const key = (extra) =>
+  const key = (off) =>
     [
-      'frame frame-sm metal-steel block h-12 w-12 shrink-0 select-none touch-manipulation',
-      'transition-[filter] duration-150 hover:brightness-110',
+      'pill pressable fill-soft grid h-12 w-12 shrink-0 place-items-center',
+      'text-title2 font-medium text-text',
+      off ? 'opacity-40' : '',
       'disabled:pointer-events-none',
-      extra,
     ].join(' ')
 
   return (
-    <div>
+    <div className={disabled ? 'opacity-50' : ''}>
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <span className="display text-[1.15rem] tracking-[0.12em] text-gold engraved">
-          {label}
-        </span>
-        {hint && <span className="text-meta font-medium text-chalk-2">{hint}</span>}
+        <span className="text-footnote font-semibold text-text-2">{label}</span>
+        {hint && <span className="text-caption text-text-3">{hint}</span>}
       </div>
 
-      <div className="flex items-stretch gap-2">
+      <div className="flex items-center gap-2">
         <button
           type="button"
-          className={key(disabled || atMin ? 'opacity-100' : '')}
+          className={key(disabled || atMin)}
           onClick={() => onChange(clamp(value - step))}
           disabled={disabled || atMin}
           aria-label={`Decrease ${label}`}
-          style={{ '--fr': '8px', '--fw': '2px' }}
         >
-          <span
-            className={`frame-inner plate plate-pressable display grid h-full place-items-center text-[1.75rem] leading-none ${
-              disabled || atMin ? 'enamel-ink-deep text-chalk-2!' : 'enamel-ink engraved'
-            }`}
-            style={{ paddingTop: '0.1em' }}
-            aria-hidden="true"
-          >
+          <span aria-hidden="true" className="-mt-px">
             &minus;
           </span>
         </button>
 
         <output
-          className="frame frame-sm metal-steel block min-w-0 flex-1"
-          style={{ '--fr': '8px', '--fw': '2px' }}
+          className="surface-sunken tabular grid h-12 min-w-0 flex-1 place-items-center text-title2 font-semibold text-text"
           aria-live="polite"
         >
-          <span
-            className="frame-inner plate enamel-ink-deep display tabular block h-12 text-center text-[2.1rem] leading-none tracking-[0.06em] text-lime"
-            style={{ paddingTop: '0.32em' }}
-          >
-            {format(value)}
-          </span>
+          {format(value)}
         </output>
 
         <button
           type="button"
-          className={key('')}
+          className={key(disabled || atMax)}
           onClick={() => onChange(clamp(value + step))}
           disabled={disabled || atMax}
           aria-label={`Increase ${label}`}
-          style={{ '--fr': '8px', '--fw': '2px' }}
         >
-          <span
-            className={`frame-inner plate plate-pressable display grid h-full place-items-center text-[1.75rem] leading-none ${
-              disabled || atMax ? 'enamel-ink-deep text-chalk-2!' : 'enamel-ink engraved'
-            }`}
-            style={{ paddingTop: '0.1em' }}
-            aria-hidden="true"
-          >
+          <span aria-hidden="true" className="-mt-px">
             +
           </span>
         </button>

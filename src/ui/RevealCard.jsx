@@ -1,20 +1,17 @@
 import Chip from './Chip'
 
 /*
- * The result of a vote, or of the whole game, landing on the table.
- *
- *   tone 'civilian'  the person voted out was a civilian (black enamel)
- *   tone 'imposter'  they were an imposter (red enamel)
- *   tone 'win'       civilians win (lime enamel)
- *   tone 'steal'     the imposter guessed the player and stole it (red, gold rim)
+ * The result of a vote, or of the whole game, landing on the table. One
+ * surface in the tone of what happened, a chip that names it in words, and
+ * the sentence underneath.
  *
  * Plays its entrance once. Under reduced motion it simply appears.
  */
 const TONES = {
-  civilian: { enamel: 'enamel-ink', chip: 'silver', chipText: 'Civilian' },
-  imposter: { enamel: 'enamel-red', chip: 'gold', chipText: 'Imposter' },
-  win: { enamel: 'enamel-lime', chip: 'gold', chipText: 'Civilians win' },
-  steal: { enamel: 'enamel-red', chip: 'gold', chipText: 'Imposter wins' },
+  civilian: { accent: 'accent-neutral', chip: 'neutral', chipText: 'Civilian', ink: 'text-text' },
+  imposter: { accent: 'accent-crimson', chip: 'flag', chipText: 'Imposter', ink: 'text-flag' },
+  win: { accent: 'accent-go', chip: 'go', chipText: 'Civilians win', ink: 'text-go' },
+  steal: { accent: 'accent-crimson', chip: 'flag', chipText: 'Imposter wins', ink: 'text-flag' },
 }
 
 export default function RevealCard({
@@ -26,53 +23,32 @@ export default function RevealCard({
   className = '',
 }) {
   const t = TONES[tone] ?? TONES.civilian
-  const onLime = tone === 'win'
 
   return (
     <div
-      className={`frame metal-gold enter w-full ${className}`}
-      style={{ '--fw': '6px' }}
+      className={`surface enter @container ${t.accent} px-6 pt-7 pb-6 text-center ${className}`}
+      style={{ '--tint': '14%' }}
       role="status"
       aria-live="polite"
     >
-      <div className={`frame-inner ${t.enamel} relative`}>
-        <div
-          className="absolute inset-3 rounded-[10px] shadow-[inset_0_0_0_1px_oklch(77%_.12_86/.45)]"
-          aria-hidden="true"
-        />
-        <div className="relative flex flex-col items-center gap-3 px-6 pt-7 pb-6 text-center">
-          <p
-            className={`display text-[1.1rem] tracking-[0.24em] ${
-              onLime ? 'text-on-lime raised' : 'text-gold engraved'
-            }`}
-          >
-            {eyebrow}
+      <div className="glow absolute -top-8 left-1/2 h-40 w-[70%] -translate-x-1/2 opacity-40" />
+
+      <div className="relative flex flex-col items-center gap-3">
+        <p className="eyebrow">{eyebrow}</p>
+
+        {name && (
+          <p className={`display text-[clamp(2.25rem,14cqw,3rem)] text-balance ${t.ink}`}>
+            {name}
           </p>
+        )}
 
-          {name && (
-            <p
-              className={`display text-[clamp(2.6rem,16cqw,3.75rem)] leading-[0.9] tracking-[0.03em] ${
-                onLime ? 'text-on-lime raised' : 'text-gold-hi engraved'
-              }`}
-            >
-              {name}
-            </p>
-          )}
+        <Chip tone={t.chip}>{t.chipText}</Chip>
 
-          <Chip tone={t.chip}>{t.chipText}</Chip>
+        {message && (
+          <p className="mt-1 max-w-[30ch] text-subhead leading-snug text-text-2">{message}</p>
+        )}
 
-          {message && (
-            <p
-              className={`mt-1 max-w-[28ch] text-body leading-snug ${
-                onLime ? 'text-on-lime' : 'text-chalk-0'
-              }`}
-            >
-              {message}
-            </p>
-          )}
-
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   )

@@ -1,71 +1,65 @@
 /*
- * A physical switch: steel housing, a brass knob that slides, and the word
- * ON or OFF engraved in the track so the state never depends on colour.
+ * A switch. The knob's position carries the state, the word beside it says
+ * the same thing in language, and the colour is the third signal rather than
+ * the only one.
  */
-export default function Toggle({
-  label,
-  description,
-  checked,
-  onChange,
-  disabled = false,
-}) {
+export default function Toggle({ label, description, checked, onChange, disabled = false }) {
   return (
     <label
       className={`flex items-start justify-between gap-4 ${
-        disabled ? 'opacity-60' : 'cursor-pointer'
+        disabled ? 'opacity-50' : 'cursor-pointer'
       }`}
     >
       <span className="min-w-0">
-        <span className="display block text-[1.15rem] tracking-[0.12em] text-gold engraved">
-          {label}
-        </span>
+        <span className="block text-callout font-semibold text-text">{label}</span>
         {description && (
-          <span className="mt-1 block text-small leading-snug text-chalk-1">
+          <span className="mt-0.5 block text-footnote leading-snug text-text-2">
             {description}
           </span>
         )}
       </span>
 
-      <span className="relative mt-0.5 shrink-0">
-        <input
-          type="checkbox"
-          className="peer sr-only"
-          checked={checked}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-
-        {/* housing */}
+      <span className="flex shrink-0 items-center gap-2.5 pt-0.5">
         <span
           aria-hidden="true"
-          className={`frame frame-sm block h-8 w-[4.25rem] ${
-            checked ? 'metal-steel' : 'metal-steel'
-          } peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-lime`}
-          style={{ '--fr': '999px', '--fw': '2px' }}
+          className={`w-7 text-right text-caption font-semibold ${
+            checked ? 'text-go' : 'text-text-3'
+          }`}
         >
-          <span
-            className={`frame-inner plate display relative block h-full rounded-full text-[0.95rem] leading-none tracking-[0.14em] transition-colors duration-200 ${
-              checked ? 'enamel-lime raised' : 'enamel-ink-deep engraved'
-            }`}
-          >
-            <span
-              className={`absolute top-1/2 -translate-y-1/2 pt-[0.15em] ${
-                checked ? 'left-2.5' : 'right-2.5 text-chalk-2'
-              }`}
-            >
-              {checked ? 'ON' : 'OFF'}
-            </span>
-          </span>
+          {checked ? 'On' : 'Off'}
         </span>
 
-        {/* knob */}
-        <span
-          aria-hidden="true"
-          className={`disc metal-gold pointer-events-none absolute top-[5px] h-[22px] w-[22px] transition-transform duration-200 ease-[var(--ease-out)] ${
-            checked ? 'translate-x-[2.55rem]' : 'translate-x-[5px]'
-          }`}
-          style={{ left: 0 }}
-        />
+        <span className="relative">
+          <input
+            type="checkbox"
+            className="peer sr-only"
+            checked={checked}
+            disabled={disabled}
+            onChange={(e) => onChange(e.target.checked)}
+          />
+
+          {/* track */}
+          <span
+            aria-hidden="true"
+            className={[
+              'accent-go block h-[31px] w-[51px] rounded-full transition-colors duration-[var(--dur-state)]',
+              'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold',
+              checked
+                ? 'fill-accent'
+                : 'bg-white/[0.12] shadow-[inset_0_0_0_1px_oklch(100%_0_0/.08)]',
+            ].join(' ')}
+          >
+            {/* knob */}
+            <span
+              className={[
+                'absolute top-[2px] left-[2px] h-[27px] w-[27px] rounded-full bg-white',
+                'shadow-[0_2px_5px_oklch(0%_0_0/.35),0_0_1px_oklch(0%_0_0/.25)]',
+                'transition-transform duration-[var(--dur-state)] ease-[var(--ease-out)]',
+                checked ? 'translate-x-5' : 'translate-x-0',
+              ].join(' ')}
+            />
+          </span>
+        </span>
       </span>
     </label>
   )

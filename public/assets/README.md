@@ -4,24 +4,27 @@
 
 | File | Role |
 |---|---|
-| `card-back-imposter.png`, `card-back-tictactoe.png`, `card-back-coming-soon.png` | **Source paintings.** Reference art and art direction. Not loaded by the app. |
+| `Imposter_GPT.png`, `tictactoe_GPT.png`, `Draft_GPT.png` | **The card designs.** Reference and art direction, and the source the key art is cut from. Not loaded by the app. |
 | `logo.png` | **Source logo.** Not loaded by the app; the vector version lives in `src/ui/brand/`. |
-| `art/*.webp`, `art/*.png` | **Art layers.** The middle window of each painting, sliced by `scripts/slice-art.py`. This is what `GameCard` renders. |
+| `art/*.webp`, `art/*.png` | **Key art.** The middle of each card design, sliced by `scripts/slice-art.py`. This is what `GameCard` renders. |
 
-The interface draws every frame, title, plate and badge itself in HTML and CSS.
-The paintings only ever appear as the art inside a frame the app has drawn, so
-changing text, state or size never means re-exporting an image.
+Each card design is a finished thing: title, eyebrow, key art, Play Now pill.
+The interface draws the title, the eyebrow, the player count and the pill
+itself in HTML, in that game's own accent, so changing any of them never means
+re-exporting a picture. Only the key art in the middle is an image.
+
+The crops also cut past the flavour text painted down the left edge of two of
+the cards. Nothing the interface shows as text comes out of a picture.
 
 ## When you re-export
 
-The current sources are about 280px wide, which goes soft on a phone screen
-where the featured card renders at 300+ CSS px at 2x or 3x density.
-
-- Export the three card paintings at **2x or 3x** (at least 600px wide).
 - Keep the same composition; the slice script uses fractional crop boxes, so a
-  larger export of the same picture slices identically.
+  bigger export of the same design slices identically.
 - Then run `python scripts/slice-art.py` (needs `pip install pillow`).
+- It writes a WebP at 720px wide, which is what the app serves, plus a
+  palette-quantised PNG that only a browser too old for WebP would ever fetch.
 
 The logo is already a vector (`src/ui/brand/logo.svg` and `mark.svg`), traced
-from `logo.png`. If the logo changes, hand over an SVG and replace those two
-files; `mark.svg` is the same drawing with its viewBox cropped to the 9.
+from `logo.png`. Both take `currentColor`, so the mark is white in the nav bar
+and gold on a card back. If the logo changes, hand over an SVG and replace
+those two files; `mark.svg` is the same drawing cropped to the 9.

@@ -21,7 +21,7 @@ function ChunkFallback() {
     <div className="grid min-h-dvh place-items-center">
       <Backdrop />
       <span className="sr-only">Loading</span>
-      <Logo mark className="h-10 animate-pulse text-gold-lo" />
+      <Logo mark className="h-10 animate-pulse text-gold-deep" />
     </div>
   )
 }

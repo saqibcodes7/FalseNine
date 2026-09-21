@@ -1,17 +1,16 @@
-import Chip from './Chip'
-
+/*
+ * The clock every phone at the table is reading. Tabular figures so nothing
+ * jitters as it counts, and a thin track beneath that drains as the phase
+ * runs down.
+ *
+ * Under ten seconds the label reads Hurry and the figures pulse. The word and
+ * the movement carry the urgency; the colour only agrees with them.
+ */
 function mmss(total) {
   const s = Math.max(0, Math.round(total))
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
-/*
- * A scoreboard clock. Gold frame, black enamel, lime Teko digits, and a thin
- * brass rail underneath that drains as the phase runs down.
- *
- * Under ten seconds the enamel goes red, HURRY is stamped beside the label,
- * and the digits tick. The word carries the state; the colour reinforces it.
- */
 export default function TimerDisplay({
   label = 'Discussion',
   secondsLeft,
@@ -24,41 +23,31 @@ export default function TimerDisplay({
 
   return (
     <div
-      className={`frame metal-gold ${className}`}
-      style={{ '--fw': '4px' }}
+      className={`surface ${urgent ? 'accent-flag' : 'accent-gold'} px-5 pt-3.5 pb-4 text-center ${className}`}
+      style={{ '--tint': urgent ? '12%' : '5%' }}
       role="timer"
       aria-label={`${label}, ${mmss(secondsLeft)} remaining`}
     >
-      <div
-        className={`frame-inner ${urgent ? 'enamel-red' : 'enamel-ink-deep'} px-4 pt-3 pb-3 text-center transition-colors duration-300`}
+      <p className="eyebrow">{urgent ? `${label} · Hurry` : label}</p>
+
+      <p
+        className={`tabular mt-1.5 text-[3.5rem] leading-none font-bold tracking-[-0.03em] ${
+          urgent ? 'urgent text-flag' : 'text-text'
+        }`}
       >
-        <div className="flex items-center justify-center gap-2">
-          <p className="display text-[1.05rem] tracking-[0.22em] text-gold engraved">
-            {label}
-          </p>
-          {urgent && <Chip tone="lime">Hurry</Chip>}
-        </div>
+        {mmss(secondsLeft)}
+      </p>
 
-        <p
-          className={`display tabular mt-1 text-[4rem] leading-none tracking-[0.04em] ${
-            urgent ? 'text-gold-hi timer-tick' : 'text-lime'
-          }`}
-          style={{ paddingTop: '0.12em' }}
-        >
-          {mmss(secondsLeft)}
-        </p>
-
+      <div
+        className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/10"
+        aria-hidden="true"
+      >
         <div
-          className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-ink-0 shadow-[inset_0_1px_2px_oklch(0%_0_0/.8)]"
-          aria-hidden="true"
-        >
-          <div
-            className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${
-              urgent ? 'bg-gold-hi' : 'bg-gold'
-            }`}
-            style={{ width: `${fraction * 100}%` }}
-          />
-        </div>
+          className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${
+            urgent ? 'bg-flag' : 'bg-gold'
+          }`}
+          style={{ width: `${fraction * 100}%` }}
+        />
       </div>
     </div>
   )

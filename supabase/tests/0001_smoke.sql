@@ -17,6 +17,10 @@
 
 \pset pager off
 
+-- Throwaway database: start clean, so the lookups below are unambiguous
+-- however many of these files have already run.
+delete from sessions;
+
 \echo '=== 1. create_session as anon ==='
 set role anon;
 select * from create_session(p_display_name => 'Saqib', p_player_pack => 'premier_league', p_difficulty => 'casual',

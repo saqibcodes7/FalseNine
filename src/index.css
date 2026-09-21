@@ -1,147 +1,155 @@
-/* Self-hosted type. Latin subset only, seven files, ~90kB of woff2. */
-@import '@fontsource/teko/latin-500.css';
-@import '@fontsource/teko/latin-600.css';
-@import '@fontsource/teko/latin-700.css';
-@import '@fontsource/saira/latin-400.css';
-@import '@fontsource/saira/latin-500.css';
-@import '@fontsource/saira/latin-600.css';
-@import '@fontsource/saira/latin-700.css';
+/* One variable face, 100–900. Subsets carry unicode-range, so a browser
+   showing English downloads the latin file (≈48kB) and nothing else. */
+@import '@fontsource-variable/inter/wght.css';
 
 @import 'tailwindcss';
-@import './ui/materials.css';
+@import './ui/surfaces.css';
 
 /* ============================================================================
    False Nine design tokens
 
-   Every colour here was sampled from the four pieces of reference art, then
-   rebuilt in OKLCH so steps are perceptually even. Neutrals are tinted toward
-   the navy of the card backs (hue 250) rather than being flat grey, which is
-   what makes the HTML surfaces sit in the same world as the paintings.
+   The palette is sampled from the three card designs in public/assets: a cool
+   near-black ground, one warm gold that every card shares, and a hue of its
+   own per game. Neutrals are tinted a few degrees toward blue rather than
+   being flat grey, which is what keeps the interface sitting in the same
+   light as the artwork.
 
-   Three materials come out of these tokens (see ui/materials.css):
-     metal   — bevelled frames and rims: gold, copper, silver, steel
-     enamel  — deep inset fills: ink, navy, red, malachite, lime
-     engrave — text cut into either of the above
+   Depth here comes from translucency, hairlines and soft shadow, never from
+   bevels or metal. Three ideas do all the work (see ui/surfaces.css):
+     surface   a panel: a thin white wash over the ground, hairline, shadow
+     accent    a hue scoped to a subtree, driving fills, rings and glow
+     glow      a large, very soft light behind the content
    ========================================================================== */
 @theme {
-  /* ---- Surfaces: ink, tinted toward navy ---- */
-  --color-ink-0: oklch(13% 0.012 250); /* page ground */
-  --color-ink-1: oklch(17% 0.014 250); /* raised */
-  --color-ink-2: oklch(22% 0.016 250); /* dark enamel */
-  --color-ink-3: oklch(30% 0.018 250); /* hairline */
-  --color-ink-4: oklch(40% 0.02 250); /* strong hairline */
+  /* ---- Ground and surfaces ---- */
+  --color-bg: oklch(15% 0.007 271); /* the page */
+  --color-surface-1: oklch(20% 0.009 264); /* cards, panels */
+  --color-surface-2: oklch(24.3% 0.012 264); /* fields, controls */
+  --color-surface-3: oklch(28.8% 0.014 262); /* pressed, hover */
 
-  --color-navy: oklch(30% 0.09 262); /* the Coming Soon card's royal blue */
-  --color-navy-deep: oklch(22% 0.07 262);
+  /* ---- Text: white at four weights of presence, the way a dark UI reads ---- */
+  --color-text: oklch(97.3% 0.003 265);
+  --color-text-2: oklch(97.3% 0.003 265 / 0.62); /* 7.9:1 on the ground */
+  --color-text-3: oklch(97.3% 0.003 265 / 0.5); /* 5.0:1 — hints are 13px, so this has to clear 4.5 */
+  --color-text-4: oklch(97.3% 0.003 265 / 0.32); /* placeholders and disabled only */
 
-  /* ---- Text: chalk, warm off-white, never pure ---- */
-  --color-chalk-0: oklch(95% 0.012 90);
-  --color-chalk-1: oklch(76% 0.018 90);
-  --color-chalk-2: oklch(58% 0.016 90);
+  /* ---- Gold: the one accent every card shares ---- */
+  --color-gold: oklch(83.8% 0.083 78);
+  --color-gold-soft: oklch(92.3% 0.048 81);
+  --color-gold-deep: oklch(65.7% 0.087 76);
 
-  /* ---- Metals: highlight / base / shadow ---- */
-  --color-gold-hi: oklch(91% 0.1 92);
-  --color-gold: oklch(77% 0.12 86);
-  --color-gold-lo: oklch(47% 0.09 76);
-
-  --color-copper-hi: oklch(83% 0.1 58);
-  --color-copper: oklch(65% 0.13 50);
-  --color-copper-lo: oklch(41% 0.09 45);
-
-  --color-silver-hi: oklch(94% 0.005 250);
-  --color-silver: oklch(75% 0.008 250);
-  --color-silver-lo: oklch(45% 0.01 250);
-
-  --color-steel-hi: oklch(54% 0.012 250);
-  --color-steel: oklch(37% 0.012 250);
-  --color-steel-lo: oklch(21% 0.012 250);
-
-  /* ---- Enamels ---- */
-  --color-red: oklch(43% 0.16 25); /* the imposter's shirt */
-  --color-red-deep: oklch(33% 0.13 25);
-  --color-malachite: oklch(46% 0.1 172); /* tic-tac-toe stone */
-
-  /* ---- The whistle: logo lime, exactly as drawn (#befa0d) ---- */
-  --color-lime: oklch(90.5% 0.235 127);
-  --color-lime-deep: oklch(77% 0.21 127);
-  --color-on-lime: oklch(20% 0.04 130);
+  /* ---- A hue per game, from each card's ground ---- */
+  --color-crimson: oklch(57.1% 0.17 28); /* Football Imposter */
+  --color-teal: oklch(62.9% 0.098 184); /* Football Tic-Tac-Toe */
+  --color-royal: oklch(53.8% 0.185 267); /* 5 A-Side Draft */
 
   /* ---- Signals ---- */
-  --color-flag: oklch(66% 0.2 25); /* errors on dark ground */
+  --color-flag: oklch(68.7% 0.203 28); /* errors */
+  --color-go: oklch(78% 0.17 152); /* ready, live, confirmed */
+  --color-lime: oklch(91.1% 0.228 125); /* the logo's own green */
 
-  /* ---- Foil: three hues from the imposter card's swirl, used sparingly ---- */
-  --color-foil-violet: oklch(60% 0.18 305);
-  --color-foil-teal: oklch(72% 0.12 200);
-  --color-foil-amber: oklch(76% 0.15 60);
+  /* ---- Type ----
+     San Francisco where it exists, Inter everywhere else, so the interface is
+     the platform's own voice on an iPhone and a faithful stand-in elsewhere.
+     Inter sits ahead of Segoe and Roboto on purpose: one look off Apple. */
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', Inter,
+    system-ui, sans-serif;
+  --font-display:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter Variable', Inter,
+    system-ui, sans-serif;
 
-  /* ---- Type ---- */
-  --font-display: 'Teko', 'Arial Narrow', 'Roboto Condensed', sans-serif;
-  --font-ui: 'Saira', 'Segoe UI', system-ui, sans-serif;
+  /* Apple's type scale, in rem. Tracking tightens as the size grows, which is
+     what SF does optically and what Inter needs doing for it. */
+  --text-caption2: 0.6875rem; /* 11 */
+  --text-caption: 0.75rem; /* 12 */
+  --text-footnote: 0.8125rem; /* 13 */
+  --text-subhead: 0.9375rem; /* 15 */
+  --text-callout: 1rem; /* 16 */
+  --text-body: 1.0625rem; /* 17 */
+  --text-title3: 1.25rem; /* 20 */
+  --text-title2: 1.375rem; /* 22 */
+  --text-title1: 1.75rem; /* 28 */
+  --text-large: 2.125rem; /* 34 */
+  --text-display: 2.75rem; /* 44 — codes and clocks */
 
-  /* Fixed rem scale, ratio ≈ 1.33. App UI, not a marketing page. */
-  --text-meta: 0.75rem; /* chips, captions */
-  --text-small: 0.875rem;
-  --text-body: 1rem;
-  --text-lead: 1.125rem;
-  --text-title: 1.75rem; /* Teko: section and plate labels */
-  --text-headline: 2.5rem; /* Teko: screen titles, card names */
-  --text-display: 3.5rem; /* Teko: join codes, timers */
+  /* ---- Radii: continuous, and bigger the bigger the thing ---- */
+  --radius-card: 24px;
+  --radius-panel: 20px;
+  --radius-control: 14px;
+  --radius-field: 12px;
+  --radius-chip: 8px;
+  --radius-pill: 980px;
 
-  /* ---- Radii: deliberately not the same everywhere ---- */
-  --radius-card: 18px;
-  --radius-plate: 9px;
-  --radius-field: 6px;
-  --radius-chip: 4px;
-
-  /* ---- Motion ---- */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* ---- Motion: iOS curves. Nothing decorative loops. ---- */
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-press: 110ms;
-  --dur-state: 240ms;
-  --dur-reveal: 640ms;
+  --dur-press: 120ms;
+  --dur-state: 220ms;
+  --dur-move: 380ms;
+  --dur-reveal: 520ms;
 }
 
 @layer base {
   html {
-    background-color: var(--color-ink-0);
+    background-color: var(--color-bg);
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
-    background-color: var(--color-ink-0);
-    color: var(--color-chalk-0);
+    background-color: var(--color-bg);
+    color: var(--color-text);
     font-family: var(--font-ui);
     font-size: var(--text-body);
-    /* Light type on dark reads lighter than it is; give it room. */
-    line-height: 1.55;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
-    font-kerning: normal;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
   }
 
-  /* Display type defaults: tall engraved capitals, tight leading. */
+  /* Display type: one notch tighter, one notch heavier. */
   .display {
     font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+  }
+
+  /* The recurring caption under every title: small, wide, quiet. */
+  .eyebrow {
+    font-size: var(--text-caption2);
     font-weight: 600;
-    line-height: 0.92;
-    letter-spacing: 0.02em;
+    line-height: 1;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-text-3);
   }
 
   .tabular {
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-lime);
+    outline: 2.5px solid var(--color-gold);
     outline-offset: 3px;
     border-radius: var(--radius-chip);
   }
 
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-on-lime);
+    background: var(--color-gold);
+    color: oklch(20% 0.03 70);
+  }
+
+  /* iOS shows a grey flash on tap; the components handle their own press. */
+  button,
+  a,
+  label,
+  input {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

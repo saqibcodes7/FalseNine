@@ -94,7 +94,7 @@ export default function JoinGame() {
 
           <Field
             label="Your display name"
-            placeholder="e.g. Saqib"
+            placeholder="Your Name"
             value={name}
             onChange={(e) => {
               setName(e.target.value)

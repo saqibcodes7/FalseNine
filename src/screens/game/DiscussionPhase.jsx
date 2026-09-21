@@ -40,8 +40,8 @@ export default function DiscussionPhase({ session, players, rounds, me, card, lo
           >
             {me.vote_ready ? 'Waiting for the others' : 'Vote now'}
           </Button>
-          <p className="mt-2 text-center text-small text-chalk-1" data-testid="ready-count">
-            <span className="display tabular text-[1.3rem] tracking-[0.06em] text-lime engraved">
+          <p className="mt-2 text-center text-footnote text-text-2" data-testid="ready-count">
+            <span className="tabular font-semibold text-gold">
               {ready} of {active.length}
             </span>{' '}
             ready to vote. The vote opens when everyone is, or when the clock runs out.
@@ -57,13 +57,13 @@ export default function DiscussionPhase({ session, players, rounds, me, card, lo
           youId={me.id}
           minPlayers={0}
           title="The table"
-          marks={(p) => (p.vote_ready ? [{ tone: 'lime', text: 'Ready' }] : [])}
+          marks={(p) => (p.vote_ready ? [{ tone: 'go', text: 'Ready' }] : [])}
         />
       </div>
 
       {me.is_active && (
         <details className="group mt-7">
-          <summary className="display cursor-pointer list-none text-center text-[1.1rem] tracking-[0.14em] text-gold engraved">
+          <summary className="mx-auto flex h-11 w-fit cursor-pointer list-none items-center px-4 text-subhead font-semibold text-gold">
             <span className="group-open:hidden">Show my card</span>
             <span className="hidden group-open:inline">Hide my card</span>
           </summary>
@@ -74,7 +74,7 @@ export default function DiscussionPhase({ session, players, rounds, me, card, lo
       <button
         type="button"
         onClick={leave}
-        className="display mt-8 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+        className="pressable mt-8 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
       >
         Leave game
       </button>

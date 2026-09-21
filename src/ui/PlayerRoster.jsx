@@ -2,15 +2,32 @@ import Chip from './Chip'
 import Panel from './Panel'
 
 /*
- * The team sheet. One line per player, a stamped brass number, the host and
- * you marked in words. Short lines are drawn with dashed steel so the panel
- * reads as "waiting on people", not "broken".
+ * The team sheet: a grouped list, one row per player, hairlines between. A
+ * player still to arrive gets a dashed placeholder rather than nothing, so
+ * the panel reads as "waiting on people" instead of broken.
  *
- * Once the game is on, a player who has been voted out is struck through
- * with OUT stamped beside them, and their role once it is public. `marks`
- * lets a phase add its own words per player ("Ready", "Voted") so state is
- * never carried by colour alone.
+ * Once the game is on, anyone voted out is struck through and stamped Out,
+ * with their role beside it once it is public. `marks` lets a phase add its
+ * own words per player — "Ready", "Voted" — so no state here is ever colour
+ * on its own.
  */
+function Avatar({ name, index, out }) {
+  const initial = String(name || '?').trim().charAt(0).toUpperCase()
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        'grid h-9 w-9 shrink-0 place-items-center rounded-full text-subhead font-semibold',
+        out
+          ? 'bg-white/[0.05] text-text-4'
+          : 'fill-soft text-text',
+      ].join(' ')}
+    >
+      {initial || index + 1}
+    </span>
+  )
+}
+
 export default function PlayerRoster({
   players,
   youId,
@@ -19,41 +36,46 @@ export default function PlayerRoster({
   marks = () => [],
 }) {
   const short = Math.max(0, minPlayers - players.length)
-  const active = players.filter((p) => p.is_active).length
-  const heading = title ?? `In the lobby · ${players.length}`
+  const active = players.filter((p) => p.is_active !== false).length
+  const heading = title ?? 'In the lobby'
 
   return (
-    <Panel title={heading}>
-      <ul className="divide-y divide-ink-3">
+    <Panel
+      title={heading}
+      action={
+        <span className="tabular text-footnote font-semibold text-text-3">
+          {active < players.length ? `${active} of ${players.length} left in` : players.length}
+        </span>
+      }
+      bodyClassName="p-0"
+    >
+      <ul className="divide-hairline" role="list">
         {players.map((player, i) => {
           const isYou = player.id === youId
-          const out = !player.is_active
+          const out = player.is_active === false
           return (
             <li
               key={player.id}
-              className="flex items-center gap-3 py-2.5 first:pt-1 last:pb-1"
+              className="flex items-center gap-3 px-4 py-2.5"
               data-out={out ? '' : undefined}
             >
-              <span
-                className={out ? 'disc metal-steel opacity-70' : 'disc metal-gold'}
-                aria-hidden="true"
-              >
-                {i + 1}
-              </span>
+              <Avatar name={player.display_name} index={i} out={out} />
 
               <span
-                className={`min-w-0 flex-1 truncate font-ui text-lead font-semibold ${
-                  out ? 'text-chalk-2 line-through decoration-flag/70' : 'text-chalk-0'
+                className={`min-w-0 flex-1 truncate text-callout font-semibold ${
+                  out ? 'text-text-3 line-through decoration-flag/60' : 'text-text'
                 }`}
               >
                 {player.display_name}
               </span>
 
-              {isYou && <Chip tone="lime">You</Chip>}
-              {player.is_host && !out && <Chip tone="gold">Host</Chip>}
-              {out && <Chip tone="steel">Out</Chip>}
-              {out && player.revealed_role === 'imposter' && <Chip tone="red">Imposter</Chip>}
-              {out && player.revealed_role === 'civilian' && <Chip tone="silver">Civilian</Chip>}
+              {isYou && <Chip tone="gold">You</Chip>}
+              {player.is_host && !out && <Chip tone="neutral">Host</Chip>}
+              {out && <Chip tone="neutral">Out</Chip>}
+              {out && player.revealed_role === 'imposter' && <Chip tone="flag">Imposter</Chip>}
+              {out && player.revealed_role === 'civilian' && (
+                <Chip tone="neutral">Civilian</Chip>
+              )}
               {!out &&
                 marks(player).map((m) => (
                   <Chip key={m.text} tone={m.tone}>
@@ -65,20 +87,15 @@ export default function PlayerRoster({
         })}
 
         {Array.from({ length: short }).map((_, i) => (
-          <li key={`empty-${i}`} className="flex items-center gap-3 py-2.5 last:pb-1">
+          <li key={`empty-${i}`} className="flex items-center gap-3 px-4 py-2.5">
             <span
               aria-hidden="true"
-              className="inline-block h-8 w-8 shrink-0 rounded-full border border-dashed border-ink-4"
+              className="h-9 w-9 shrink-0 rounded-full border border-dashed border-white/15"
             />
-            <span className="text-small text-chalk-2">Waiting for a player…</span>
+            <span className="text-subhead text-text-3">Waiting for a player…</span>
           </li>
         ))}
       </ul>
-      {title && active < players.length && (
-        <p className="mt-3 text-meta font-medium text-chalk-2">
-          {active} still in it · {players.length - active} out
-        </p>
-      )}
     </Panel>
   )
 }

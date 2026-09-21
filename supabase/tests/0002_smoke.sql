@@ -11,6 +11,10 @@
 
 \pset pager off
 
+-- Throwaway database: start clean, so the lookups below are unambiguous
+-- however many of these files have already run.
+delete from sessions;
+
 \echo '=== 1. a new lobby defaults to casual ==='
 set role anon;
 select * from create_session('Saqib') \gset host_

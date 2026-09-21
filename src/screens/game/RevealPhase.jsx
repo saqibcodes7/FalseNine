@@ -56,27 +56,27 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
 
       <div className="mt-6">
         <Panel title="How the vote went">
-          <ul className="divide-y divide-ink-3" data-testid="vote-breakdown">
+          <ul className="divide-hairline" data-testid="vote-breakdown">
             {tally.lines.map((line) => (
               <li key={line.player.id} className="flex items-baseline justify-between gap-3 py-2 first:pt-0">
-                <span className="font-ui text-lead font-semibold text-chalk-0">
+                <span className="font-ui text-callout font-semibold text-text">
                   {line.player.display_name}
-                  <span className="display ml-2 text-[1.1rem] tracking-[0.06em] text-gold engraved">
+                  <span className="tabular ml-2 text-callout font-bold text-gold">
                     {line.count}
                   </span>
                 </span>
-                <span className="text-right text-small text-chalk-1">{line.voters.join(', ')}</span>
+                <span className="text-right text-footnote text-text-2">{line.voters.join(', ')}</span>
               </li>
             ))}
             {tally.skips.length > 0 && (
               <li className="flex items-baseline justify-between gap-3 py-2">
-                <span className="font-ui text-lead font-semibold text-chalk-2">
+                <span className="font-ui text-callout font-semibold text-text-3">
                   Skipped
-                  <span className="display ml-2 text-[1.1rem] tracking-[0.06em] text-gold engraved">
+                  <span className="tabular ml-2 text-callout font-bold text-gold">
                     {tally.skips.length}
                   </span>
                 </span>
-                <span className="text-right text-small text-chalk-1">{tally.skips.join(', ')}</span>
+                <span className="text-right text-footnote text-text-2">{tally.skips.join(', ')}</span>
               </li>
             )}
           </ul>
@@ -91,10 +91,10 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
             <Button size="lg" fullWidth disabled={busy} onClick={() => call('continue_round', {}, 'Could not move the game on.')}>
               {continueLabel}
             </Button>
-            <p className="mt-2 text-center text-small text-chalk-1">{nextNote}</p>
+            <p className="mt-2 text-center text-footnote text-text-2">{nextNote}</p>
           </>
         ) : (
-          <p className="text-center text-small text-chalk-1">
+          <p className="text-center text-footnote text-text-2">
             {nextNote} Waiting for the host to carry on.
           </p>
         )}
@@ -107,7 +107,7 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
       <button
         type="button"
         onClick={leave}
-        className="display mt-8 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+        className="pressable mt-8 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
       >
         Leave game
       </button>

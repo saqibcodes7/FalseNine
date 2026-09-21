@@ -1,21 +1,18 @@
 /*
- * Buttons are enamel plates in a metal rim.
+ * One shape for everything you press: a pill.
  *
- *   primary    lime enamel, steel rim     the one thing to do next
- *   secondary  ink enamel, gold rim       the other reasonable thing
- *   quiet      no plate, engraved text    back out, cancel, tertiary
- *   danger     red enamel, steel rim      leave, close, destroy
+ *   primary    filled in the surrounding accent    the one thing to do next
+ *   secondary  the material, ringed                 the other reasonable thing
+ *   danger     filled crimson                       leave, close, destroy
+ *   quiet      text only                            back out, cancel
+ *
+ * Height follows Apple's touch guidance rather than the text: 44pt minimum,
+ * 50pt for the prominent one at the bottom of a screen.
  */
-const VARIANTS = {
-  primary: { rim: 'metal-steel', enamel: 'enamel-lime', text: 'raised' },
-  secondary: { rim: 'metal-gold', enamel: 'enamel-ink', text: 'engraved' },
-  danger: { rim: 'metal-steel', enamel: 'enamel-red', text: 'engraved' },
-}
-
 const SIZES = {
-  sm: 'h-10 px-4 text-[1.15rem]',
-  md: 'h-12 px-5 text-[1.35rem]',
-  lg: 'h-14 px-6 text-[1.6rem]',
+  sm: 'h-11 px-5 text-subhead',
+  md: 'h-12 px-6 text-callout',
+  lg: 'h-[3.25rem] px-7 text-body',
 }
 
 export default function Button({
@@ -28,17 +25,23 @@ export default function Button({
   children,
   ...rest
 }) {
+  const base = [
+    'pill pressable inline-flex items-center justify-center gap-2 select-none',
+    'font-semibold whitespace-nowrap',
+    'disabled:pointer-events-none',
+    fullWidth ? 'w-full' : '',
+    SIZES[size] ?? SIZES.md,
+  ]
+
   if (variant === 'quiet') {
     return (
       <button
         type={type}
         disabled={disabled}
         className={[
-          'display inline-flex items-center justify-center gap-2 px-3 text-[1.2rem] text-gold engraved',
-          'transition-colors duration-150 hover:text-gold-hi',
-          'disabled:pointer-events-none disabled:text-chalk-2',
-          SIZES[size]?.split(' ')[0] ?? 'h-12',
-          fullWidth ? 'w-full' : '',
+          ...base,
+          'text-gold transition-colors',
+          'hover:text-gold-soft disabled:text-text-4',
           className,
         ].join(' ')}
         {...rest}
@@ -48,37 +51,26 @@ export default function Button({
     )
   }
 
-  const v = VARIANTS[variant] ?? VARIANTS.primary
+  /* Disabled is a flat, dim, still perfectly legible plate — never a ghost. */
+  const fill = disabled
+    ? 'bg-white/[0.06] text-text-3 shadow-[inset_0_0_0_1px_oklch(100%_0_0/.07)]'
+    : variant === 'secondary'
+      ? 'fill-soft'
+      : 'fill-accent'
 
   return (
     <button
       type={type}
       disabled={disabled}
       className={[
-        'frame frame-sm group block select-none touch-manipulation text-left',
-        'transition-[transform,filter] duration-150',
-        'disabled:pointer-events-none',
-        // Disabled: the plate goes cold. Metal desaturates, enamel dims, text
-        // stays fully legible. Never a translucent ghost of the button.
-        disabled ? 'metal-steel' : v.rim,
-        fullWidth ? 'w-full' : 'inline-block',
+        ...base,
+        variant === 'danger' ? 'accent-flag' : '',
+        fill,
         className,
       ].join(' ')}
       {...rest}
     >
-      <span
-        className={[
-          'frame-inner plate display flex items-center justify-center gap-2',
-          'whitespace-nowrap tracking-[0.06em]',
-          v.text,
-          disabled ? 'enamel-ink-deep' : `${v.enamel} plate-pressable`,
-          disabled ? 'text-chalk-2!' : '',
-          SIZES[size] ?? SIZES.md,
-        ].join(' ')}
-        style={{ paddingTop: '0.12em' }}
-      >
-        {children}
-      </span>
+      {children}
     </button>
   )
 }

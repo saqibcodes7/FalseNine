@@ -1,0 +1,322 @@
+/* ============================================================================
+   False Nine surfaces
+
+   Everything on screen is one of three things, and they compose:
+
+     .surface   a panel. A thin white wash over the ground, a hairline that is
+                brighter along the top edge, and a soft shadow beneath. No
+                bevel, no gradient fill, no heavy blur — depth comes from the
+                light sitting above the object, the way it does on the cards.
+
+     .accent-*  a hue scoped to a subtree. Sets --accent and --accent-ink, and
+                everything inside picks them up: the fill of the primary
+                button, the ring on a selected row, the glow behind the card.
+
+     .glow      a large, very soft light in the accent hue. Always behind,
+                always low contrast, never animated.
+
+   Two rules keep this from turning into glassmorphism: backdrop-filter is used
+   only where a bar genuinely floats over scrolling content, and every border
+   is one hairline, never two.
+   ========================================================================== */
+
+@layer base {
+  /* The accent every scope inherits from. Gold is the action colour across the
+     whole app; a game's own hue is atmosphere — the lights behind a screen, the
+     tint on its card, the one Play Now pill that card carries. That division
+     keeps red free to mean only one thing: something is wrong. */
+  :root {
+    --accent: var(--color-gold);
+    --accent-ink: oklch(22% 0.04 72);
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+     Accent scopes
+     ------------------------------------------------------------------------- */
+  .accent-gold {
+    --accent: var(--color-gold);
+    --accent-ink: oklch(22% 0.04 72);
+  }
+  .accent-crimson {
+    --accent: var(--color-crimson);
+    --accent-ink: var(--color-text);
+  }
+  .accent-teal {
+    --accent: var(--color-teal);
+    --accent-ink: oklch(18% 0.03 190);
+  }
+  .accent-royal {
+    --accent: var(--color-royal);
+    --accent-ink: var(--color-text);
+  }
+  .accent-flag {
+    --accent: var(--color-flag);
+    --accent-ink: var(--color-text);
+  }
+  .accent-go {
+    --accent: var(--color-go);
+    --accent-ink: oklch(20% 0.04 155);
+  }
+  .accent-neutral {
+    --accent: oklch(70% 0.01 265);
+    --accent-ink: var(--color-text);
+  }
+
+  /* ---------------------------------------------------------------------------
+     Surface: the one container
+     ------------------------------------------------------------------------- */
+  .surface {
+    --tint: 0%;
+    position: relative;
+    border-radius: var(--radius-panel);
+    /* A wash of white for the material, plus a whisper of the accent so a
+       card in a game's colour sits in that game's light. */
+    background-image: linear-gradient(
+        oklch(100% 0 0 / 0.055),
+        oklch(100% 0 0 / 0.028)
+      ),
+      linear-gradient(
+        color-mix(in oklch, var(--accent, transparent) var(--tint), transparent),
+        transparent 65%
+      );
+    background-color: var(--color-surface-1);
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 0.1),
+      inset 0 0 0 1px oklch(100% 0 0 / 0.07),
+      0 1px 2px oklch(0% 0 0 / 0.4),
+      0 12px 32px -12px oklch(0% 0 0 / 0.55);
+  }
+
+  /* Continuous corners where the browser can draw them. Ignored elsewhere,
+     which just means ordinary rounded corners. */
+  @supports (corner-shape: squircle) {
+    .surface,
+    .surface-sunken,
+    .pill {
+      corner-shape: squircle;
+    }
+  }
+
+  /* Pressed into the panel rather than sitting on it: fields, readouts, the
+     inactive half of a control. */
+  .surface-sunken {
+    position: relative;
+    border-radius: var(--radius-field);
+    background-color: oklch(0% 0 0 / 0.28);
+    box-shadow:
+      inset 0 0 0 1px oklch(100% 0 0 / 0.07),
+      inset 0 1px 3px oklch(0% 0 0 / 0.3);
+  }
+
+  /* A bar that floats over content it does not own. The one place blur earns
+     its cost, because the content really is moving underneath. */
+  .surface-bar {
+    background-color: color-mix(in oklch, var(--color-bg) 94%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* ---------------------------------------------------------------------------
+     Glow: the ambient light behind a card or a screen
+     ------------------------------------------------------------------------- */
+  .glow {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklch, var(--accent, white) 42%, transparent),
+      transparent 100%
+    );
+    filter: blur(28px);
+    opacity: 0.55;
+  }
+
+  /* ---------------------------------------------------------------------------
+     Pill: the primary shape for anything you press
+     ------------------------------------------------------------------------- */
+  .pill {
+    border-radius: var(--radius-pill);
+  }
+
+  /* Filled in the accent. One soft vertical gradient, a lighter rim along the
+     top, and a shadow tinted by the accent so it reads as lit, not stuck on. */
+  .fill-accent {
+    color: var(--accent-ink);
+    background-image: linear-gradient(
+      color-mix(in oklch, var(--accent) 88%, white),
+      var(--accent) 52%,
+      color-mix(in oklch, var(--accent) 88%, black)
+    );
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 0.28),
+      inset 0 0 0 1px color-mix(in oklch, var(--accent) 70%, white 30%),
+      0 6px 18px -8px color-mix(in oklch, var(--accent) 65%, transparent);
+  }
+
+  /* The quieter sibling: the material, with the accent only in the ring. */
+  .fill-soft {
+    color: var(--color-text);
+    background-color: oklch(100% 0 0 / 0.07);
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 0.1),
+      inset 0 0 0 1px oklch(100% 0 0 / 0.1);
+  }
+
+  .fill-tinted {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+    background-color: color-mix(in oklch, var(--accent) 16%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 34%, transparent);
+  }
+
+  /* Anything pressable dips and dims a touch. 120ms, no bounce. */
+  .pressable {
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      filter var(--dur-press) var(--ease-out),
+      background-color var(--dur-state) var(--ease-out);
+    touch-action: manipulation;
+  }
+  .pressable:active:not(:disabled) {
+    transform: scale(0.972);
+    filter: brightness(0.94);
+  }
+  @media (hover: hover) {
+    .pressable:hover:not(:disabled) {
+      filter: brightness(1.07);
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     Hairline: the only divider in the system
+     ------------------------------------------------------------------------- */
+  .hairline {
+    height: 1px;
+    background-color: oklch(100% 0 0 / 0.09);
+  }
+  .divide-hairline > * + * {
+    border-top: 1px solid oklch(100% 0 0 / 0.08);
+  }
+
+  /* ---------------------------------------------------------------------------
+     Art window: the key art inside a card
+     ------------------------------------------------------------------------- */
+  .art {
+    position: relative;
+    overflow: hidden;
+    background-color: oklch(0% 0 0 / 0.35);
+  }
+  .art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* A gentle floor under the art so a title can sit over its bottom edge. */
+  .art-scrim::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      transparent 45%,
+      color-mix(in oklch, var(--color-bg) 82%, transparent)
+    );
+  }
+  /* A game that has not shipped: the art holds its shape but loses its voice. */
+  .art-locked img {
+    filter: saturate(0.25) brightness(0.62) contrast(0.95);
+  }
+
+  /* ---------------------------------------------------------------------------
+     Role card: the peek. A real card that turns over.
+     ------------------------------------------------------------------------- */
+  .rolecard {
+    perspective: 1400px;
+    width: 100%;
+    max-width: 19rem;
+    aspect-ratio: 5 / 7;
+  }
+  .rolecard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform var(--dur-reveal) var(--ease-out);
+  }
+  .rolecard-inner[data-flipped='true'] {
+    transform: rotateY(180deg);
+  }
+  .rolecard-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+  .rolecard-back {
+    transform: rotateY(0deg);
+  }
+  .rolecard-front {
+    transform: rotateY(180deg);
+  }
+
+  /* The back of every card: the ground, one soft light, one fine ring. */
+  .rolecard-pattern {
+    background-color: oklch(17% 0.012 264);
+    background-image: radial-gradient(
+        120% 90% at 50% 8%,
+        color-mix(in oklch, var(--accent, white) 22%, transparent),
+        transparent 62%
+      ),
+      radial-gradient(
+        80% 60% at 50% 108%,
+        color-mix(in oklch, var(--accent, white) 14%, transparent),
+        transparent 70%
+      );
+  }
+
+  /* Turning a card over in 3D is decoration; the information is the turn
+     itself. With motion reduced it crossfades in place instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .rolecard-inner {
+      transform: none !important;
+    }
+    .rolecard-face {
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+      transform: none !important;
+      transition: opacity var(--dur-state) linear;
+    }
+    .rolecard-inner[data-flipped='false'] .rolecard-front,
+    .rolecard-inner[data-flipped='true'] .rolecard-back {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     Entrances. One at a time, on arrival, never on a loop.
+     ------------------------------------------------------------------------- */
+  .enter {
+    animation: fn-enter var(--dur-move) var(--ease-out) both;
+  }
+  @keyframes fn-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.985);
+    }
+  }
+
+  /* The clock's last ten seconds. A pulse, not a flash. */
+  .urgent {
+    animation: fn-urgent 1s var(--ease-in-out) infinite;
+  }
+  @keyframes fn-urgent {
+    50% {
+      opacity: 0.55;
+    }
+  }
+}

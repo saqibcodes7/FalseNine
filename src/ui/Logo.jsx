@@ -3,7 +3,8 @@ import markMarkup from './brand/mark.svg?raw'
 
 /*
  * The brand, inlined so it takes `currentColor`. That is what lets the same
- * drawing be lime on the home screen and engraved brass on a card back.
+ * drawing be white in the nav bar and gold on a card back. The lime of the
+ * original lock-up stays where the brand is painted rather than rendered.
  *
  *   <Logo />         the full lock-up: the 9 over FALSE NINE
  *   <Logo mark />    just the 9, for headers and card backs

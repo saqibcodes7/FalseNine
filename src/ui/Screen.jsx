@@ -3,11 +3,12 @@ import Backdrop from './Backdrop'
 import Logo from './Logo'
 
 /*
- * The page frame every game screen sits in.
+ * Every screen is the same three bands: a slim nav bar, a large title, then
+ * the content. The nav bar holds a back chevron on the left, the mark in the
+ * middle and whatever the screen wants to say about itself on the right.
  *
- * Header row: a back link on the left, the 9 in the middle, a status slot on
- * the right. Below it the screen title in engraved Teko and a one-line
- * subtitle. Narrow by default; this is a phone game.
+ * `accent` tints the lights behind the page, so the Imposter flow sits in
+ * crimson the whole way through without any screen having to say so twice.
  */
 export default function Screen({
   title,
@@ -15,6 +16,7 @@ export default function Screen({
   back,
   backLabel = 'Back',
   status,
+  accent = 'accent-crimson',
   width = 'md',
   children,
 }) {
@@ -22,38 +24,42 @@ export default function Screen({
 
   return (
     <div className="min-h-dvh">
-      <Backdrop />
+      <Backdrop accent={accent} />
+
       <div
         className={`mx-auto w-full ${maxWidth} px-5 pb-16`}
-        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
       >
-        <div className="mb-5 grid h-11 grid-cols-[1fr_auto_1fr] items-center">
+        <div className="mb-4 grid h-12 grid-cols-[1fr_auto_1fr] items-center">
           {back ? (
             <Link
               to={back}
-              className="display inline-flex items-center gap-1.5 justify-self-start text-[1.15rem] tracking-[0.08em] text-gold engraved transition-colors hover:text-gold-hi"
+              className="-ml-2 inline-flex h-11 items-center gap-0.5 justify-self-start pr-3 pl-2 text-callout font-medium text-gold transition-colors hover:text-gold-soft"
             >
               <svg
                 aria-hidden="true"
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
+                viewBox="0 0 12 20"
+                className="h-[17px] w-[11px]"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M9 2 4 7l5 5" />
+                <path d="M10 2 2 10l8 8" />
               </svg>
-              <span className="pt-[0.15em]">{backLabel}</span>
+              {backLabel}
             </Link>
           ) : (
             <span />
           )}
 
-          <Link to="/" aria-label="False Nine home" className="text-gold hover:text-gold-hi">
-            <Logo mark className="h-8" />
+          <Link
+            to="/"
+            aria-label="False Nine home"
+            className="text-text-2 transition-colors hover:text-text"
+          >
+            <Logo mark className="h-7" />
           </Link>
 
           <div className="justify-self-end">{status}</div>
@@ -61,9 +67,9 @@ export default function Screen({
 
         {title && (
           <header className="mb-6">
-            <h1 className="display text-headline text-chalk-0 engraved">{title}</h1>
+            <h1 className="display text-large text-balance text-text">{title}</h1>
             {subtitle && (
-              <p className="mt-1.5 max-w-[38ch] text-[15px] leading-relaxed text-chalk-1">
+              <p className="mt-2 max-w-[42ch] text-callout leading-relaxed text-text-2">
                 {subtitle}
               </p>
             )}

@@ -20,16 +20,15 @@ import { DIFFICULTIES, getDifficulty, playersFor } from '../data/packs'
 
 /*
  * The kit. Every primitive in every state, on one page, so the system can be
- * judged as a system. Also where the reveal, timer and role card live until
- * the round engine wires them up.
+ * judged as a system rather than a screen at a time.
  */
 
-function Section({ title, children }) {
+function Section({ title, note, children }) {
   return (
-    <section className="mb-10">
-      <div className="mb-4 flex items-center gap-3">
-        <h2 className="display text-title leading-none text-gold engraved">{title}</h2>
-        <span className="hairline metal-gold flex-1" aria-hidden="true" />
+    <section className="mb-12">
+      <div className="mb-4">
+        <h2 className="display text-title2 text-text">{title}</h2>
+        {note && <p className="mt-1 text-footnote text-text-3">{note}</p>}
       </div>
       {children}
     </section>
@@ -37,17 +36,18 @@ function Section({ title, children }) {
 }
 
 const SWATCHES = [
-  ['ink-0', 'bg-ink-0'],
-  ['ink-2', 'bg-ink-2'],
-  ['navy', 'bg-navy'],
-  ['chalk-0', 'bg-chalk-0'],
+  ['bg', 'bg-bg'],
+  ['surface 1', 'bg-surface-1'],
+  ['surface 2', 'bg-surface-2'],
+  ['surface 3', 'bg-surface-3'],
+  ['text', 'bg-text'],
   ['gold', 'bg-gold'],
-  ['copper', 'bg-copper'],
-  ['silver', 'bg-silver'],
-  ['steel', 'bg-steel'],
-  ['red', 'bg-red'],
-  ['malachite', 'bg-malachite'],
-  ['lime', 'bg-lime'],
+  ['gold soft', 'bg-gold-soft'],
+  ['gold deep', 'bg-gold-deep'],
+  ['crimson', 'bg-crimson'],
+  ['teal', 'bg-teal'],
+  ['royal', 'bg-royal'],
+  ['go', 'bg-go'],
   ['flag', 'bg-flag'],
 ]
 
@@ -74,97 +74,90 @@ export default function Kit() {
   return (
     <Screen
       back="/"
-      backLabel="Binder"
+      backLabel="Home"
+      accent="accent-gold"
+      width="lg"
       title="The kit"
       subtitle="Every part of the interface, in every state, on one page."
-      width="lg"
     >
-      <Section title="Brand">
+      <Section title="Brand" note="The mark takes currentColor, so it is whatever it sits on.">
         <div className="flex flex-wrap items-end gap-8">
-          <Logo className="h-28 text-lime" />
-          <Logo mark className="h-20 text-gold engraved" />
-          <Logo mark className="h-12 text-silver" />
-          <Logo mark className="h-8 text-chalk-2" />
+          <Logo className="h-20 text-text" />
+          <Logo mark className="h-14 text-gold" />
+          <Logo mark className="h-9 text-text-2" />
+          <Logo mark className="h-6 text-text-4" />
         </div>
       </Section>
 
-      <Section title="Palette">
-        <ul className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-12">
+      <Section title="Palette" note="Sampled from the three card designs.">
+        <div className="flex flex-wrap gap-3">
           {SWATCHES.map(([name, cls]) => (
-            <li key={name}>
+            <div key={name} className="w-[4.25rem]">
               <div
-                className={`${cls} h-12 rounded-[4px] shadow-[inset_0_0_0_1px_oklch(0%_0_0/.4)]`}
+                className={`h-12 w-full rounded-[12px] shadow-[inset_0_0_0_1px_oklch(100%_0_0/.12)] ${cls}`}
               />
-              <p className="mt-1 text-meta text-chalk-2">{name}</p>
-            </li>
+              <p className="mt-1.5 text-caption2 text-text-3">{name}</p>
+            </div>
           ))}
-        </ul>
+        </div>
       </Section>
 
-      <Section title="Type">
-        <p className="display text-display leading-none text-gold-hi engraved">Football Imposter</p>
-        <p className="display mt-1 text-headline leading-none text-chalk-0 engraved">Screen title in Teko</p>
-        <p className="display mt-1 text-title leading-none text-gold engraved">Plate label · 1.75rem</p>
-        <p className="mt-3 max-w-[60ch] text-body text-chalk-0">
-          Body copy in Saira at 16px. Take turns dropping a clue. Vague enough to survive,
-          sharp enough to prove you know the player.
+      <Section title="Type" note="San Francisco where it exists, Inter everywhere else.">
+        <p className="display text-large text-text">Football Imposter</p>
+        <p className="display mt-1.5 text-title1 text-gold">Title · 28pt bold</p>
+        <p className="mt-3 text-body text-text">
+          Body is 17pt, the size iOS reads at. Everyone is shown the same footballer,
+          everyone except the imposter.
         </p>
-        <p className="mt-1 max-w-[60ch] text-small text-chalk-1">
-          Secondary text at 14px, for hints and metadata.
+        <p className="mt-1.5 text-subhead text-text-2">
+          Subhead 15pt, secondary, for the line under a control.
         </p>
+        <p className="mt-1.5 text-footnote text-text-3">Footnote 13pt, tertiary, for hints.</p>
+        <p className="eyebrow mt-3">Eyebrow · uppercase · letterspaced</p>
+        <p className="tabular mt-3 text-display font-bold text-gold">2:48</p>
       </Section>
 
       <Section title="Buttons">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button>Create game</Button>
+          <Button variant="secondary">Join game</Button>
+          <Button variant="danger">Leave</Button>
+          <Button variant="quiet">Cancel</Button>
+          <Button disabled>Start game</Button>
+        </div>
+        <div className="mt-4 grid gap-3 sm:max-w-sm">
           <Button size="lg" fullWidth>
-            Start game
+            Prominent, full width
           </Button>
-          <Button size="lg" fullWidth variant="secondary">
-            Join game
-          </Button>
-          <Button size="lg" fullWidth disabled>
-            Start game
-          </Button>
-          <Button size="lg" fullWidth variant="danger">
-            Close lobby
-          </Button>
-          <Button size="md">Medium</Button>
-          <Button size="sm" variant="secondary">
-            Small
-          </Button>
-          <Button variant="quiet">Leave game</Button>
         </div>
       </Section>
 
-      <Section title="Chips">
-        <div className="flex flex-wrap gap-2">
-          <Chip tone="lime">You</Chip>
-          <Chip tone="gold">Host</Chip>
-          <Chip tone="lime">Live</Chip>
-          <Chip tone="steel">Reconnecting</Chip>
-          <Chip tone="silver">Coming soon</Chip>
-          <Chip tone="red">Imposter</Chip>
-          <Chip tone="steel">Medium</Chip>
+      <Section title="Chips" note="Every chip says its state in words.">
+        <div className="flex flex-wrap items-center gap-2">
+          <Chip tone="gold">You</Chip>
+          <Chip tone="neutral">Host</Chip>
+          <Chip tone="go">Live</Chip>
+          <Chip tone="neutral">Reconnecting</Chip>
+          <Chip tone="neutral">Coming soon</Chip>
+          <Chip tone="flag">Imposter</Chip>
+          <Chip tone="crimson">Round 2 · Vote</Chip>
         </div>
       </Section>
 
       <Section title="Controls">
         <div className="grid gap-6 md:grid-cols-2">
-          <Panel title="Fields" bodyClassName="space-y-5">
-            <Field label="Your display name" placeholder="e.g. Saqib" hint="20 characters max." />
-            <Field
-              label="Join code"
-              defaultValue="KADU6"
-              variant="code"
-            />
+          <Panel title="Fields">
+            <Field label="Your display name" placeholder="Your Name" hint="20 characters max." />
+            <Field label="Join code" variant="code" defaultValue="KADU6" className="mt-5" />
             <Field
               label="With an error"
               defaultValue="amir"
               error="Someone in this game is already called Amir"
+              className="mt-5"
             />
           </Panel>
 
-          <Panel title="Rules" bodyClassName="space-y-6">
+          <Panel title="Rules" bodyClassName="p-4 space-y-6">
             <Stepper
               label="Discussion timer"
               hint="60s to 5 min"
@@ -200,7 +193,7 @@ export default function Kit() {
                 value={difficulty}
                 onChange={setDifficulty}
               />
-              <p className="mt-2 text-small leading-snug text-chalk-1">
+              <p className="mt-2 text-footnote leading-snug text-text-3">
                 {getDifficulty(difficulty).blurb}
               </p>
             </div>
@@ -226,38 +219,37 @@ export default function Kit() {
             youId="b"
             minPlayers={0}
             title="The table"
-            marks={(p) => (p.id === 'a' ? [{ tone: 'lime', text: 'Voted' }] : [])}
+            marks={(p) => (p.id === 'a' ? [{ tone: 'go', text: 'Voted' }] : [])}
           />
         </div>
       </Section>
 
       <Section title="Cards">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <GameCard game={GAMES[0]} featured />
-          <GameCard game={GAMES[1]} />
-          <GameCard game={GAMES[2]} />
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <GameCard game={GAMES[0]} layout="featured" />
+          <div className="grid content-start gap-3">
+            <GameCard game={GAMES[1]} />
+            <GameCard game={GAMES[2]} />
+          </div>
         </div>
       </Section>
 
-      <Section title="The peek">
-        <div className="grid items-start gap-6 md:grid-cols-[minmax(0,20rem)_1fr]">
+      <Section title="The peek" note="Tap the card to turn it over.">
+        <div className="flex flex-wrap items-start gap-8">
           <RoleCard
             flipped={flipped}
             role={role}
             playerName="Bukayo Saka"
-            hint={role === 'imposter' ? 'Plays wide, favours the left foot, came through an academy.' : null}
+            hint={role === 'imposter' ? 'Left-footed, plays wide, wears number seven.' : null}
             onFlip={() => setFlipped((f) => !f)}
           />
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3">
             <Button variant="secondary" onClick={() => setFlipped((f) => !f)}>
               {flipped ? 'Turn face down' : 'Turn face up'}
             </Button>
             <Button
               variant="secondary"
-              onClick={() => {
-                setFlipped(false)
-                setRole((r) => (r === 'civilian' ? 'imposter' : 'civilian'))
-              }}
+              onClick={() => setRole((r) => (r === 'civilian' ? 'imposter' : 'civilian'))}
             >
               Deal as {role === 'civilian' ? 'imposter' : 'civilian'}
             </Button>
@@ -266,38 +258,44 @@ export default function Kit() {
       </Section>
 
       <Section title="The clock">
-        <div className="grid items-start gap-6 md:grid-cols-2">
-          <TimerDisplay label="Discussion" secondsLeft={seconds} total={30} />
-          <div>
-            <Button variant="secondary" onClick={() => setSeconds(24)}>
-              Restart at 0:24
-            </Button>
-            <p className="mt-3 max-w-[40ch] text-small text-chalk-1">
-              Under ten seconds the enamel turns red, HURRY is stamped beside the label,
-              and the digits tick once a second.
-            </p>
+        <div className="flex flex-wrap items-start gap-5">
+          <div className="w-52">
+            <TimerDisplay label="Discussion" secondsLeft={seconds} total={180} />
           </div>
+          <div className="w-52">
+            <TimerDisplay label="Voting" secondsLeft={7} total={60} />
+          </div>
+          <Button variant="secondary" onClick={() => setSeconds(24)}>
+            Run it again
+          </Button>
         </div>
       </Section>
 
-      <Section title="The reveal">
-        <div className="grid gap-6 md:grid-cols-2">
+      <Section title="Reveals">
+        <div className="grid gap-5 sm:grid-cols-2">
           <RevealCard
+            eyebrow="Voted out"
             name="Priya"
             tone="civilian"
             message="Priya was a civilian. The imposter is still at the table."
           />
           <RevealCard
-            name="Amir"
+            eyebrow="Voted out"
+            name="Tom"
             tone="imposter"
-            message="Amir was indeed the Imposter. 1 imposter remains."
+            message="Tom was indeed the Imposter. 1 imposter remains."
           />
-          <RevealCard eyebrow="Full time" name="Civilians" tone="win" message="Every imposter found. The player was Bukayo Saka." />
           <RevealCard
-            eyebrow="Stolen"
-            name="Amir"
+            eyebrow="Full time"
+            name="Clean sheet"
+            tone="win"
+            message="Every imposter was found. The player was Bukayo Saka."
+          />
+          <RevealCard
+            eyebrow="Full time"
+            name="Stolen"
             tone="steal"
-            message="Guessed Bukayo Saka with the last breath. The imposter wins."
+            message="Tom guessed “Saka”. It was Bukayo Saka."
           />
         </div>
       </Section>

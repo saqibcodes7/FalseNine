@@ -36,7 +36,7 @@ export default function SalvagePhase({ session, players, me, call, busy, error, 
     >
       {itsMe ? (
         <form onSubmit={submit} noValidate>
-          <Panel title="One guess" metal="metal-gold" enamel="enamel-red">
+          <Panel title="One guess" accent="accent-crimson" tint>
             <Field
               label="The footballer"
               placeholder="e.g. Erling Haaland"
@@ -55,12 +55,12 @@ export default function SalvagePhase({ session, players, me, call, busy, error, 
           </Panel>
         </form>
       ) : (
-        <Panel title="Hold on" metal="metal-gold">
+        <Panel title="Hold on" accent="accent-gold" tint>
           <div className="flex flex-wrap items-center gap-2">
-            <Chip tone="red">Imposter</Chip>
-            <span className="font-ui text-lead font-semibold text-chalk-0">{guesser?.display_name}</span>
+            <Chip tone="flag">Imposter</Chip>
+            <span className="font-ui text-callout font-semibold text-text">{guesser?.display_name}</span>
           </div>
-          <p className="mt-3 text-body leading-snug text-chalk-1">
+          <p className="mt-3 text-body leading-snug text-text-2">
             Every imposter has been found. Before the civilians take it, {guesser?.display_name ?? 'they'} can
             still steal the win by naming the footballer. One guess, no retries. Say nothing.
           </p>
@@ -74,7 +74,7 @@ export default function SalvagePhase({ session, players, me, call, busy, error, 
       <button
         type="button"
         onClick={leave}
-        className="display mt-8 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+        className="pressable mt-8 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
       >
         Leave game
       </button>

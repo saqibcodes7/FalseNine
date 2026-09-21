@@ -78,8 +78,8 @@ export default function VotingPhase({
 
       <div className="mt-6">
         <Panel title={mine ? "Your vote is in" : "The vote so far"}>
-          <p className="text-body text-chalk-1" data-testid="vote-count">
-            <span className="display tabular text-[1.4rem] tracking-[0.06em] text-lime engraved">
+          <p className="text-body text-text-2" data-testid="vote-count">
+            <span className="tabular font-semibold text-gold">
               {tally.cast} of {active.length}
             </span>{" "}
             have voted.
@@ -90,26 +90,26 @@ export default function VotingPhase({
           </p>
 
           {session.votes_visible && tally.cast > 0 && (
-            <ul className="mt-4 divide-y divide-ink-3" data-testid="live-votes">
+            <ul className="mt-4 divide-hairline" data-testid="live-votes">
               {tally.lines.map((line) => (
                 <li
                   key={line.player.id}
                   className="flex items-baseline justify-between gap-3 py-2"
                 >
-                  <span className="font-ui text-lead font-semibold text-chalk-0">
+                  <span className="font-ui text-callout font-semibold text-text">
                     {line.player.display_name}
                   </span>
-                  <span className="text-small text-chalk-1">
+                  <span className="text-footnote text-text-2">
                     {line.voters.join(", ")}
                   </span>
                 </li>
               ))}
               {tally.skips.length > 0 && (
                 <li className="flex items-baseline justify-between gap-3 py-2">
-                  <span className="font-ui text-lead font-semibold text-chalk-2">
+                  <span className="font-ui text-callout font-semibold text-text-3">
                     Skip
                   </span>
-                  <span className="text-small text-chalk-1">
+                  <span className="text-footnote text-text-2">
                     {tally.skips.join(", ")}
                   </span>
                 </li>
@@ -117,7 +117,7 @@ export default function VotingPhase({
             </ul>
           )}
           {!session.votes_visible && (
-            <p className="mt-3 text-small text-chalk-2">
+            <p className="mt-3 text-footnote text-text-3">
               Who voted for whom comes out at the reveal.
             </p>
           )}
@@ -131,14 +131,14 @@ export default function VotingPhase({
           minPlayers={0}
           title="The table"
           marks={(p) =>
-            voteBy(votes, round, p.id) ? [{ tone: "lime", text: "Voted" }] : []
+            voteBy(votes, round, p.id) ? [{ tone: 'go', text: 'Voted' }] : []
           }
         />
       </div>
 
       {me.is_active && (
         <details className="group mt-7">
-          <summary className="display cursor-pointer list-none text-center text-[1.1rem] tracking-[0.14em] text-gold engraved">
+          <summary className="mx-auto flex h-11 w-fit cursor-pointer list-none items-center px-4 text-subhead font-semibold text-gold">
             <span className="group-open:hidden">Show my card</span>
             <span className="hidden group-open:inline">Hide my card</span>
           </summary>
@@ -154,7 +154,7 @@ export default function VotingPhase({
       <button
         type="button"
         onClick={leave}
-        className="display mt-8 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+        className="pressable mt-8 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
       >
         Leave game
       </button>

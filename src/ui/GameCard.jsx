@@ -1,115 +1,117 @@
 import { Link } from 'react-router-dom'
-import Corners from './Corners'
 
 /*
- * A collectible card from the False Nine binder.
+ * A game in the collection, built the way the card designs are: key art, the
+ * title in two tones, the eyebrow, then a pill. The art is the only picture —
+ * the title, the player count and the button are live text in the game's own
+ * accent, so none of it has to be re-exported to change.
  *
- * Three layers, all HTML: a bevelled metal frame, an interior split into a
- * title band / an art window / a plate, and (for locked cards) chrome corner
- * brackets riding the outside of the frame. The painting sits only in the
- * art window. The title, the plate and the state are live text.
+ *   layout 'featured'  the playable one: big square art and a filled pill
+ *   layout 'row'       a game still to come: a thumbnail and its name, at a
+ *                      height that lets several sit under the featured card
+ *                      without burying it
  *
- *   status 'live'  → gold frame, the art in full colour, a PLAY NOW plate,
- *                    the whole card is the link, a restrained lift on hover.
- *   status 'soon'  → silver frame, desaturated art pushed back, chrome
- *                    corners, a COMING SOON plate. Not a link.
+ * A locked game keeps its shape and loses its colour. It should still look
+ * like something worth waiting for, so it is dimmed, never greyed out.
  */
-
-/* "Tic-Tac-Toe" must not break at its hyphens on a narrow card. */
-function Title({ text }) {
-  return text.split(' ').map((word, i) => (
-    <span key={i}>
-      {i > 0 && ' '}
-      {word.includes('-') ? <span className="whitespace-nowrap">{word}</span> : word}
-    </span>
-  ))
-}
-
-export default function GameCard({ game, featured = false, className = '' }) {
-  const live = game.status === 'live'
-  const metal = live ? 'metal-gold' : 'metal-silver'
-
-  const interior = (
-    <div
-      className={`frame-inner ${live ? 'enamel-ink' : 'enamel-ink-deep'} ${live ? 'sweep' : ''} grid h-full grid-rows-[auto_1fr_auto]`}
-    >
-      {/* title band */}
-      <div className="relative z-10 px-3 pt-3 pb-2 text-center">
-        <h2
-          className={`display text-[clamp(1.2rem,8cqw,1.9rem)] leading-[0.95] tracking-[0.07em] engraved ${
-            live ? 'text-gold' : 'text-silver'
-          }`}
-        >
-          <Title text={game.name} />
-        </h2>
-      </div>
-
-      {/* art window */}
-      <div className="relative mx-2 overflow-hidden rounded-[4px] shadow-[inset_0_0_0_1px_oklch(0%_0_0/.6),inset_0_2px_10px_oklch(0%_0_0/.6)]">
-        <picture>
-          <source srcSet={`/assets/art/${game.art}.webp`} type="image/webp" />
-          <img
-            src={`/assets/art/${game.art}.png`}
-            alt=""
-            width="254"
-            height="266"
-            loading={featured ? 'eager' : 'lazy'}
-            decoding="async"
-            className={`block h-full w-full object-cover object-top ${live ? '' : 'locked-art'}`}
-          />
-        </picture>
-        {/* players line, engraved into the bottom of the window */}
-        <p
-          className={`display absolute right-2 bottom-1.5 left-2 z-10 text-right text-[clamp(0.8rem,4.5cqw,0.95rem)] tracking-[0.14em] engraved ${
-            live ? 'text-gold-hi' : 'text-silver'
-          }`}
-        >
-          {game.players}
-        </p>
-      </div>
-
-      {/* plate */}
-      <div className="relative z-10 px-3 pt-3 pb-3">
-        <div
-          className={`frame frame-sm ${live ? 'metal-gold' : 'metal-silver'}`}
-          style={{ '--fr': '8px', '--fw': '2px' }}
-        >
-          <span
-            className={`frame-inner plate display block py-2 text-center text-[clamp(1rem,6.5cqw,1.35rem)] leading-none tracking-[0.14em] whitespace-nowrap ${
-              live ? 'enamel-red text-gold-hi' : 'enamel-ink-deep text-silver'
-            } engraved`}
-            style={{ paddingTop: '0.62rem' }}
-          >
-            {live ? 'Play now' : 'Coming soon'}
-          </span>
-        </div>
-      </div>
+function Art({ game, live, className, sizes }) {
+  return (
+    <div className={`art ${live ? '' : 'art-locked'} ${className}`}>
+      <picture>
+        <source srcSet={`/assets/art/${game.art}.webp`} type="image/webp" />
+        <img
+          src={`/assets/art/${game.art}.png`}
+          alt=""
+          width="720"
+          height="736"
+          sizes={sizes}
+          loading={live ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={live ? 'high' : 'auto'}
+        />
+      </picture>
     </div>
   )
+}
 
-  const frameCls = ['frame block aspect-[5/7] w-full @container', metal, className].join(' ')
+function Title({ game, live, className }) {
+  return (
+    <h2 className={`display text-balance ${className}`}>
+      <span className="text-text">{game.lead}</span>{' '}
+      <span className={live ? 'text-gold' : 'text-text-3'}>{game.tail}</span>
+    </h2>
+  )
+}
 
-  if (!live) {
+export default function GameCard({ game, layout = 'row', className = '' }) {
+  const live = game.status === 'live'
+  const accent = live ? game.accent : 'accent-neutral'
+
+  /* ---- a game still to come: art on the left, name beside it ---- */
+  if (layout === 'row') {
     return (
-      <div className={frameCls} aria-disabled="true" style={{ '--fw': '5px' }}>
-        {interior}
-        <Corners metal="metal-silver" />
+      <div
+        className={`surface ${accent} flex items-center gap-4 p-3 ${className}`}
+        aria-disabled={live ? undefined : 'true'}
+      >
+        <Art
+          game={game}
+          live={live}
+          className="h-[4.75rem] w-[4.75rem] shrink-0 rounded-[15px]"
+          sizes="76px"
+        />
+        <div className="min-w-0 flex-1">
+          <Title game={game} live={live} className="text-callout leading-tight" />
+          <p className="mt-1 text-footnote text-text-3">{game.players}</p>
+        </div>
+        <span className="pill fill-soft shrink-0 px-3 py-1.5 text-caption font-semibold text-text-2">
+          Coming soon
+        </span>
       </div>
     )
   }
 
+  /* ---- the playable one ---- */
   return (
     <Link
       to={game.path}
       className={[
-        frameCls,
-        'transition-[transform,filter] duration-[240ms] ease-[var(--ease-out)]',
-        'hover:-translate-y-1 hover:brightness-[1.06] focus-visible:-translate-y-1',
-        'active:translate-y-0 active:brightness-100',
+        'surface pressable block overflow-hidden rounded-[var(--radius-card)] text-left',
+        accent,
+        'transition-[transform,box-shadow] duration-[var(--dur-state)] ease-[var(--ease-out)]',
+        'hover:-translate-y-0.5 focus-visible:-translate-y-0.5 active:translate-y-0',
+        className,
       ].join(' ')}
-      style={{ '--fw': featured ? '6px' : '5px' }}
+      style={{ '--tint': '11%' }}
+      aria-label={`${game.name}. ${game.players}. Play now.`}
     >
-      {interior}
+      <div className="relative">
+        <Art
+          game={game}
+          live={live}
+          className="aspect-square rounded-t-[calc(var(--radius-card)-1px)] md:aspect-[5/4]"
+          sizes="(min-width: 768px) 420px, 100vw"
+        />
+        <span className="absolute top-3 right-3 z-10 rounded-full bg-black/45 px-2.5 py-1 text-caption font-semibold text-text/90">
+          {game.players}
+        </span>
+      </div>
+
+      <div className="p-5 pt-4">
+        <Title game={game} live={live} className="text-title1" />
+        <p className="eyebrow mt-2.5">{game.eyebrow}</p>
+        <p className="mt-3 text-subhead leading-snug text-text-2">{game.tagline}</p>
+
+        <span
+          className="pill fill-accent mt-5 flex h-[3.25rem] items-center justify-center gap-2 text-body font-semibold"
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 12 14" className="h-[13px] w-[13px]" fill="currentColor">
+            <path d="M11.2 6.13a1 1 0 0 1 0 1.74l-9.7 5.6A1 1 0 0 1 0 12.6V1.4A1 1 0 0 1 1.5.53l9.7 5.6Z" />
+          </svg>
+          Play now
+        </span>
+      </div>
     </Link>
   )
 }

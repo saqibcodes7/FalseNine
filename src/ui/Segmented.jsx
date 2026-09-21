@@ -1,16 +1,22 @@
 import { useId } from 'react'
 
 /*
- * A row of enamel keys in one steel housing, exactly one of them lit. The
- * lit key is lime with the word stamped up; the others are dark with the
- * word cut in, so the choice reads without colour and at arm's length.
+ * A segmented control: one recessed track, and a pale pill that slides to the
+ * chosen option. The pill is what carries the selection, not colour, so it
+ * reads at a glance and in monochrome.
  *
- * Behaves as a radio group: arrow keys move the selection, Home/End jump.
+ * Behaves as a radio group — arrow keys move, Home and End jump.
  *
  *   options  [{ id, name, meta? }]   meta is the small line under the name
- *   value    the selected id
  */
-export default function Segmented({ label, hint, options, value, onChange, disabled = false }) {
+export default function Segmented({
+  label,
+  hint,
+  options,
+  value,
+  onChange,
+  disabled = false,
+}) {
   const id = useId()
   const index = Math.max(
     0,
@@ -30,15 +36,15 @@ export default function Segmented({ label, hint, options, value, onChange, disab
   }
 
   return (
-    <div className={disabled ? 'opacity-60' : ''}>
+    <div className={disabled ? 'opacity-50' : ''}>
       {(label || hint) && (
         <div className="mb-2 flex items-baseline justify-between gap-3">
           {label && (
-            <span id={`${id}-label`} className="display text-[1.15rem] tracking-[0.12em] text-gold engraved">
+            <span id={`${id}-label`} className="text-footnote font-semibold text-text-2">
               {label}
             </span>
           )}
-          {hint && <span className="text-meta font-medium text-chalk-2">{hint}</span>}
+          {hint && <span className="text-caption text-text-3">{hint}</span>}
         </div>
       )}
 
@@ -46,12 +52,21 @@ export default function Segmented({ label, hint, options, value, onChange, disab
         role="radiogroup"
         aria-labelledby={label ? `${id}-label` : undefined}
         onKeyDown={disabled ? undefined : onKeyDown}
-        className="frame frame-sm metal-steel"
-        style={{ '--fr': '8px', '--fw': '2px' }}
+        className="surface-sunken relative p-1"
       >
-        {/* the housing shows through the 2px gaps between keys */}
+        {/* the selection, sliding */}
+        <span
+          aria-hidden="true"
+          className="fill-soft pointer-events-none absolute inset-y-1 rounded-[9px] transition-transform duration-[var(--dur-state)] ease-[var(--ease-out)]"
+          style={{
+            width: `calc((100% - 0.5rem) / ${options.length})`,
+            transform: `translateX(calc(${index} * 100%))`,
+            left: '0.25rem',
+          }}
+        />
+
         <div
-          className="grid gap-[2px] overflow-hidden rounded-[6px]"
+          className="relative grid"
           style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
         >
           {options.map((option, i) => {
@@ -65,24 +80,19 @@ export default function Segmented({ label, hint, options, value, onChange, disab
                 tabIndex={selected ? 0 : -1}
                 disabled={disabled}
                 onClick={() => onChange(option.id)}
-                className={[
-                  'plate plate-pressable flex min-h-12 flex-col items-center justify-center px-1 py-2 text-center select-none touch-manipulation',
-                  'transition-colors duration-[var(--dur-state)]',
-                  selected ? 'enamel-lime raised' : 'enamel-ink-deep engraved',
-                ].join(' ')}
+                className="flex min-h-11 flex-col items-center justify-center px-1 py-1.5 text-center select-none"
               >
                 <span
-                  className={`display block text-[clamp(0.9rem,4.2vw,1.05rem)] leading-[0.95] tracking-[0.06em] ${
-                    selected ? 'text-on-lime' : 'text-chalk-1'
+                  className={`text-subhead leading-tight font-semibold transition-colors duration-[var(--dur-state)] ${
+                    selected ? 'text-text' : 'text-text-2'
                   }`}
-                  style={{ paddingTop: '0.15em' }}
                 >
                   {option.name}
                 </span>
                 {option.meta && (
                   <span
-                    className={`mt-1 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
-                      selected ? 'text-on-lime/80' : 'text-chalk-2'
+                    className={`mt-0.5 text-caption2 font-medium transition-colors duration-[var(--dur-state)] ${
+                      selected ? 'text-gold' : 'text-text-4'
                     }`}
                   >
                     {option.meta}

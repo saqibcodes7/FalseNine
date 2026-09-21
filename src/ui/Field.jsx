@@ -1,27 +1,33 @@
 import { useId } from 'react'
 
 /*
- * A text field is a recess cut into the panel: dark enamel, a steel hairline,
- * the label engraved above it in Teko. Focus brings the lime rim up.
+ * A text field is a recess in the panel: dark, hairlined, no border of its
+ * own. The label sits above it in quiet type and the message below it, so the
+ * field never changes height when an error appears.
  *
- *   variant 'text'  ordinary Saira input
- *   variant 'code'  the join code, set like the host's scoreboard: Teko,
- *                   big, letterspaced, lime
+ *   variant 'text'  ordinary 17pt input
+ *   variant 'code'  the join code: big, tabular, letterspaced, gold
  */
 const INPUT = {
-  text: 'font-ui text-body font-medium px-4 py-3.5 text-chalk-0 placeholder:text-chalk-2',
-  code: 'display text-center text-[2.5rem] tracking-[0.34em] pl-[0.34em] pr-0 pt-3 pb-1.5 text-lime placeholder:text-ink-4',
+  text: 'text-body text-text px-4 py-3.5 placeholder:text-text-4',
+  code: 'tabular text-center text-[2rem] font-semibold tracking-[0.28em] pl-[0.28em] py-3 text-gold placeholder:text-text-4 uppercase',
 }
 
 function Alert({ id, children }) {
   return (
-    <p id={id} role="alert" className="mt-2 flex items-start gap-2 text-small font-medium text-flag">
-      <span
+    <p
+      id={id}
+      role="alert"
+      className="mt-2 flex items-start gap-1.5 text-footnote font-medium text-flag"
+    >
+      <svg
         aria-hidden="true"
-        className="display mt-[1px] inline-grid h-4 w-4 shrink-0 place-items-center rounded-[3px] bg-flag pt-[2px] text-[0.8rem] leading-none text-ink-0"
+        viewBox="0 0 16 16"
+        className="mt-[2px] h-[14px] w-[14px] shrink-0"
+        fill="currentColor"
       >
-        !
-      </span>
+        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 3.4c.5 0 .9.4.86.9l-.23 3.9a.63.63 0 0 1-1.26 0l-.23-3.9c-.03-.5.36-.9.86-.9Zm0 8.9a.95.95 0 1 1 0-1.9.95.95 0 0 1 0 1.9Z" />
+      </svg>
       {children}
     </p>
   )
@@ -42,17 +48,13 @@ export default function Field({
 
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="display mb-2 block text-[1.15rem] tracking-[0.12em] text-gold engraved"
-      >
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="mb-2 block text-footnote font-semibold text-text-2">
+          {label}
+        </label>
+      )}
 
-      <div
-        className="frame frame-sm metal-steel frame-focus transition-[background] duration-150"
-        style={{ '--fr': '8px', '--fw': '2px' }}
-      >
+      <div className="surface-sunken transition-shadow duration-200 focus-within:shadow-[inset_0_0_0_1.5px_var(--color-gold),inset_0_1px_3px_oklch(0%_0_0/.3)]">
         <input
           id={id}
           aria-invalid={error ? 'true' : undefined}
@@ -61,12 +63,10 @@ export default function Field({
             undefined
           }
           className={[
-            'frame-inner block w-full bg-ink-1 outline-none',
-            'shadow-[inset_0_2px_8px_oklch(0%_0_0/.55)]',
+            'block w-full bg-transparent outline-none',
             INPUT[variant] ?? INPUT.text,
             inputClassName,
           ].join(' ')}
-          style={{ borderRadius: '6px' }}
           {...inputProps}
         />
       </div>
@@ -74,7 +74,7 @@ export default function Field({
       {error ? (
         <Alert id={errorId}>{error}</Alert>
       ) : hint ? (
-        <p id={hintId} className="mt-2 text-small text-chalk-2">
+        <p id={hintId} className="mt-2 text-footnote text-text-3">
           {hint}
         </p>
       ) : null}

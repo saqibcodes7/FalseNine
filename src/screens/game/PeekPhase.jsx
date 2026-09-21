@@ -44,8 +44,8 @@ export default function PeekPhase({ session, players, me, isHost, card, loadCard
           />
         ) : null}
 
-        <p className="mt-5 text-center text-small text-chalk-1" data-testid="peek-count">
-          <span className="display tabular text-[1.4rem] tracking-[0.06em] text-lime engraved">
+        <p className="mt-5 text-center text-footnote text-text-2" data-testid="peek-count">
+          <span className="tabular font-semibold text-gold">
             {seen} of {active.length}
           </span>{' '}
           have looked
@@ -60,7 +60,7 @@ export default function PeekPhase({ session, players, me, isHost, card, loadCard
           youId={me.id}
           minPlayers={0}
           title={`Round ${session.current_round}`}
-          marks={(p) => (p.has_peeked ? [{ tone: 'lime', text: 'Seen' }] : [])}
+          marks={(p) => (p.has_peeked ? [{ tone: 'go', text: 'Seen' }] : [])}
         />
       </div>
 
@@ -75,7 +75,7 @@ export default function PeekPhase({ session, players, me, isHost, card, loadCard
           >
             Start the discussion
           </Button>
-          <p className="mt-2 text-center text-small text-chalk-2">
+          <p className="mt-2 text-center text-footnote text-text-3">
             It starts by itself once everyone has looked.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function PeekPhase({ session, players, me, isHost, card, loadCard
       <button
         type="button"
         onClick={leave}
-        className="display mt-8 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+        className="pressable mt-8 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
       >
         Leave game
       </button>

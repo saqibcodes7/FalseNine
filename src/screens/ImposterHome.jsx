@@ -30,26 +30,21 @@ export default function ImposterHome() {
         </div>
       )}
 
-      {/* match card: a sliver of the art beside the facts */}
-      <div className="mb-6 flex items-center gap-4">
-        <div
-          className="frame metal-gold h-[4.5rem] w-[4.5rem] shrink-0"
-          style={{ '--fw': '3px', '--fr': '10px' }}
-        >
-          <div className="frame-inner enamel-ink">
-            <picture>
-              <source srcSet="/assets/art/imposter.webp" type="image/webp" />
-              <img
-                src="/assets/art/imposter.png"
-                alt=""
-                className="block h-full w-full object-cover object-[50%_20%]"
-                width="254"
-                height="266"
-              />
-            </picture>
-          </div>
+      {/* a sliver of the key art beside the facts */}
+      <div className="mb-7 flex items-center gap-4">
+        <div className="art accent-crimson h-[4.75rem] w-[4.75rem] shrink-0 rounded-[18px] shadow-[inset_0_0_0_1px_oklch(100%_0_0/.1)]">
+          <picture>
+            <source srcSet="/assets/art/imposter.webp" type="image/webp" />
+            <img
+              src="/assets/art/imposter.png"
+              alt=""
+              className="object-[56%_22%]"
+              width="720"
+              height="720"
+            />
+          </picture>
         </div>
-        <ul className="display space-y-0.5 text-[1.15rem] leading-[1.1] tracking-[0.1em] text-gold engraved">
+        <ul className="space-y-1 text-subhead font-medium text-text-2">
           <li>One footballer</li>
           <li>One liar, or more</li>
           <li>One vote a round</li>
@@ -78,28 +73,28 @@ export default function ImposterHome() {
       </div>
 
       {openLobbies.length > 0 && (
-        <Panel title="Rejoin" className="mt-8">
-          <ul className="divide-y divide-ink-3">
+        <Panel title="Rejoin" className="mt-8" bodyClassName="p-0">
+          <ul className="divide-hairline">
             {openLobbies.map((entry) => (
               <li key={entry.code}>
                 <button
                   type="button"
                   onClick={() => navigate(`/imposter/lobby/${entry.code}`)}
-                  className="flex w-full items-center justify-between gap-3 py-2.5 text-left transition-colors hover:text-gold-hi"
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
                 >
                   <span className="min-w-0">
-                    <span className="display tabular block text-[1.6rem] leading-none tracking-[0.12em] text-lime">
+                    <span className="tabular block text-title3 font-bold tracking-[0.06em] text-gold">
                       {entry.code}
                     </span>
-                    <span className="block truncate text-small text-chalk-1">
+                    <span className="block truncate text-footnote text-text-3">
                       as {entry.displayName}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
                     {entry.isHost && <Chip tone="gold">Host</Chip>}
-                    <span aria-hidden="true" className="text-gold">
-                      &rarr;
-                    </span>
+                    <svg aria-hidden="true" viewBox="0 0 12 20" className="h-4 w-2.5 text-text-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 2l8 8-8 8" />
+                    </svg>
                   </span>
                 </button>
               </li>
@@ -108,14 +103,17 @@ export default function ImposterHome() {
         </Panel>
       )}
 
-      <Panel title="How it plays" className="mt-8">
-        <ol className="space-y-3">
+      <Panel title="How it plays" className="mt-8" bodyClassName="p-0">
+        <ol className="divide-hairline">
           {RULES.map((rule, i) => (
-            <li key={rule} className="flex gap-3">
-              <span className="disc metal-gold shrink-0" aria-hidden="true">
+            <li key={rule} className="flex gap-3.5 px-4 py-3.5">
+              <span
+                className="accent-gold fill-accent grid h-6 w-6 shrink-0 place-items-center rounded-full text-caption font-bold"
+                aria-hidden="true"
+              >
                 {i + 1}
               </span>
-              <span className="pt-0.5 text-small leading-relaxed text-chalk-0">{rule}</span>
+              <span className="text-subhead leading-relaxed text-text-2">{rule}</span>
             </li>
           ))}
         </ol>

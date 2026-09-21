@@ -25,7 +25,7 @@ function formatSeconds(total) {
 }
 
 function LiveChip({ live }) {
-  return live ? <Chip tone="lime">Live</Chip> : <Chip tone="steel">Reconnecting</Chip>
+  return live ? <Chip tone="go">Live</Chip> : <Chip tone="neutral">Reconnecting</Chip>
 }
 
 export default function Lobby() {
@@ -116,9 +116,7 @@ export default function Lobby() {
       <Screen back="/imposter" title="Loading lobby…">
         <div className="space-y-3" aria-hidden="true">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="frame metal-steel animate-pulse" style={{ '--fw': '3px' }}>
-              <div className="frame-inner enamel-ink-deep h-16" />
-            </div>
+            <div key={i} className="surface h-16 animate-pulse" />
           ))}
         </div>
       </Screen>
@@ -128,7 +126,7 @@ export default function Lobby() {
   if (status === 'missing') {
     return (
       <Screen back="/imposter" title="That lobby is gone">
-        <p className="max-w-[38ch] text-body leading-relaxed text-chalk-1">
+        <p className="max-w-[38ch] text-body leading-relaxed text-text-2">
           Either the code was mistyped, or the host closed the game. Ask them to start
           a new one.
         </p>
@@ -150,9 +148,9 @@ export default function Lobby() {
   if (!identity) {
     return (
       <Screen back="/imposter" title="You are not in this lobby">
-        <p className="max-w-[38ch] text-body leading-relaxed text-chalk-1">
+        <p className="max-w-[38ch] text-body leading-relaxed text-text-2">
           This browser has no seat in game{' '}
-          <span className="display text-[1.3rem] tracking-[0.12em] text-lime">{upperCode}</span>.
+          <span className="tabular font-bold tracking-[0.08em] text-gold">{upperCode}</span>.
           Join it with your display name and you are in.
         </p>
         <Button
@@ -203,8 +201,8 @@ export default function Lobby() {
         title="You're in"
         subtitle="Waiting for the host to kick off."
       >
-        <Panel title="Match settings" className="mb-6">
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+        <Panel title="Match settings" className="mb-6" bodyClassName="p-0">
+          <dl className="divide-hairline">
             {[
               ['Pack', pack.name],
               ['Mode', difficulty.name],
@@ -214,13 +212,9 @@ export default function Lobby() {
               ['AI hints', session.ai_hints_enabled ? 'On' : 'Off'],
               ['Live votes', session.votes_visible ? 'Shown' : 'Hidden'],
             ].map(([k, v]) => (
-              <div key={k}>
-                <dt className="display text-[0.95rem] tracking-[0.18em] text-chalk-2 engraved">
-                  {k}
-                </dt>
-                <dd className="display tabular text-[1.6rem] leading-none tracking-[0.04em] text-gold-hi engraved">
-                  {v}
-                </dd>
+              <div key={k} className="flex items-baseline justify-between gap-4 px-4 py-2.5">
+                <dt className="text-subhead text-text-2">{k}</dt>
+                <dd className="tabular text-callout font-semibold text-text">{v}</dd>
               </div>
             ))}
           </dl>
@@ -252,8 +246,8 @@ export default function Lobby() {
       </div>
 
       <div className="space-y-7">
-        <Panel title="Player pack">
-          <ul className="divide-y divide-ink-3" role="list">
+        <Panel title="Player pack" bodyClassName="p-0">
+          <ul className="divide-hairline" role="list">
             {PACKS.map((pack) => {
               const selected = draft?.player_pack === pack.id
               return (
@@ -262,41 +256,44 @@ export default function Lobby() {
                     type="button"
                     onClick={() => set({ player_pack: pack.id })}
                     aria-pressed={selected}
-                    className="group flex w-full items-center gap-3 py-2.5 text-left transition-colors first:pt-1 last:pb-1"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left"
                   >
-                    <span
-                      aria-hidden="true"
-                      className={
-                        selected
-                          ? 'disc metal-gold shrink-0 text-[1rem]'
-                          : 'inline-block h-8 w-8 shrink-0 rounded-full border border-dashed border-ink-4 transition-colors group-hover:border-gold-lo'
-                      }
-                    >
-                      {selected ? '✓' : ''}
-                    </span>
-
                     <span className="min-w-0 flex-1">
                       <span
-                        className={`display block text-[1.4rem] leading-none tracking-[0.05em] engraved ${
-                          selected ? 'text-gold-hi' : 'text-chalk-1 group-hover:text-chalk-0'
+                        className={`block text-callout font-semibold ${
+                          selected ? 'text-gold' : 'text-text'
                         }`}
                       >
                         {pack.name}
                       </span>
-                      <span className="mt-0.5 block text-small leading-snug text-chalk-1">
+                      <span className="mt-0.5 block text-footnote leading-snug text-text-3">
                         {pack.blurb}
                       </span>
                     </span>
 
-                    {selected && <Chip tone="lime">Selected</Chip>}
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 16 16"
+                      className={`h-[15px] w-[15px] shrink-0 transition-opacity duration-[var(--dur-state)] ${
+                        selected ? 'text-gold opacity-100' : 'opacity-0'
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2.5 8.5 6.2 12.4 13.5 3.8" />
+                    </svg>
                   </button>
                 </li>
               )
             })}
           </ul>
 
-          <div className="hairline metal-steel my-4" aria-hidden="true" />
+          <div className="hairline" aria-hidden="true" />
 
+          <div className="p-4">
           <Segmented
             label="How deep"
             hint={`${inPlay} of ${squadSize} in play`}
@@ -304,9 +301,10 @@ export default function Lobby() {
             value={draft?.difficulty ?? 'casual'}
             onChange={(v) => set({ difficulty: v })}
           />
-          <p className="mt-2 text-small leading-snug text-chalk-1" data-testid="difficulty-blurb">
+          <p className="mt-2 text-footnote leading-snug text-text-3" data-testid="difficulty-blurb">
             {getDifficulty(draft?.difficulty).blurb}
           </p>
+          </div>
         </Panel>
 
         <Panel title="Rules" bodyClassName="space-y-6">
@@ -368,16 +366,16 @@ export default function Lobby() {
 
       {/* the whistle: pinned to the thumb */}
       <div
-        className="sticky bottom-0 z-30 -mx-5 mt-8 bg-ink-0 px-5 pt-3"
+        className="surface-bar sticky bottom-0 z-30 -mx-5 mt-8 px-5 pt-3"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
-        <div className="hairline metal-steel mb-3" aria-hidden="true" />
+        <div className="hairline mb-3 -mx-5" aria-hidden="true" />
 
         <Button size="lg" fullWidth disabled={!canStart || starting} onClick={startGame}>
           {starting ? 'Dealing…' : 'Start game'}
         </Button>
 
-        <p className="mt-2.5 text-center text-small text-chalk-1">
+        <p className="mt-2.5 text-center text-footnote text-text-2">
           {!enoughPlayers
             ? `Need ${MIN_PLAYERS - players.length} more player${
                 MIN_PLAYERS - players.length === 1 ? '' : 's'
@@ -392,7 +390,7 @@ export default function Lobby() {
         <button
           type="button"
           onClick={leave}
-          className="display mt-2 w-full text-[1.05rem] tracking-[0.12em] text-chalk-2 engraved transition-colors hover:text-flag"
+          className="pressable mt-1 h-11 w-full text-subhead font-semibold text-text-3 transition-colors hover:text-flag"
         >
           Close lobby
         </button>

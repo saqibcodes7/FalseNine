@@ -13,6 +13,22 @@
 
 const KEY_PREFIX = 'fn:imposter:'
 
+/**
+ * How many seats the Rejoin list offers. Two, because the only ones worth
+ * offering are the game you are in and the one you were just in. Nothing here
+ * ever expired, so on a phone that is never cleared the list grew into a
+ * history of every game ever played.
+ */
+const REJOIN_LIMIT = 2
+
+/**
+ * How many seats stay in storage. More than the list shows, because a seat
+ * that is not offered is still a seat: someone with three lobbies open should
+ * not be thrown out of the oldest one on refresh just because it is not on
+ * the list any more.
+ */
+const KEEP_LIMIT = 10
+
 function keyFor(code) {
   return `${KEY_PREFIX}${String(code || '').toUpperCase()}`
 }
@@ -33,9 +49,22 @@ export function loadIdentity(code) {
 export function saveIdentity(code, identity) {
   try {
     window.localStorage.setItem(keyFor(code), JSON.stringify(identity))
+    pruneIdentities()
   } catch {
     // Storage full, blocked, or private mode. The player stays in the game for
     // this page load; they just lose their seat on refresh. Not worth crashing.
+  }
+}
+
+/** Drop the oldest seats past KEEP_LIMIT so storage cannot grow forever. */
+function pruneIdentities() {
+  try {
+    const all = allIdentities()
+    for (const entry of all.slice(KEEP_LIMIT)) {
+      window.localStorage.removeItem(keyFor(entry.code))
+    }
+  } catch {
+    // Pruning is housekeeping. If it fails, nothing the player does breaks.
   }
 }
 
@@ -47,8 +76,16 @@ export function clearIdentity(code) {
   }
 }
 
+/**
+ * The seats worth offering on the home screen: the newest few, not the lot.
+ * Pass a different limit if you want more; pass Infinity for everything.
+ */
+export function listIdentities(limit = REJOIN_LIMIT) {
+  return allIdentities().slice(0, limit)
+}
+
 /** Every lobby this browser has a seat in, newest first. */
-export function listIdentities() {
+function allIdentities() {
   const out = []
   try {
     for (let i = 0; i < window.localStorage.length; i += 1) {

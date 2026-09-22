@@ -83,7 +83,10 @@ export default function ImposterHome() {
                   className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
                 >
                   <span className="min-w-0">
-                    <span className="tabular block text-title3 font-bold tracking-[0.06em] text-gold">
+                    <span
+                      className="tabular block text-title3 font-bold tracking-[0.06em] text-gold"
+                      data-testid="rejoin-code"
+                    >
                       {entry.code}
                     </span>
                     <span className="block truncate text-footnote text-text-3">

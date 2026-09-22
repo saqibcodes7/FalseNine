@@ -4,6 +4,7 @@ import Panel from '../../ui/Panel'
 import RevealCard from '../../ui/RevealCard'
 import PlayerRoster from '../../ui/PlayerRoster'
 import { Alert } from '../../ui/Field'
+import { useCountdown } from '../../hooks/useCountdown'
 import {
   eliminatedThisRound,
   impostersRemaining,
@@ -16,14 +17,23 @@ import {
 /*
  * Section 5, reveal. Who went out and what they were, in the brief's exact
  * words when it was an imposter. The vote breakdown is public here whatever
- * the host chose for the voting phase. The host moves the game on.
+ * the host chose for the voting phase.
+ *
+ * The host moves the game on, with one exception: when the player just voted
+ * out was the last imposter, the server puts a clock on this screen and the
+ * salvage guess opens by itself. Being caught is what earns that guess, so it
+ * is not the host's to withhold. The host can still go early.
  */
-export default function RevealPhase({ session, players, rounds, votes, me, isHost, call, busy, error, status, leave }) {
+export default function RevealPhase({ session, players, rounds, votes, me, isHost, call, nudge, clockOffset, busy, error, status, leave }) {
   const out = eliminatedThisRound(rounds, session, players)
   const remaining = impostersRemaining(session, players)
   const next = nextAfterReveal(session, players)
   const tally = tallyView(votes, votingRound(rounds, session), players)
   const wasImposter = out?.revealed_role === 'imposter'
+
+  // Only armed for the last-imposter-out case; null the rest of the time.
+  const secondsLeft = useCountdown(session.reveal_ends_at, clockOffset, nudge)
+  const counting = Boolean(session.reveal_ends_at)
 
   const message = !out
     ? ''
@@ -85,17 +95,36 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
 
       {error && <Alert>{error}</Alert>}
 
+      {counting && (
+        <p
+          className={`mt-6 text-center text-footnote text-text-2 ${secondsLeft <= 3 ? 'urgent' : ''}`}
+          data-testid="reveal-countdown"
+          aria-live="polite"
+        >
+          Last chance for {out?.display_name ?? 'the imposter'} in{' '}
+          <span className="tabular font-semibold text-gold">{secondsLeft}</span>
+        </p>
+      )}
+
       <div className="mt-6">
         {isHost ? (
           <>
-            <Button size="lg" fullWidth disabled={busy} onClick={() => call('continue_round', {}, 'Could not move the game on.')}>
-              {continueLabel}
+            <Button
+              size="lg"
+              fullWidth
+              variant={counting ? 'secondary' : 'primary'}
+              disabled={busy}
+              onClick={() => call('continue_round', {}, 'Could not move the game on.')}
+            >
+              {counting ? 'Skip the wait' : continueLabel}
             </Button>
-            <p className="mt-2 text-center text-footnote text-text-2">{nextNote}</p>
+            <p className="mt-2 text-center text-footnote text-text-2">
+              {counting ? 'It happens by itself when the clock runs out.' : nextNote}
+            </p>
           </>
         ) : (
           <p className="text-center text-footnote text-text-2">
-            {nextNote} Waiting for the host to carry on.
+            {counting ? nextNote : `${nextNote} Waiting for the host to carry on.`}
           </p>
         )}
       </div>

@@ -104,6 +104,12 @@ for (const name of ['Amir', 'Priya']) {
   joiners.push({ ctx, page, name })
 }
 check('joiners reached the waiting room', joiners.length === 2)
+const joinerCode = await joiners[0].page.locator('[data-testid="join-code"]').getAttribute('data-code')
+check('a joiner can read the code off their own phone too', joinerCode === code, String(joinerCode))
+check(
+  'and pass the invite on without asking the host',
+  (await joiners[0].page.getByRole('button', { name: /Copy invite link/ }).count()) === 1,
+)
 await joiners[0].page.screenshot({ path: `${OUT}/06-waiting-room.png`, fullPage: true })
 
 // ---------- Duplicate name is refused ----------
@@ -194,6 +200,28 @@ await lost.goto(`${BASE}/imposter/lobby/ZZZZZ`, { waitUntil: 'networkidle' })
 await lost.waitForSelector('text=That lobby is gone')
 check('unknown code shows a dead-end screen, not a crash', true)
 await lost.screenshot({ path: `${OUT}/11-lobby-gone.png`, fullPage: true })
+
+// ---------- Rejoin offers the last two seats, not a life story ----------
+const oldCtx = await browser.newContext({ viewport: PHONE })
+const old = await oldCtx.newPage()
+watch(old, 'rejoin')
+await old.goto(`${BASE}/imposter`, { waitUntil: 'networkidle' })
+await old.evaluate(() => {
+  // Five games' worth of seats, oldest first, the way a phone accumulates them.
+  const seats = ['AAAAA', 'BBBBB', 'CCCCC', 'DDDDD', 'EEEEE']
+  seats.forEach((code, i) => {
+    window.localStorage.setItem(
+      `fn:imposter:${code}`,
+      JSON.stringify({ playerId: `0000000${i}-0000-4000-8000-000000000000`, displayName: `Player ${i}`, isHost: false, savedAt: 1000 + i }),
+    )
+  })
+})
+await old.reload({ waitUntil: 'networkidle' })
+const rejoinCodes = await old.locator('[data-testid="rejoin-code"]').allInnerTexts()
+check('Rejoin offers two seats, not every game ever played', rejoinCodes.length === 2, rejoinCodes.join(' | '))
+check('and they are the two most recent', rejoinCodes.join(',') === 'EEEEE,DDDDD', rejoinCodes.join(' | '))
+await old.screenshot({ path: `${OUT}/11b-rejoin-capped.png`, fullPage: true })
+await oldCtx.close()
 
 // ---------- Desktop view ----------
 const wide = await browser.newContext({ viewport: { width: 1280, height: 900 } })

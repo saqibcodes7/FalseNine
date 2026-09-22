@@ -54,7 +54,7 @@ export function readableError(error, fallback = 'Something went wrong.') {
 
 /** Every column the browser is allowed to read from `sessions`. */
 export const SESSION_COLUMNS =
-  'id, code, host_player_id, player_pack, difficulty, num_imposters, hints_enabled, votes_visible, discussion_seconds, voting_seconds, status, current_round, created_at, started_at, peek_ends_at, winner, salvage_player_id, salvage_guess, salvage_correct, revealed_target, ended_at'
+  'id, code, host_player_id, player_pack, difficulty, num_imposters, hints_enabled, votes_visible, discussion_seconds, voting_seconds, status, current_round, created_at, started_at, peek_ends_at, reveal_ends_at, winner, salvage_player_id, salvage_guess, salvage_correct, revealed_target, ended_at'
 
 /** Every column the browser is allowed to read from `players`. */
 export const PLAYER_COLUMNS =

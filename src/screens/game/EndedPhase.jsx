@@ -3,15 +3,21 @@ import Screen from '../../ui/Screen'
 import Button from '../../ui/Button'
 import RevealCard from '../../ui/RevealCard'
 import PlayerRoster from '../../ui/PlayerRoster'
+import { Alert } from '../../ui/Field'
 import { clearIdentity } from '../../lib/identity'
 
 /*
  * Full time. Who won, how, and the footballer everyone was talking about.
  * Every role is public now, so the roster shows them all.
+ *
+ * "Play again" puts this same lobby back to waiting: same code, same people,
+ * same settings. Nobody types a code in twice, and the rest of the table is
+ * carried along automatically, because every phone is watching the status.
  */
-export default function EndedPhase({ session, players, me, isHost, status }) {
+export default function EndedPhase({ session, players, me, isHost, call, busy, error, status }) {
   const navigate = useNavigate()
   const guesser = players.find((p) => p.id === session.salvage_player_id) ?? null
+  const host = players.find((p) => p.id === session.host_player_id) ?? null
   const civiliansWon = session.winner === 'civilians'
   const stolen = session.winner === 'imposters' && session.salvage_correct === true
 
@@ -32,9 +38,12 @@ export default function EndedPhase({ session, players, me, isHost, status }) {
     message = `The imposters were no longer outnumbered. The player was ${session.revealed_target}.`
   }
 
-  function done() {
+  // Leaving has to reach the server now, or the lobby would carry you into the
+  // next game as someone who never turns up.
+  async function done() {
+    await call('leave_session')
     clearIdentity(session.code)
-    navigate(isHost ? '/imposter/create' : '/imposter', { replace: true })
+    navigate('/imposter', { replace: true })
   }
 
   return (
@@ -57,9 +66,32 @@ export default function EndedPhase({ session, players, me, isHost, status }) {
         />
       </div>
 
+      {error && <Alert>{error}</Alert>}
+
       <div className="mt-7 grid gap-2">
-        <Button size="lg" fullWidth onClick={done}>
-          {isHost ? 'Set up another game' : 'Back to Football Imposter'}
+        {isHost ? (
+          <>
+            <Button
+              size="lg"
+              fullWidth
+              disabled={busy}
+              onClick={() => call('play_again', {}, 'Could not start another game.')}
+            >
+              {busy ? 'Resetting…' : 'Play again'}
+            </Button>
+            <p className="mb-1 text-center text-footnote text-text-2">
+              Same code, same players, back to the lobby. Everyone comes with you.
+            </p>
+          </>
+        ) : (
+          <p className="mb-1 text-center text-footnote text-text-2">
+            If {host?.display_name ?? 'the host'} starts another game, you will be
+            taken back to the lobby. Stay put.
+          </p>
+        )}
+
+        <Button variant="secondary" size="lg" fullWidth onClick={done}>
+          {isHost ? 'Close this lobby' : 'Leave the lobby'}
         </Button>
         <Button variant="quiet" fullWidth onClick={() => navigate('/')}>
           Back to the binder

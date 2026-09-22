@@ -204,6 +204,12 @@ export default function Lobby() {
         title="You're in"
         subtitle="Waiting for the host to kick off."
       >
+        {/* Anyone in the lobby can read the code out or pass the link on —
+            it is not the host's to keep. */}
+        <div className="mb-7">
+          <JoinCodeDisplay code={session.code} />
+        </div>
+
         <Panel title="Match settings" className="mb-6" bodyClassName="p-0">
           <dl className="divide-hairline">
             {[

@@ -195,11 +195,19 @@ check(
 const breakdown = await amir.page.locator('[data-testid="vote-breakdown"]').innerText()
 check('the vote breakdown is public at the reveal', breakdown.includes(imposter.name) && breakdown.includes('3'), breakdown.replace(/\n/g, ' | '))
 check('non-hosts have no Continue button', (await amir.page.getByRole('button', { name: /last chance|Start round|See the result/ }).count()) === 0)
+
+// The last imposter is out, so the salvage starts on its own clock. Nobody,
+// host included, is going to press anything here.
+const revealCountdown = await amir.page.locator('[data-testid="reveal-countdown"]').innerText()
+check(
+  'the table is told the last chance is coming, on a clock',
+  new RegExp(`Last chance for ${imposter.name} in\\s*\\d+`, 'i').test(revealCountdown),
+  revealCountdown.replace(/\n/g, ' '),
+)
 await amir.page.screenshot({ path: `${OUT}/06-reveal-imposter.png`, fullPage: true })
 
-await host.page.getByRole('button', { name: 'Give them their last chance' }).click()
-await Promise.all(everyone.map((p) => waitPhase(p, /Last chance/)))
-check('the last imposter out leads to the salvage guess', true)
+await Promise.all(everyone.map((p) => waitPhase(p, /Last chance/, 25000)))
+check('the salvage opened by itself, with no host tap', true)
 check('only the imposter gets the guess box', (await imposter.page.getByLabel('The footballer').count()) === 1 && (await c1.page.getByLabel('The footballer').count()) === 0)
 await imposter.page.screenshot({ path: `${OUT}/07-salvage-guess.png`, fullPage: true })
 await c1.page.screenshot({ path: `${OUT}/07b-salvage-waiting.png`, fullPage: true })
@@ -211,7 +219,30 @@ const endText = await c1.page.locator('[role="status"]').innerText()
 check('a wrong guess ends it for the civilians', /Civilians win/i.test(endText) && endText.includes(target), endText.replace(/\n/g, ' | '))
 const roster = await c1.page.locator('ul').last().innerText()
 check('every role is public at full time', /Imposter/i.test(roster) && /Civilian/i.test(roster), roster.replace(/\n/g, ' | '))
+// amir is never the host; c1 sometimes is, when the host draws a civilian.
+check('only the host is offered another game', (await host.page.getByRole('button', { name: 'Play again' }).count()) === 1 && (await amir.page.getByRole('button', { name: 'Play again' }).count()) === 0)
 await c1.page.screenshot({ path: `${OUT}/08-full-time-civilians.png`, fullPage: true })
+
+// ---- Play again: same code, same people, nobody types anything ------------
+await host.page.getByRole('button', { name: 'Play again' }).click()
+await Promise.all(everyone.map((p) => p.page.waitForSelector('[data-testid="join-code"]', { timeout: 15000 })))
+check('one tap took the whole table back to the lobby', true)
+const sameCode = await Promise.all(everyone.map((p) => p.page.locator('[data-testid="join-code"]').getAttribute('data-code')))
+check('it is the same lobby, same code, for everyone', sameCode.every((c) => c === code), sameCode.join(' | '))
+check('the host is back on the setup screen', (await host.page.getByRole('button', { name: 'Start game' }).count()) === 1)
+check('the players are back in the waiting room', (await amir.page.locator("text=You're in").count()) === 1)
+await host.page.screenshot({ path: `${OUT}/08b-play-again-lobby.png`, fullPage: true })
+
+// And it really is playable, not just a screen that looks right.
+await host.page.getByRole('button', { name: 'Start game' }).click()
+await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Peek/)))
+const cards1b = {}
+for (const p of everyone) cards1b[p.name] = await peek(p)
+check('a fresh deal in the same lobby', everyone.filter((p) => cards1b[p.name].imposter).length === 1, JSON.stringify(cards1b))
+const target1b = cards1b[everyone.find((p) => !cards1b[p.name].imposter).name].name
+check('the second game has its own footballer to talk about', Boolean(target1b), `${target} then ${target1b}`)
+await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Discuss/, 20000)))
+check('the second game runs the same way', true)
 
 for (const p of everyone) await p.ctx.close()
 
@@ -252,8 +283,10 @@ await civ2[1].page.screenshot({ path: `${OUT}/09-live-votes.png`, fullPage: true
 await voteFor(civ2[1], imp2.name)
 await Promise.all(trio.map((p) => waitPhase(p, /Round 1 · Reveal/)))
 check('two of three is a majority, closed early', true)
-await h2.page.getByRole('button', { name: 'Give them their last chance' }).click()
+// This time the host does cut the wait short, which is still allowed.
+await h2.page.getByRole('button', { name: 'Skip the wait' }).click()
 await Promise.all(trio.map((p) => waitPhase(p, /Last chance/)))
+check('the host can still skip the wait', true)
 
 const surname = target2.split(' ').pop().toLowerCase()
 await imp2.page.getByLabel('The footballer').fill(surname)

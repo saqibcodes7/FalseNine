@@ -1,10 +1,18 @@
+import { useEffect, useRef } from 'react'
 import Screen from '../../ui/Screen'
 import Button from '../../ui/Button'
 import Panel from '../../ui/Panel'
 import RevealCard from '../../ui/RevealCard'
 import PassTable from './PassTable'
+import { useElapsed } from '../../hooks/useCountdown'
 import { imposterFoundMessage } from '../../lib/game'
-import { stillIn, roleOf, impostersLeft, canPlayAnotherRound } from '../../lib/passplay'
+import {
+  stillIn,
+  roleOf,
+  impostersLeft,
+  canPlayAnotherRound,
+  TIE_GRACE_SECONDS,
+} from '../../lib/passplay'
 
 /*
  * Who the table voted out, and what they were.
@@ -14,10 +22,27 @@ import { stillIn, roleOf, impostersLeft, canPlayAnotherRound } from '../../lib/p
  * refereeing — it does not declare a winner — but it does tell you how many
  * imposters are left, because it dealt them and the table has just earned
  * that information.
+ *
+ * "Nobody could agree" is a third: it says so, counts down a few seconds, and
+ * starts the next round on its own, so a deadlock is never mistaken for the
+ * round having restarted itself.
  */
 export default function PassOutcome({ game, onVoteOut, onSkip, onNextRound, onFinish, onQuit }) {
   const decided = game.lastOut !== null || game.skipped === true
   const remaining = impostersLeft(game)
+
+  // Counts only while the deadlock card is up; zero otherwise.
+  const elapsed = useElapsed(game.skipped ? game.phaseStartedAt : null)
+  const secondsLeft = Math.max(0, TIE_GRACE_SECONDS - elapsed)
+
+  const fired = useRef(null)
+  useEffect(() => {
+    if (!game.skipped || secondsLeft > 0) return
+    const key = `skip:${game.round}`
+    if (fired.current === key) return
+    fired.current = key
+    onNextRound()
+  }, [game.skipped, game.round, secondsLeft, onNextRound])
 
   // ---- still choosing ----------------------------------------------------
   if (!decided) {
@@ -73,7 +98,7 @@ export default function PassOutcome({ game, onVoteOut, onSkip, onNextRound, onFi
         back="/imposter"
         backLabel="Imposter"
         title="Nobody out"
-        subtitle="No decision, no elimination. Back round for another go."
+        subtitle="No decision, no elimination. The next round starts by itself."
       >
         <RevealCard
           eyebrow={`Round ${game.round}`}
@@ -87,11 +112,20 @@ export default function PassOutcome({ game, onVoteOut, onSkip, onNextRound, onFi
           <PassTable game={game} title="Still in" />
         </div>
 
-        <div className="mt-7 grid gap-2">
+        <p
+          className={`mt-6 text-center text-footnote text-text-2 ${secondsLeft <= 3 ? 'urgent' : ''}`}
+          data-testid="tie-countdown"
+          aria-live="polite"
+        >
+          Round {game.round + 1} starts in{' '}
+          <span className="tabular font-semibold text-gold">{secondsLeft}</span>
+        </p>
+
+        <div className="mt-6 grid gap-2">
           <Button size="lg" fullWidth onClick={onNextRound}>
-            Start round {game.round + 1}
+            Start round {game.round + 1} now
           </Button>
-          <Button variant="secondary" size="lg" fullWidth onClick={onFinish}>
+          <Button variant="quiet" fullWidth onClick={onFinish}>
             Call it here and show everything
           </Button>
         </div>

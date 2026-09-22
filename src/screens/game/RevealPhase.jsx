@@ -19,27 +19,41 @@ import {
  * words when it was an imposter. The vote breakdown is public here whatever
  * the host chose for the voting phase.
  *
- * The host moves the game on, with one exception: when the player just voted
- * out was the last imposter, the server puts a clock on this screen and the
- * salvage guess opens by itself. Being caught is what earns that guess, so it
- * is not the host's to withhold. The host can still go early.
+ * The host moves the game on, with two exceptions, both of which the server
+ * puts a clock on so they clear themselves:
+ *
+ *   the last imposter is voted out  → the salvage guess opens by itself,
+ *                                     because being caught is what earns it
+ *   nobody is voted out at all      → the next round opens by itself, after
+ *                                     the table has been told why
+ *
+ * That second one used to happen silently: a drawn vote dropped everyone back
+ * into a new discussion with no word, and from a phone it looked like the round
+ * had restarted itself. The result is on screen now, and it still needs nobody
+ * to press anything.
  */
 export default function RevealPhase({ session, players, rounds, votes, me, isHost, call, nudge, clockOffset, busy, error, status, leave }) {
+  const round = votingRound(rounds, session)
   const out = eliminatedThisRound(rounds, session, players)
   const remaining = impostersRemaining(session, players)
   const next = nextAfterReveal(session, players)
-  const tally = tallyView(votes, votingRound(rounds, session), players)
+  const tally = tallyView(votes, round, players)
   const wasImposter = out?.revealed_role === 'imposter'
 
-  // Only armed for the last-imposter-out case; null the rest of the time.
+  // Nobody out: the vote drew, or the skips had it. The server records which.
+  const nobodyOut = !out
+  const tied = round?.result === 'tied'
+
   const secondsLeft = useCountdown(session.reveal_ends_at, clockOffset, nudge)
   const counting = Boolean(session.reveal_ends_at)
 
-  const message = !out
-    ? ''
-    : wasImposter
+  const message = out
+    ? wasImposter
       ? imposterFoundMessage(out.display_name, remaining)
       : `${out.display_name} was a civilian. ${remaining === 1 ? 'The imposter is' : 'The imposters are'} still at the table.`
+    : tied
+      ? 'Two players finished level, so nobody goes. Everyone is still in, and so are the imposters.'
+      : 'The table chose to skip, so nobody goes. Everyone is still in, and so are the imposters.'
 
   const continueLabel = {
     discussion: `Start round ${session.current_round + 1}`,
@@ -54,15 +68,18 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
   }[next]
 
   return (
-    <Screen status={status} title="Voted out" subtitle={`Round ${session.current_round} is over.`}>
-      {out && (
-        <RevealCard
-          eyebrow="Voted out"
-          name={out.display_name}
-          tone={wasImposter ? 'imposter' : 'civilian'}
-          message={message}
-        />
-      )}
+    <Screen
+      status={status}
+      title={nobodyOut ? (tied ? 'Tied vote' : 'Nobody out') : 'Voted out'}
+      subtitle={`Round ${session.current_round} is over.`}
+    >
+      <RevealCard
+        eyebrow={nobodyOut ? `Round ${session.current_round}` : 'Voted out'}
+        name={nobodyOut ? (tied ? 'Level' : 'Skipped') : out.display_name}
+        tone={nobodyOut ? 'civilian' : wasImposter ? 'imposter' : 'civilian'}
+        chipText={nobodyOut ? 'Nobody out' : undefined}
+        message={message}
+      />
 
       <div className="mt-6">
         <Panel title="How the vote went">
@@ -101,7 +118,9 @@ export default function RevealPhase({ session, players, rounds, votes, me, isHos
           data-testid="reveal-countdown"
           aria-live="polite"
         >
-          Last chance for {out?.display_name ?? 'the imposter'} in{' '}
+          {nobodyOut
+            ? `Round ${session.current_round + 1} starts in `
+            : `Last chance for ${out?.display_name ?? 'the imposter'} in `}
           <span className="tabular font-semibold text-gold">{secondsLeft}</span>
         </p>
       )}

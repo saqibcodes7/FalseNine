@@ -179,7 +179,27 @@ await page.waitForFunction(() => document.querySelector('h1')?.textContent === '
 check('round 2 starts back at the discussion', true)
 
 // ---------------------------------------------------------------------------
-console.log('\n=== Round 2: catch the imposter ===')
+console.log('\n=== A table that cannot agree is told so, and moves on by itself ===')
+await page.getByTestId('advance').click()
+await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Vote')
+await page.getByTestId('advance').click()
+await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Who went out?')
+await page.getByRole('button', { name: 'Nobody could agree' }).click()
+await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Nobody out')
+const deadlock = await page.locator('[role="status"]').innerText()
+check('the deadlock is announced', /Deadlock/i.test(deadlock) && /Nobody out/i.test(deadlock), deadlock.replace(/\n/g, ' | '))
+const tieCount = await page.getByTestId('tie-countdown').innerText()
+check('with a countdown to the next round', /Round 3 starts in\s*\d+/i.test(tieCount), tieCount.replace(/\n/g, ' '))
+await page.screenshot({ path: `${OUT}/07b-deadlock.png`, fullPage: true })
+
+// Nobody touches the phone.
+await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Discussion', null, { timeout: 20000 })
+check('and it starts round 3 on its own', true)
+const roundLabel = await page.locator('[data-testid="pass-table"]').count()
+check('the table is intact after a deadlock', roundLabel === 1)
+
+// ---------------------------------------------------------------------------
+console.log('\n=== Round 3: catch the imposter ===')
 await page.getByTestId('advance').click()
 await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Vote')
 await page.getByTestId('advance').click()

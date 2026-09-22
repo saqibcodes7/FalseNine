@@ -135,16 +135,24 @@ do $$ begin
 exception when unique_violation then raise notice 'PASS: %', sqlerrm;
 end $$;
 
-\echo '--- 9. a 2-2 tie goes straight back to discussion, nobody out ---'
+\echo '--- 9. a 2-2 tie is announced, then loops back to discussion ---'
 select cast_vote(:'g1_session_id', :'g1_amir', :'g1_player_id', false);
 select cast_vote(:'g1_session_id', :'g1_priya', :'g1_amir', false);
 select cast_vote(:'g1_session_id', :'g1_tom', :'g1_player_id', false);
 reset role;
-select case when status = 'discussion' and current_round = 2 then 'PASS: tie looped to discussion round 2' else 'FAIL: ' || status || ' round ' || current_round end
+-- 0007: the table is told about a tie rather than being dropped back into the
+-- next round with no explanation.
+select case when status = 'reveal' and reveal_ends_at is not null then 'PASS: the tie stopped at the reveal' else 'FAIL: ' || status end
 from sessions where id = :'g1_session_id';
 select case when result = 'tied' then 'PASS: round 1 recorded as tied' else 'FAIL: ' || coalesce(result,'null') end
 from rounds where session_id = :'g1_session_id' and round_number = 1 and phase = 'voting';
 select case when count(*) = 4 then 'PASS: everyone still active' else 'FAIL' end from players where session_id = :'g1_session_id' and is_active;
+update sessions set reveal_ends_at = now() - interval '1 second' where id = :'g1_session_id';
+set role anon;
+select case when tick(:'g1_session_id') = 'discussion' then 'PASS: tie cleared itself into round 2' else 'FAIL' end;
+reset role;
+select case when current_round = 2 then 'PASS: discussion round 2' else 'FAIL: round ' || current_round end
+from sessions where id = :'g1_session_id';
 
 \echo '--- 10. the discussion timer expiring opens voting (clock moved by hand) ---'
 update rounds set ends_at = now() - interval '1 second' where session_id = :'g1_session_id' and round_number = 2 and phase = 'discussion';
@@ -156,7 +164,13 @@ select cast_vote(:'g1_session_id', :'g1_player_id', null, true);
 select cast_vote(:'g1_session_id', :'g1_amir', null, true);
 select cast_vote(:'g1_session_id', :'g1_priya', null, true);
 reset role;
-select case when status = 'discussion' and current_round = 3 then 'PASS: 3 skips of 4 ended the vote early, round 3' else 'FAIL: ' || status || ' round ' || current_round end
+select case when status = 'reveal' and reveal_ends_at is not null then 'PASS: 3 skips of 4 ended the vote early, and said so' else 'FAIL: ' || status end
+from sessions where id = :'g1_session_id';
+update sessions set reveal_ends_at = now() - interval '1 second' where id = :'g1_session_id';
+set role anon;
+select case when tick(:'g1_session_id') = 'discussion' then 'PASS: the skip cleared itself' else 'FAIL' end;
+reset role;
+select case when current_round = 3 then 'PASS: round 3' else 'FAIL: round ' || current_round end
 from sessions where id = :'g1_session_id';
 
 \echo '--- 12. the voting timer expiring tallies what is there ---'

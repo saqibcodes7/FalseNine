@@ -176,8 +176,23 @@ check('after voting you see the running count and your own vote only', /3 of 4/i
 check('live votes are hidden by default', (await c3.page.locator('[data-testid="live-votes"]').count()) === 0)
 await c3.page.screenshot({ path: `${OUT}/05-voted-waiting.png`, fullPage: true })
 await voteFor(imposter, c1.name)
-await Promise.all(everyone.map((p) => waitPhase(p, /Round 2 · Discuss/)))
-check('a 2-2 tie went straight back to discussion, round 2', true)
+
+// A drawn vote used to drop everyone into round 2 with no explanation.
+await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Reveal/, 15000)))
+const tieText = await amir.page.locator('[role="status"]').innerText()
+check(
+  'a 2-2 tie is announced rather than swallowed',
+  /Level/i.test(tieText) && /Nobody out/i.test(tieText) && /level/i.test(tieText),
+  tieText.replace(/\n/g, ' | '),
+)
+const tieCountdown = await amir.page.locator('[data-testid="reveal-countdown"]').innerText()
+check('with a countdown to the next round', /Round 2 starts in\s*\d+/i.test(tieCountdown), tieCountdown.replace(/\n/g, ' '))
+check('the tie reveal still shows how the vote fell', (await amir.page.locator('[data-testid="vote-breakdown"]').count()) === 1)
+await amir.page.screenshot({ path: `${OUT}/05b-tied-vote.png`, fullPage: true })
+
+// Nobody presses anything.
+await Promise.all(everyone.map((p) => waitPhase(p, /Round 2 · Discuss/, 20000)))
+check('and it clears itself into round 2 with nobody pressing', true)
 check('nobody was voted out on the tie', (await host.page.locator('[data-out]').count()) === 0)
 
 // Round 2: everyone finds the imposter. Three votes of four closes it early.
@@ -335,12 +350,20 @@ check('an unlimited discussion counts up instead of down', /no limit/i.test(cloc
 await h3.page.waitForTimeout(1600)
 const clock3b = await h3.page.getByRole('timer').getAttribute('aria-label')
 check('and it is ticking', clock3b !== clock3, `${clock3} -> ${clock3b}`)
-check('only the host is offered the way out', (await h3.page.getByRole('button', { name: 'Open the vote' }).count()) === 1 && (await ivy.page.getByRole('button', { name: 'Open the vote' }).count()) === 0)
+check(
+  'nobody, host included, can open the vote for the table',
+  (await h3.page.getByRole('button', { name: 'Open the vote' }).count()) === 0 &&
+    (await ivy.page.getByRole('button', { name: 'Open the vote' }).count()) === 0,
+)
 await h3.page.screenshot({ path: `${OUT}/12-no-limit-discussion.png`, fullPage: true })
 
-await h3.page.getByRole('button', { name: 'Open the vote' }).click()
+// The only way out is all three pressing Vote now.
+await h3.page.getByRole('button', { name: 'Vote now' }).click()
+await ivy.page.getByRole('button', { name: 'Vote now' }).click()
+check('two of three ready does not open it', (await phaseOf(h3)).includes('Discuss'))
+await jon.page.getByRole('button', { name: 'Vote now' }).click()
 await Promise.all(three.map((p) => waitPhase(p, /Round 1 · Vote/)))
-check('the host opened the vote with no clock to wait for', true)
+check('the last player ready opened the vote', true)
 const voteClock3 = await h3.page.getByRole('timer').getAttribute('aria-label')
 check('the vote has no clock either', /no limit/i.test(voteClock3), voteClock3)
 

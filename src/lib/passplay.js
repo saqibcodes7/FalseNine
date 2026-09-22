@@ -22,6 +22,13 @@ import { NO_LIMIT } from './clocks'
 export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 12
 
+/**
+ * How long the table gets to read "nobody out" before the next round starts by
+ * itself. Mirrors tie_grace() in migration 0007, so a deadlock reads the same
+ * however you are playing.
+ */
+export const TIE_GRACE_SECONDS = 6
+
 /** 0 means no limit — the table talks until someone says stop. Defined in
  *  lib/clocks.js, which the online lobby uses too, and re-exported here so
  *  Pass & Play's callers have one place to import from. */
@@ -142,9 +149,14 @@ export function toOutcome(game) {
   return { ...game, phase: 'outcome', lastOut: null }
 }
 
-/** The table says who is out. `null` means they could not agree on anybody. */
+/**
+ * The table says who is out. `null` means they could not agree on anybody,
+ * which is announced and then clears itself, so it records when it happened.
+ */
 export function voteOut(game, number) {
-  if (number === null) return { ...game, lastOut: null, phase: 'outcome', skipped: true }
+  if (number === null) {
+    return { ...game, lastOut: null, phase: 'outcome', skipped: true, phaseStartedAt: Date.now() }
+  }
   if (game.out.includes(number)) return game
   return { ...game, out: [...game.out, number], lastOut: number, skipped: false }
 }

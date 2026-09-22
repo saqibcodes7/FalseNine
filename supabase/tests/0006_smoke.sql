@@ -85,8 +85,15 @@ do $$ begin
 exception when insufficient_privilege then raise notice 'PASS: %', sqlerrm;
 end $$;
 
-\echo '--- 8. the host opens the vote ---'
-select host_advance(:'g1_session_id', :'g1_player_id');
+\echo '--- 8. and since 0007, neither can the host: the table opens its own vote ---'
+do $$ begin
+  perform host_advance((select id from sessions limit 1), (select host_player_id from sessions limit 1));
+  raise notice 'FAIL: the host opened the vote';
+exception when check_violation then raise notice 'PASS: %', sqlerrm;
+end $$;
+select ready_to_vote(:'g1_session_id', :'g1_player_id');
+select ready_to_vote(:'g1_session_id', :'g1_b');
+select ready_to_vote(:'g1_session_id', :'g1_c');
 reset role;
 select case when status = 'voting' then 'PASS: the vote is open' else 'FAIL: ' || status end
 from sessions where id = :'g1_session_id';

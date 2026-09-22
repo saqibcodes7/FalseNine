@@ -16,6 +16,10 @@ const JoinGame = lazy(() => import('./screens/JoinGame'))
 const Lobby = lazy(() => import('./screens/Lobby'))
 const Kit = lazy(() => import('./screens/Kit'))
 
+// Pass & Play touches no backend at all, so it gets a chunk of its own and
+// never drags the Supabase client onto a phone that is playing offline.
+const PassPlay = lazy(() => import('./screens/PassPlay'))
+
 function ChunkFallback() {
   return (
     <div className="grid min-h-dvh place-items-center">
@@ -36,6 +40,7 @@ export default function App() {
           <Route path="/imposter/create" element={<CreateGame />} />
           <Route path="/imposter/join" element={<JoinGame />} />
           <Route path="/imposter/lobby/:code" element={<Lobby />} />
+          <Route path="/imposter/pass" element={<PassPlay />} />
           <Route path="/kit" element={<Kit />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

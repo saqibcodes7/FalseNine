@@ -70,6 +70,19 @@ export default function ImposterHome() {
         >
           Join game
         </Button>
+
+        {/* Not disabled by the config notice: this one needs no backend. */}
+        <Button
+          size="lg"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/imposter/pass')}
+        >
+          Pass &amp; Play
+        </Button>
+        <p className="px-1 text-center text-footnote leading-snug text-text-3">
+          One phone, no codes. Pass it round the table.
+        </p>
       </div>
 
       {openLobbies.length > 0 && (

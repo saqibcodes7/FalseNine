@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test:e2e": "node scripts/e2e-lobby.mjs",
     "mock:api": "node scripts/mock-postgrest.mjs",
-    "test:game": "node scripts/e2e-game.mjs"
+    "test:game": "node scripts/e2e-game.mjs",
+    "test:pass": "node scripts/e2e-pass.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

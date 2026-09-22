@@ -12,17 +12,23 @@ const TONES = {
   imposter: { accent: 'accent-crimson', chip: 'flag', chipText: 'Imposter', ink: 'text-flag' },
   win: { accent: 'accent-go', chip: 'go', chipText: 'Civilians win', ink: 'text-go' },
   steal: { accent: 'accent-crimson', chip: 'flag', chipText: 'Imposter wins', ink: 'text-flag' },
+  // For a card that states a fact rather than a result. Pass & Play ends on
+  // one of these, because the phone deals and times but never declares a
+  // winner: that is the table's to argue about.
+  answer: { accent: 'accent-gold', chip: 'gold', chipText: 'The answer', ink: 'text-gold' },
 }
 
 export default function RevealCard({
   eyebrow = 'Voted out',
   name,
   tone = 'civilian',
+  chipText,
   message,
   children,
   className = '',
 }) {
   const t = TONES[tone] ?? TONES.civilian
+  const label = chipText ?? t.chipText
 
   return (
     <div
@@ -42,7 +48,7 @@ export default function RevealCard({
           </p>
         )}
 
-        <Chip tone={t.chip}>{t.chipText}</Chip>
+        {label && <Chip tone={t.chip}>{label}</Chip>}
 
         {message && (
           <p className="mt-1 max-w-[30ch] text-subhead leading-snug text-text-2">{message}</p>

@@ -84,9 +84,18 @@ from (values (:'host_card_role', :'host_card_target_name'), (:'amir_card_role', 
 select case when status = 'peeking' then 'PASS: still peeking with one player yet to look' else 'FAIL: ' || status end
 from sessions where id = :'g1_session_id';
 
-\echo '--- 5. last peek starts the discussion with a server deadline ---'
+\echo '--- 5. last peek arms the grace period, then the discussion opens ---'
 set role anon;
 select role from get_my_card(:'g1_session_id', :'g1_tom') \gset tom_card_
+reset role;
+-- 0004: the last peek no longer jumps straight to the discussion, so Tom has
+-- time to read the card that call just handed him.
+select case when status = 'peeking' and peek_ends_at is not null
+  then 'PASS: grace period armed, still peeking' else 'FAIL: ' || status end
+from sessions where id = :'g1_session_id';
+update sessions set peek_ends_at = now() - interval '1 second' where id = :'g1_session_id';
+set role anon;
+select case when tick(:'g1_session_id') = 'discussion' then 'PASS: discussion opened when the grace ran out' else 'FAIL' end;
 reset role;
 select case when status = 'discussion' then 'PASS: discussion opened on its own' else 'FAIL: ' || status end
 from sessions where id = :'g1_session_id';

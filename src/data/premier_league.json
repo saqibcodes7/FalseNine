@@ -1,108 +1,408 @@
 {
   "casual": [
-    "Erling Haaland",
-    "Bukayo Saka",
-    "Cole Palmer",
-    "Bruno Fernandes",
-    "Virgil van Dijk",
-    "Declan Rice",
-    "Martin Ødegaard",
-    "Phil Foden",
-    "Alexander Isak",
-    "Florian Wirtz",
-    "Alisson Becker",
-    "Gianluigi Donnarumma",
-    "Jordan Pickford",
-    "Harry Maguire",
-    "Jack Grealish",
-    "Kai Havertz",
-    "Gabriel Jesus",
-    "Jordan Henderson",
-    "Bruno Guimarães",
-    "Reece James",
-    "Viktor Gyökeres",
-    "Eberechi Eze",
-    "Enzo Fernández",
-    "Emiliano Martínez",
-    "Bradley Barcola",
-    "Sandro Tonali",
-    "Morgan Rogers",
-    "Andy Robertson",
-    "Moisés Caicedo",
-    "William Saliba"
+    {
+      "name": "Erling Haaland",
+      "hint": "machine"
+    },
+    {
+      "name": "Bukayo Saka",
+      "hint": "humble"
+    },
+    {
+      "name": "Cole Palmer",
+      "hint": "cold"
+    },
+    {
+      "name": "Bruno Fernandes",
+      "hint": "captain"
+    },
+    {
+      "name": "Virgil van Dijk",
+      "hint": "aura"
+    },
+    {
+      "name": "Declan Rice",
+      "hint": "engine"
+    },
+    {
+      "name": "Martin Ødegaard",
+      "hint": "silk"
+    },
+    {
+      "name": "Phil Foden",
+      "hint": "gifted"
+    },
+    {
+      "name": "Alexander Isak",
+      "hint": "elegant"
+    },
+    {
+      "name": "Florian Wirtz",
+      "hint": "vision"
+    },
+    {
+      "name": "Alisson Becker",
+      "hint": "assured"
+    },
+    {
+      "name": "Gianluigi Donnarumma",
+      "hint": "giant"
+    },
+    {
+      "name": "Jordan Pickford",
+      "hint": "shouty"
+    },
+    {
+      "name": "Harry Maguire",
+      "hint": "headers"
+    },
+    {
+      "name": "Jack Grealish",
+      "hint": "showman"
+    },
+    {
+      "name": "Kai Havertz",
+      "hint": "lanky"
+    },
+    {
+      "name": "Gabriel Jesus",
+      "hint": "misfiring"
+    },
+    {
+      "name": "Jordan Henderson",
+      "hint": "veteran"
+    },
+    {
+      "name": "Bruno Guimarães",
+      "hint": "conductor"
+    },
+    {
+      "name": "Reece James",
+      "hint": "fragile"
+    },
+    {
+      "name": "Viktor Gyökeres",
+      "hint": "poacher"
+    },
+    {
+      "name": "Eberechi Eze",
+      "hint": "trickster"
+    },
+    {
+      "name": "Enzo Fernández",
+      "hint": "expensive"
+    },
+    {
+      "name": "Emiliano Martínez",
+      "hint": "villain"
+    },
+    {
+      "name": "Bradley Barcola",
+      "hint": "direct"
+    },
+    {
+      "name": "Sandro Tonali",
+      "hint": "deep-lying"
+    },
+    {
+      "name": "Morgan Rogers",
+      "hint": "unheralded"
+    },
+    {
+      "name": "Andy Robertson",
+      "hint": "overlap"
+    },
+    {
+      "name": "Moisés Caicedo",
+      "hint": "ball-winner"
+    },
+    {
+      "name": "William Saliba",
+      "hint": "calm"
+    }
   ],
   "ball_aware": [
-    "Gabriel Magalhães",
-    "Rúben Dias",
-    "Jérémy Doku",
-    "Omar Marmoush",
-    "Matheus Cunha",
-    "Bryan Mbeumo",
-    "Benjamin Šeško",
-    "Amad Diallo",
-    "Mason Mount",
-    "Kobbie Mainoo",
-    "Dominic Solanke",
-    "Richarlison",
-    "James Maddison",
-    "Micky van de Ven",
-    "Kaoru Mitoma",
-    "Chris Wood",
-    "Morgan Gibbs-White",
-    "Antoine Semenyo",
-    "Dominik Szoboszlai",
-    "Cody Gakpo",
-    "Elliot Anderson",
-    "Carlos Baleba",
-    "Iliman Ndiaye",
-    "Savinho",
-    "Xavi Simons",
-    "Mohammed Kudus",
-    "Hugo Ekitiké",
-    "Dominic Calvert-Lewin",
-    "Marc Guéhi",
-    "Nick Woltemade"
+    {
+      "name": "Gabriel Magalhães",
+      "hint": "set-piece"
+    },
+    {
+      "name": "Rúben Dias",
+      "hint": "organiser"
+    },
+    {
+      "name": "Jérémy Doku",
+      "hint": "dribbler"
+    },
+    {
+      "name": "Omar Marmoush",
+      "hint": "livewire"
+    },
+    {
+      "name": "Matheus Cunha",
+      "hint": "temper"
+    },
+    {
+      "name": "Bryan Mbeumo",
+      "hint": "underrated"
+    },
+    {
+      "name": "Benjamin Šeško",
+      "hint": "raw"
+    },
+    {
+      "name": "Amad Diallo",
+      "hint": "spark"
+    },
+    {
+      "name": "Mason Mount",
+      "hint": "forgotten"
+    },
+    {
+      "name": "Kobbie Mainoo",
+      "hint": "composed"
+    },
+    {
+      "name": "Dominic Solanke",
+      "hint": "workhorse"
+    },
+    {
+      "name": "Richarlison",
+      "hint": "acrobat"
+    },
+    {
+      "name": "James Maddison",
+      "hint": "cheeky"
+    },
+    {
+      "name": "Micky van de Ven",
+      "hint": "rapid"
+    },
+    {
+      "name": "Kaoru Mitoma",
+      "hint": "slalom"
+    },
+    {
+      "name": "Chris Wood",
+      "hint": "targetman"
+    },
+    {
+      "name": "Morgan Gibbs-White",
+      "hint": "scrapper"
+    },
+    {
+      "name": "Antoine Semenyo",
+      "hint": "powerhouse"
+    },
+    {
+      "name": "Dominik Szoboszlai",
+      "hint": "thunderbolt"
+    },
+    {
+      "name": "Cody Gakpo",
+      "hint": "streaky"
+    },
+    {
+      "name": "Elliot Anderson",
+      "hint": "understated"
+    },
+    {
+      "name": "Carlos Baleba",
+      "hint": "destroyer"
+    },
+    {
+      "name": "Iliman Ndiaye",
+      "hint": "twinkle"
+    },
+    {
+      "name": "Savinho",
+      "hint": "touchline"
+    },
+    {
+      "name": "Xavi Simons",
+      "hint": "hyped"
+    },
+    {
+      "name": "Mohammed Kudus",
+      "hint": "strong"
+    },
+    {
+      "name": "Hugo Ekitiké",
+      "hint": "smooth"
+    },
+    {
+      "name": "Dominic Calvert-Lewin",
+      "hint": "aerial"
+    },
+    {
+      "name": "Marc Guéhi",
+      "hint": "steady"
+    },
+    {
+      "name": "Nick Woltemade",
+      "hint": "towering"
+    }
   ],
   "you_know_ball": [
-    "Milos Kerkez",
-    "Jeremie Frimpong",
-    "Ryan Gravenberch",
-    "Rayan Cherki",
-    "Joško Gvardiol",
-    "Nico O'Reilly",
-    "Martín Zubimendi",
-    "Noni Madueke",
-    "Riccardo Calafiori",
-    "Myles Lewis-Skelly",
-    "Ethan Nwaneri",
-    "Cristhian Mosquera",
-    "João Pedro",
-    "Estêvão",
-    "Jamie Gittens",
-    "Levi Colwill",
-    "Leny Yoro",
-    "Patrick Dorgu",
-    "Senne Lammens",
-    "Lucas Bergvall",
-    "Archie Gray",
-    "Yoane Wissa",
-    "Tino Livramento",
-    "Dan Burn",
-    "Adam Wharton",
-    "Jean-Philippe Mateta",
-    "Yankuba Minteh",
-    "Murillo",
-    "Granit Xhaka",
-    "Igor Thiago",
-    "Liam Delap",
-    "Mateus Fernandes",
-    "Ayyoub Bouaddi",
-    "Jérémy Jacquet",
-    "Maxence Lacroix",
-    "Jan Paul van Hecke",
-    "Jarrad Branthwaite",
-    "Evanilson",
-    "Justin Kluivert",
-    "Bart Verbruggen"
+    {
+      "name": "Milos Kerkez",
+      "hint": "relentless"
+    },
+    {
+      "name": "Jeremie Frimpong",
+      "hint": "flying"
+    },
+    {
+      "name": "Ryan Gravenberch",
+      "hint": "glides"
+    },
+    {
+      "name": "Rayan Cherki",
+      "hint": "audacious"
+    },
+    {
+      "name": "Joško Gvardiol",
+      "hint": "bulldozer"
+    },
+    {
+      "name": "Nico O'Reilly",
+      "hint": "homegrown"
+    },
+    {
+      "name": "Martín Zubimendi",
+      "hint": "tidy"
+    },
+    {
+      "name": "Noni Madueke",
+      "hint": "erratic"
+    },
+    {
+      "name": "Riccardo Calafiori",
+      "hint": "marauding"
+    },
+    {
+      "name": "Myles Lewis-Skelly",
+      "hint": "cocky"
+    },
+    {
+      "name": "Ethan Nwaneri",
+      "hint": "wonderkid"
+    },
+    {
+      "name": "Cristhian Mosquera",
+      "hint": "unfazed"
+    },
+    {
+      "name": "João Pedro",
+      "hint": "clutch"
+    },
+    {
+      "name": "Estêvão",
+      "hint": "phenom"
+    },
+    {
+      "name": "Jamie Gittens",
+      "hint": "burst"
+    },
+    {
+      "name": "Levi Colwill",
+      "hint": "left-sided"
+    },
+    {
+      "name": "Leny Yoro",
+      "hint": "promise"
+    },
+    {
+      "name": "Patrick Dorgu",
+      "hint": "flyer"
+    },
+    {
+      "name": "Senne Lammens",
+      "hint": "newcomer"
+    },
+    {
+      "name": "Lucas Bergvall",
+      "hint": "grit"
+    },
+    {
+      "name": "Archie Gray",
+      "hint": "versatile"
+    },
+    {
+      "name": "Yoane Wissa",
+      "hint": "quiet"
+    },
+    {
+      "name": "Tino Livramento",
+      "hint": "bursting"
+    },
+    {
+      "name": "Dan Burn",
+      "hint": "colossus"
+    },
+    {
+      "name": "Adam Wharton",
+      "hint": "passer"
+    },
+    {
+      "name": "Jean-Philippe Mateta",
+      "hint": "bull"
+    },
+    {
+      "name": "Yankuba Minteh",
+      "hint": "electric"
+    },
+    {
+      "name": "Murillo",
+      "hint": "aggressive"
+    },
+    {
+      "name": "Granit Xhaka",
+      "hint": "stubborn"
+    },
+    {
+      "name": "Igor Thiago",
+      "hint": "clinical"
+    },
+    {
+      "name": "Liam Delap",
+      "hint": "bustling"
+    },
+    {
+      "name": "Mateus Fernandes",
+      "hint": "unassuming"
+    },
+    {
+      "name": "Ayyoub Bouaddi",
+      "hint": "prospect"
+    },
+    {
+      "name": "Jérémy Jacquet",
+      "hint": "unknown"
+    },
+    {
+      "name": "Maxence Lacroix",
+      "hint": "physical"
+    },
+    {
+      "name": "Jan Paul van Hecke",
+      "hint": "reader"
+    },
+    {
+      "name": "Jarrad Branthwaite",
+      "hint": "beanpole"
+    },
+    {
+      "name": "Evanilson",
+      "hint": "runner"
+    },
+    {
+      "name": "Justin Kluivert",
+      "hint": "bloodline"
+    },
+    {
+      "name": "Bart Verbruggen",
+      "hint": "sweeper-keeper"
+    }
   ]
 }

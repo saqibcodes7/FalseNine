@@ -14,7 +14,7 @@ import { useLobby } from '../hooks/useLobby'
 import Game from './Game'
 import { supabase, readableError } from '../lib/supabase'
 import { loadIdentity, clearIdentity } from '../lib/identity'
-import { PACKS, DIFFICULTIES, getPack, getDifficulty, playersFor } from '../data/packs'
+import { PACKS, DIFFICULTIES, getPack, getDifficulty, playersFor, candidatesFor } from '../data/packs'
 
 const MIN_PLAYERS = 3
 
@@ -56,7 +56,7 @@ export default function Lobby() {
       player_pack: session.player_pack,
       difficulty: session.difficulty,
       num_imposters: session.num_imposters,
-      ai_hints_enabled: session.ai_hints_enabled,
+      hints_enabled: session.hints_enabled,
       votes_visible: session.votes_visible,
       discussion_seconds: session.discussion_seconds,
       voting_seconds: session.voting_seconds,
@@ -74,7 +74,7 @@ export default function Lobby() {
         p_player_pack: draft.player_pack,
         p_difficulty: draft.difficulty,
         p_num_imposters: draft.num_imposters,
-        p_ai_hints_enabled: draft.ai_hints_enabled,
+        p_hints_enabled: draft.hints_enabled,
         p_votes_visible: draft.votes_visible,
         p_discussion_seconds: draft.discussion_seconds,
         p_voting_seconds: draft.voting_seconds,
@@ -89,10 +89,13 @@ export default function Lobby() {
     if (!draft || starting) return
     setStarting(true)
     setStartError(null)
+    // Both arrays go up, in step with each other. The server draws the index.
+    const { names, hints } = candidatesFor(draft.player_pack, draft.difficulty)
     const { error } = await supabase.rpc('start_game', {
       p_session_id: session.id,
       p_player_id: identity.playerId,
-      p_candidates: playersFor(draft.player_pack, draft.difficulty),
+      p_candidates: names,
+      p_hints: hints,
     })
     setStarting(false)
     if (error) setStartError(readableError(error, 'Could not start the game.'))
@@ -209,7 +212,7 @@ export default function Lobby() {
               ['Imposters', String(session.num_imposters)],
               ['Discussion', formatSeconds(session.discussion_seconds)],
               ['Voting', formatSeconds(session.voting_seconds)],
-              ['AI hints', session.ai_hints_enabled ? 'On' : 'Off'],
+              ['Hints for imposters', session.hints_enabled ? 'On' : 'Off'],
               ['Live votes', session.votes_visible ? 'Shown' : 'Hidden'],
             ].map(([k, v]) => (
               <div key={k} className="flex items-baseline justify-between gap-4 px-4 py-2.5">
@@ -345,10 +348,10 @@ export default function Lobby() {
           />
 
           <Toggle
-            label="AI hints for imposters"
-            description="Gives each imposter a vague clue about the player instead of nothing at all. Easier for them, harder for you."
-            checked={draft?.ai_hints_enabled ?? false}
-            onChange={(v) => set({ ai_hints_enabled: v })}
+            label="Hints for imposters"
+            description="Each imposter gets one vague word about the footballer instead of nothing at all. Easier for them, harder for you."
+            checked={draft?.hints_enabled ?? false}
+            onChange={(v) => set({ hints_enabled: v })}
           />
 
           <Toggle

@@ -39,7 +39,7 @@ export function readableError(error, fallback = 'Something went wrong.') {
   // The app is ahead of the database: a migration has not been run yet.
   // PostgREST reports this as a missing function, which is not what the person
   // holding the phone needs to hear.
-  if (/could not find the function public\.(create_session|update_session_settings)/i.test(message)) {
+  if (/could not find the function public\.(create_session|update_session_settings|start_game)/i.test(message)) {
     return 'The database is a step behind the app. Run the newest file in supabase/migrations in the Supabase SQL editor, then try again.'
   }
 
@@ -54,7 +54,7 @@ export function readableError(error, fallback = 'Something went wrong.') {
 
 /** Every column the browser is allowed to read from `sessions`. */
 export const SESSION_COLUMNS =
-  'id, code, host_player_id, player_pack, difficulty, num_imposters, ai_hints_enabled, votes_visible, discussion_seconds, voting_seconds, status, current_round, created_at, started_at, winner, salvage_player_id, salvage_guess, salvage_correct, revealed_target, ended_at'
+  'id, code, host_player_id, player_pack, difficulty, num_imposters, hints_enabled, votes_visible, discussion_seconds, voting_seconds, status, current_round, created_at, started_at, peek_ends_at, winner, salvage_player_id, salvage_guess, salvage_correct, revealed_target, ended_at'
 
 /** Every column the browser is allowed to read from `players`. */
 export const PLAYER_COLUMNS =

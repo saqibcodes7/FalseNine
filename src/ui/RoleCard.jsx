@@ -6,7 +6,7 @@ import Logo from './Logo'
  * real hinge.
  *
  *   role 'civilian' → the footballer's name, large, in gold
- *   role 'imposter' → crimson, IMPOSTER, and the clue if hints are on
+ *   role 'imposter' → crimson, IMPOSTER, and the one-word clue if hints are on
  *
  * Nothing about the footballer ever renders on an imposter's card, so there
  * is nothing to find in the DOM either.
@@ -52,9 +52,15 @@ export default function RoleCard({
                   Imposter
                 </p>
                 {hint ? (
-                  <div className="surface-sunken mt-1 w-full px-3.5 py-3 text-left">
-                    <p className="eyebrow">Your clue</p>
-                    <p className="mt-1.5 text-subhead leading-snug text-text">{hint}</p>
+                  // One word, given the room a single word needs to land.
+                  <div className="surface-sunken mt-1 w-full px-4 py-3.5 text-center">
+                    <p className="eyebrow">Your only clue</p>
+                    <p
+                      className="display mt-1 text-[clamp(1.35rem,9cqw,1.85rem)] text-balance text-text"
+                      data-testid="hint"
+                    >
+                      {hint}
+                    </p>
                   </div>
                 ) : (
                   <p className="max-w-[24ch] text-subhead leading-snug text-text-2">

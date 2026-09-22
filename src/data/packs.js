@@ -20,6 +20,13 @@ import worldCup from './world_cup.json'
  * `sessions.difficulty`, so if you rename one you will orphan any lobby created
  * before the rename. Add, don't rename.
  *
+ * Every footballer carries a one-word hint: what an imposter is shown instead
+ * of the name, if the host turns hints on. They are deliberately vague — the
+ * thing people say about that player rather than anything you could look up.
+ * Vinícius Júnior is "flair", Bruno Fernandes is "captain", Virgil van Dijk is
+ * "aura". No clubs, no countries, no shirt numbers: a clue you can bluff
+ * around, not one that hands the game over.
+ *
  * The lists were written from general football knowledge and a read of the
  * summer 2026 window, not a live data source. Give them a read before launch;
  * squads move on.
@@ -78,15 +85,44 @@ export function getDifficulty(id) {
 }
 
 /**
+ * One entry, whichever shape the pack file is in. The files hold
+ * `{ name, hint }`, but an older pack — or a hand-edited one — may still be a
+ * bare list of names, and a missing hint should cost you the clue, not the game.
+ */
+function entry(item) {
+  if (typeof item === 'string') return { name: item, hint: null }
+  return { name: item?.name ?? '', hint: item?.hint ?? null }
+}
+
+/**
  * The footballers in play for a pack at a difficulty: every tier up to and
- * including the chosen one. Unknown ids fall back to the defaults rather than
- * throwing, since a stale lobby row should degrade to an easy game, not a
- * blank screen.
+ * including the chosen one, as `{ name, hint }`. Unknown ids fall back to the
+ * defaults rather than throwing, since a stale lobby row should degrade to an
+ * easy game, not a blank screen.
  */
 export function playersFor(packId, difficultyId) {
   const pack = getPack(packId)
   const depth = DIFFICULTIES.findIndex((d) => d.id === getDifficulty(difficultyId).id)
-  return DIFFICULTIES.slice(0, depth + 1).flatMap((d) => pack.tiers[d.id] ?? [])
+  return DIFFICULTIES.slice(0, depth + 1)
+    .flatMap((d) => pack.tiers[d.id] ?? [])
+    .map(entry)
+    .filter((p) => p.name)
+}
+
+/**
+ * What start_game() wants: the same list split into two parallel arrays, so
+ * hints[i] belongs to names[i].
+ *
+ * The whole pack's hints go up with the request, not just one. The server draws
+ * the footballer, so if only the winning hint travelled, the payload would name
+ * the answer — and the host's own phone would be holding it.
+ */
+export function candidatesFor(packId, difficultyId) {
+  const list = playersFor(packId, difficultyId)
+  return {
+    names: list.map((p) => p.name),
+    hints: list.map((p) => p.hint ?? ''),
+  }
 }
 
 /**

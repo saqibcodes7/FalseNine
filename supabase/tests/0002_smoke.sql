@@ -25,7 +25,7 @@ from sessions where id = :'host_session_id';
 \echo '=== 2. the host can pick a harder mode, and the pack with it ==='
 set role anon;
 select update_session_settings(p_session_id => :'host_session_id', p_player_id => :'host_player_id',
-  p_player_pack => 'world_cup', p_difficulty => 'you_know_ball', p_num_imposters => null, p_ai_hints_enabled => null,
+  p_player_pack => 'world_cup', p_difficulty => 'you_know_ball', p_num_imposters => null, p_hints_enabled => null,
   p_votes_visible => null, p_discussion_seconds => null, p_voting_seconds => null);
 reset role;
 select case when (player_pack, difficulty) = ('world_cup', 'you_know_ball')
@@ -36,7 +36,7 @@ from sessions where id = :'host_session_id';
 \echo '=== 3. nulls leave the difficulty alone (partial saves are fine) ==='
 set role anon;
 select update_session_settings(p_session_id => :'host_session_id', p_player_id => :'host_player_id',
-  p_player_pack => null, p_difficulty => null, p_num_imposters => 2, p_ai_hints_enabled => null,
+  p_player_pack => null, p_difficulty => null, p_num_imposters => 2, p_hints_enabled => null,
   p_votes_visible => null, p_discussion_seconds => null, p_voting_seconds => null);
 reset role;
 select case when difficulty = 'you_know_ball' and num_imposters = 2
@@ -49,7 +49,7 @@ set role anon;
 do $$ begin
   perform update_session_settings(
     p_session_id => (select id from sessions limit 1), p_player_id => (select host_player_id from sessions limit 1),
-    p_player_pack => null, p_difficulty => 'impossible', p_num_imposters => null, p_ai_hints_enabled => null,
+    p_player_pack => null, p_difficulty => 'impossible', p_num_imposters => null, p_hints_enabled => null,
     p_votes_visible => null, p_discussion_seconds => null, p_voting_seconds => null);
   raise notice 'FAIL: unknown difficulty accepted';
 exception when check_violation then raise notice 'PASS: %', sqlerrm;

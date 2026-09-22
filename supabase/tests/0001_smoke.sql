@@ -24,7 +24,7 @@ delete from sessions;
 \echo '=== 1. create_session as anon ==='
 set role anon;
 select * from create_session(p_display_name => 'Saqib', p_player_pack => 'premier_league', p_difficulty => 'casual',
-  p_num_imposters => 1, p_ai_hints_enabled => true, p_discussion_seconds => 180, p_voting_seconds => 60) \gset host_
+  p_num_imposters => 1, p_hints_enabled => true, p_discussion_seconds => 180, p_voting_seconds => 60) \gset host_
 \echo 'session code:' :'host_code'
 reset role;
 
@@ -105,10 +105,10 @@ select id from players where is_host \gset h_
 \echo '=== 11. host can change settings ==='
 set role anon;
 select update_session_settings(p_session_id => :'s_id', p_player_id => :'h_id', p_player_pack => 'world_cup',
-  p_difficulty => 'ball_aware', p_num_imposters => 2, p_ai_hints_enabled => false, p_votes_visible => null,
+  p_difficulty => 'ball_aware', p_num_imposters => 2, p_hints_enabled => false, p_votes_visible => null,
   p_discussion_seconds => 240, p_voting_seconds => 45);
 reset role;
-select player_pack, difficulty, num_imposters, ai_hints_enabled, discussion_seconds, voting_seconds from sessions;
+select player_pack, difficulty, num_imposters, hints_enabled, discussion_seconds, voting_seconds from sessions;
 
 \echo '=== 12. a non-host cannot change settings ==='
 set role anon;
@@ -117,7 +117,7 @@ do $$ begin
     p_session_id => (select id from sessions limit 1),
     p_player_id => (select id from players where display_name = 'Amir'),
     p_player_pack => 'premier_league', p_difficulty => 'casual', p_num_imposters => 1,
-    p_ai_hints_enabled => true, p_votes_visible => null, p_discussion_seconds => 300, p_voting_seconds => 90);
+    p_hints_enabled => true, p_votes_visible => null, p_discussion_seconds => 300, p_voting_seconds => 90);
   raise notice 'FAIL: non-host changed settings';
 exception when insufficient_privilege then raise notice 'PASS: %', sqlerrm;
 end $$;
@@ -127,7 +127,7 @@ do $$ begin
   perform update_session_settings(
     p_session_id => (select id from sessions limit 1), p_player_id => (select id from players where is_host),
     p_player_pack => 'world_cup', p_difficulty => 'ball_aware', p_num_imposters => 2,
-    p_ai_hints_enabled => false, p_votes_visible => null, p_discussion_seconds => 30, p_voting_seconds => 45);
+    p_hints_enabled => false, p_votes_visible => null, p_discussion_seconds => 30, p_voting_seconds => 45);
   raise notice 'FAIL: 30s discussion accepted';
 exception when check_violation then raise notice 'PASS: discussion_seconds range enforced';
 end $$;

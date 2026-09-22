@@ -1,108 +1,408 @@
 {
   "casual": [
-    "Pelé",
-    "Diego Maradona",
-    "Lionel Messi",
-    "Cristiano Ronaldo",
-    "Zinedine Zidane",
-    "Ronaldo Nazário",
-    "Ronaldinho",
-    "David Beckham",
-    "Thierry Henry",
-    "Wayne Rooney",
-    "Neymar",
-    "Kylian Mbappé",
-    "Luka Modrić",
-    "Andrés Iniesta",
-    "Xavi",
-    "Franz Beckenbauer",
-    "Johan Cruyff",
-    "Bobby Moore",
-    "Gary Lineker",
-    "Paolo Maldini",
-    "Roberto Baggio",
-    "Gianluigi Buffon",
-    "Iker Casillas",
-    "Miroslav Klose",
-    "Harry Kane",
-    "Kaká",
-    "Cafu",
-    "Roberto Carlos",
-    "Michael Owen",
-    "Rodri"
+    {
+      "name": "Pelé",
+      "hint": "immortal"
+    },
+    {
+      "name": "Diego Maradona",
+      "hint": "genius"
+    },
+    {
+      "name": "Lionel Messi",
+      "hint": "inevitable"
+    },
+    {
+      "name": "Cristiano Ronaldo",
+      "hint": "relentless"
+    },
+    {
+      "name": "Zinedine Zidane",
+      "hint": "pirouette"
+    },
+    {
+      "name": "Ronaldo Nazário",
+      "hint": "unstoppable"
+    },
+    {
+      "name": "Ronaldinho",
+      "hint": "joy"
+    },
+    {
+      "name": "David Beckham",
+      "hint": "whipped"
+    },
+    {
+      "name": "Thierry Henry",
+      "hint": "gliding"
+    },
+    {
+      "name": "Wayne Rooney",
+      "hint": "bulldog"
+    },
+    {
+      "name": "Neymar",
+      "hint": "theatrical"
+    },
+    {
+      "name": "Kylian Mbappé",
+      "hint": "lightning"
+    },
+    {
+      "name": "Luka Modrić",
+      "hint": "maestro"
+    },
+    {
+      "name": "Andrés Iniesta",
+      "hint": "ghost"
+    },
+    {
+      "name": "Xavi",
+      "hint": "tempo"
+    },
+    {
+      "name": "Franz Beckenbauer",
+      "hint": "sweeper"
+    },
+    {
+      "name": "Johan Cruyff",
+      "hint": "philosopher"
+    },
+    {
+      "name": "Bobby Moore",
+      "hint": "composure"
+    },
+    {
+      "name": "Gary Lineker",
+      "hint": "poacher"
+    },
+    {
+      "name": "Paolo Maldini",
+      "hint": "timeless"
+    },
+    {
+      "name": "Roberto Baggio",
+      "hint": "melancholy"
+    },
+    {
+      "name": "Gianluigi Buffon",
+      "hint": "longevity"
+    },
+    {
+      "name": "Iker Casillas",
+      "hint": "reflexes"
+    },
+    {
+      "name": "Miroslav Klose",
+      "hint": "efficient"
+    },
+    {
+      "name": "Harry Kane",
+      "hint": "complete"
+    },
+    {
+      "name": "Kaká",
+      "hint": "gallop"
+    },
+    {
+      "name": "Cafu",
+      "hint": "overlapping"
+    },
+    {
+      "name": "Roberto Carlos",
+      "hint": "thunderbolt"
+    },
+    {
+      "name": "Michael Owen",
+      "hint": "burst"
+    },
+    {
+      "name": "Rodri",
+      "hint": "metronome"
+    }
   ],
   "ball_aware": [
-    "Lothar Matthäus",
-    "Gerd Müller",
-    "Marco van Basten",
-    "Zico",
-    "Sócrates",
-    "Romário",
-    "Rivaldo",
-    "Michel Platini",
-    "Eusébio",
-    "Bobby Charlton",
-    "Geoff Hurst",
-    "Gordon Banks",
-    "Paul Gascoigne",
-    "Alan Shearer",
-    "Steven Gerrard",
-    "Frank Lampard",
-    "Fabio Cannavaro",
-    "Andrea Pirlo",
-    "Francesco Totti",
-    "Alessandro Del Piero",
-    "Philipp Lahm",
-    "Bastian Schweinsteiger",
-    "Thomas Müller",
-    "Manuel Neuer",
-    "Lilian Thuram",
-    "Patrick Vieira",
-    "Didier Drogba",
-    "Samuel Eto'o",
-    "Antoine Griezmann",
-    "Ángel Di María"
+    {
+      "name": "Lothar Matthäus",
+      "hint": "driving"
+    },
+    {
+      "name": "Gerd Müller",
+      "hint": "box"
+    },
+    {
+      "name": "Marco van Basten",
+      "hint": "volley"
+    },
+    {
+      "name": "Zico",
+      "hint": "free-kicks"
+    },
+    {
+      "name": "Sócrates",
+      "hint": "thinker"
+    },
+    {
+      "name": "Romário",
+      "hint": "sly"
+    },
+    {
+      "name": "Rivaldo",
+      "hint": "languid"
+    },
+    {
+      "name": "Michel Platini",
+      "hint": "elegant"
+    },
+    {
+      "name": "Eusébio",
+      "hint": "explosive"
+    },
+    {
+      "name": "Bobby Charlton",
+      "hint": "statesman"
+    },
+    {
+      "name": "Geoff Hurst",
+      "hint": "clinical"
+    },
+    {
+      "name": "Gordon Banks",
+      "hint": "unbeatable"
+    },
+    {
+      "name": "Paul Gascoigne",
+      "hint": "mercurial"
+    },
+    {
+      "name": "Alan Shearer",
+      "hint": "brutal"
+    },
+    {
+      "name": "Steven Gerrard",
+      "hint": "thunder"
+    },
+    {
+      "name": "Frank Lampard",
+      "hint": "arriving"
+    },
+    {
+      "name": "Fabio Cannavaro",
+      "hint": "leader"
+    },
+    {
+      "name": "Andrea Pirlo",
+      "hint": "serene"
+    },
+    {
+      "name": "Francesco Totti",
+      "hint": "loyal"
+    },
+    {
+      "name": "Alessandro Del Piero",
+      "hint": "curler"
+    },
+    {
+      "name": "Philipp Lahm",
+      "hint": "reliable"
+    },
+    {
+      "name": "Bastian Schweinsteiger",
+      "hint": "warrior"
+    },
+    {
+      "name": "Thomas Müller",
+      "hint": "awkward"
+    },
+    {
+      "name": "Manuel Neuer",
+      "hint": "commanding"
+    },
+    {
+      "name": "Lilian Thuram",
+      "hint": "unlikely"
+    },
+    {
+      "name": "Patrick Vieira",
+      "hint": "towering"
+    },
+    {
+      "name": "Didier Drogba",
+      "hint": "force"
+    },
+    {
+      "name": "Samuel Eto'o",
+      "hint": "sharp"
+    },
+    {
+      "name": "Antoine Griezmann",
+      "hint": "cheeky"
+    },
+    {
+      "name": "Ángel Di María",
+      "hint": "finals"
+    }
   ],
   "you_know_ball": [
-    "Garrincha",
-    "Jairzinho",
-    "Carlos Alberto",
-    "Gérson",
-    "Tostão",
-    "Just Fontaine",
-    "Raymond Kopa",
-    "Sándor Kocsis",
-    "Ferenc Puskás",
-    "Nándor Hidegkuti",
-    "Uwe Seeler",
-    "Helmut Rahn",
-    "Fritz Walter",
-    "Karl-Heinz Rummenigge",
-    "Pierre Littbarski",
-    "Rudi Völler",
-    "Jürgen Klinsmann",
-    "Andreas Brehme",
-    "Paolo Rossi",
-    "Salvatore Schillaci",
-    "Dino Zoff",
-    "Gaetano Scirea",
-    "Marco Tardelli",
-    "Mario Kempes",
-    "Daniel Passarella",
-    "Jorge Burruchaga",
-    "Claudio Caniggia",
-    "Gabriel Batistuta",
-    "Hristo Stoichkov",
-    "Roger Milla",
-    "Oleg Salenko",
-    "Davor Šuker",
-    "Bebeto",
-    "Dunga",
-    "Cláudio Taffarel",
-    "Guillermo Ochoa",
-    "Keylor Navas",
-    "Tim Howard",
-    "James Rodríguez",
-    "Unai Simón"
+    {
+      "name": "Garrincha",
+      "hint": "dribbler"
+    },
+    {
+      "name": "Jairzinho",
+      "hint": "hurricane"
+    },
+    {
+      "name": "Carlos Alberto",
+      "hint": "thunderous"
+    },
+    {
+      "name": "Gérson",
+      "hint": "brain"
+    },
+    {
+      "name": "Tostão",
+      "hint": "intelligent"
+    },
+    {
+      "name": "Just Fontaine",
+      "hint": "prolific"
+    },
+    {
+      "name": "Raymond Kopa",
+      "hint": "pioneer"
+    },
+    {
+      "name": "Sándor Kocsis",
+      "hint": "headers"
+    },
+    {
+      "name": "Ferenc Puskás",
+      "hint": "cannon"
+    },
+    {
+      "name": "Nándor Hidegkuti",
+      "hint": "deep"
+    },
+    {
+      "name": "Uwe Seeler",
+      "hint": "stocky"
+    },
+    {
+      "name": "Helmut Rahn",
+      "hint": "decisive"
+    },
+    {
+      "name": "Fritz Walter",
+      "hint": "captain"
+    },
+    {
+      "name": "Karl-Heinz Rummenigge",
+      "hint": "sleek"
+    },
+    {
+      "name": "Pierre Littbarski",
+      "hint": "bandy"
+    },
+    {
+      "name": "Rudi Völler",
+      "hint": "curls"
+    },
+    {
+      "name": "Jürgen Klinsmann",
+      "hint": "diver"
+    },
+    {
+      "name": "Andreas Brehme",
+      "hint": "two-footed"
+    },
+    {
+      "name": "Paolo Rossi",
+      "hint": "redemption"
+    },
+    {
+      "name": "Salvatore Schillaci",
+      "hint": "surprise"
+    },
+    {
+      "name": "Dino Zoff",
+      "hint": "ageless"
+    },
+    {
+      "name": "Gaetano Scirea",
+      "hint": "gentleman"
+    },
+    {
+      "name": "Marco Tardelli",
+      "hint": "tenacious"
+    },
+    {
+      "name": "Mario Kempes",
+      "hint": "mane"
+    },
+    {
+      "name": "Daniel Passarella",
+      "hint": "iron"
+    },
+    {
+      "name": "Jorge Burruchaga",
+      "hint": "winner"
+    },
+    {
+      "name": "Claudio Caniggia",
+      "hint": "flowing"
+    },
+    {
+      "name": "Gabriel Batistuta",
+      "hint": "power"
+    },
+    {
+      "name": "Hristo Stoichkov",
+      "hint": "fiery"
+    },
+    {
+      "name": "Roger Milla",
+      "hint": "dancing"
+    },
+    {
+      "name": "Oleg Salenko",
+      "hint": "one-off"
+    },
+    {
+      "name": "Davor Šuker",
+      "hint": "silky"
+    },
+    {
+      "name": "Bebeto",
+      "hint": "partner"
+    },
+    {
+      "name": "Dunga",
+      "hint": "snarling"
+    },
+    {
+      "name": "Cláudio Taffarel",
+      "hint": "shootouts"
+    },
+    {
+      "name": "Guillermo Ochoa",
+      "hint": "heroics"
+    },
+    {
+      "name": "Keylor Navas",
+      "hint": "underdog"
+    },
+    {
+      "name": "Tim Howard",
+      "hint": "saves"
+    },
+    {
+      "name": "James Rodríguez",
+      "hint": "breakout"
+    },
+    {
+      "name": "Unai Simón",
+      "hint": "modern"
+    }
   ]
 }

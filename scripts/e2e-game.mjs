@@ -72,7 +72,9 @@ async function peek(p) {
   await p.page.waitForFunction(() => (document.querySelector('.rolecard-front p.display')?.textContent || '').trim().length > 0)
   const text = (await face.textContent()).trim()
   const imposter = text === 'Imposter'
-  return { imposter, name: imposter ? null : text }
+  const hintEl = p.page.locator('[data-testid="hint"]')
+  const hint = (await hintEl.count()) ? (await hintEl.textContent()).trim() : null
+  return { imposter, name: imposter ? null : text, hint }
 }
 
 async function voteFor(voter, targetName) {
@@ -94,14 +96,26 @@ const code = await createLobby(host)
 for (const p of [amir, priya, tom]) await join(p, code)
 await host.page.waitForFunction(() => document.body.innerText.includes('Tom'))
 
+// Hints on for this game, so the imposter's clue can be checked.
+await host.page.getByText('Hints for imposters').click()
+await host.page.waitForFunction(() => document.querySelector('input[type=checkbox]:checked') !== null)
+await host.page.waitForTimeout(900) // debounced save
+
 await host.page.getByRole('button', { name: 'Start game' }).click()
 await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Peek/)))
 check('start game put every phone on the peek screen', true)
 await host.page.screenshot({ path: `${OUT}/01-peek-facedown.png`, fullPage: true })
 
-// Peek, one by one; the last peek should open the discussion by itself.
+// Peek, one by one. The last peek must NOT snatch the card away: the server
+// arms a grace period and the discussion opens when it runs out.
 const cards = {}
 for (const p of everyone) cards[p.name] = await peek(p)
+const lastPhase = await phaseOf(tom)
+check('the last player to look is still on their card, not in the discussion', /Peek/i.test(lastPhase), lastPhase)
+const countdown = await tom.page.locator('[data-testid="peek-countdown"]').innerText()
+check('the table is shown a countdown to kick-off', /Discussion starts in\s*\d+/i.test(countdown), countdown.replace(/\n/g, ' '))
+await tom.page.screenshot({ path: `${OUT}/01b-peek-countdown.png`, fullPage: true })
+
 const imposters = everyone.filter((p) => cards[p.name].imposter)
 const civilians = everyone.filter((p) => !cards[p.name].imposter)
 check('exactly one imposter was dealt', imposters.length === 1, JSON.stringify(cards))
@@ -112,11 +126,23 @@ check(
 )
 const target = cards[civilians[0].name].name
 const imposter = imposters[0]
+check(
+  'the imposter is given a one-word clue',
+  Boolean(cards[imposter.name].hint) && cards[imposter.name].hint.split(/\s+/).length === 1,
+  String(cards[imposter.name].hint),
+)
+check(
+  'the clue is not the footballer, and no civilian is shown one',
+  cards[imposter.name].hint.toLowerCase() !== target.toLowerCase() &&
+    civilians.every((p) => cards[p.name].hint === null),
+  `${cards[imposter.name].hint} vs ${target}`,
+)
 await imposter.page.screenshot({ path: `${OUT}/02-imposter-card.png`, fullPage: true })
 await civilians[0].page.screenshot({ path: `${OUT}/03-civilian-card.png`, fullPage: true })
 
-await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Discuss/)))
-check('the last peek opened the discussion on every phone', true)
+// Nothing is pressed here: the grace period expiring is what moves the game on.
+await Promise.all(everyone.map((p) => waitPhase(p, /Round 1 · Discuss/, 20000)))
+check('the grace period ran out and the discussion opened on every phone', true)
 const timerText = await host.page.getByRole('timer').getAttribute('aria-label')
 check('discussion clock is running from the server deadline', /Discussion, [0-2]:\d\d remaining/.test(timerText), timerText)
 await host.page.screenshot({ path: `${OUT}/04-discussion.png`, fullPage: true })
@@ -213,7 +239,8 @@ for (const p of trio) cards2[p.name] = await peek(p)
 const imp2 = trio.find((p) => cards2[p.name].imposter)
 const civ2 = trio.filter((p) => !cards2[p.name].imposter)
 const target2 = cards2[civ2[0].name].name
-await Promise.all(trio.map((p) => waitPhase(p, /Round 1 · Discuss/)))
+check('hints off means the imposter is shown no clue', cards2[imp2.name].hint === null, String(cards2[imp2.name].hint))
+await Promise.all(trio.map((p) => waitPhase(p, /Round 1 · Discuss/, 20000)))
 
 for (const p of trio) await p.page.getByRole('button', { name: 'Vote now' }).click()
 await Promise.all(trio.map((p) => waitPhase(p, /Round 1 · Vote/)))

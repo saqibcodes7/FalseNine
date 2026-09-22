@@ -178,8 +178,8 @@ export default function Kit() {
               warning="Imposters have to be outnumbered. With 4 players you can have at most 1."
             />
             <Toggle
-              label="AI hints for imposters"
-              description="Gives each imposter a vague clue about the player."
+              label="Hints for imposters"
+              description="Each imposter gets one vague word about the footballer."
               checked={toggle}
               onChange={setToggle}
             />
@@ -240,7 +240,7 @@ export default function Kit() {
             flipped={flipped}
             role={role}
             playerName="Bukayo Saka"
-            hint={role === 'imposter' ? 'Left-footed, plays wide, wears number seven.' : null}
+            hint={role === 'imposter' ? 'humble' : null}
             onFlip={() => setFlipped((f) => !f)}
           />
           <div className="flex flex-col gap-3">

@@ -36,7 +36,7 @@ export default function CreateGame() {
       p_player_pack: DEFAULT_PACK_ID,
       p_difficulty: DEFAULT_DIFFICULTY_ID,
       p_num_imposters: 1,
-      p_ai_hints_enabled: false,
+      p_hints_enabled: false,
       p_votes_visible: false,
       p_discussion_seconds: 180,
       p_voting_seconds: 60,

@@ -1,108 +1,408 @@
 {
   "casual": [
-    "Kylian Mbappé",
-    "Jude Bellingham",
-    "Vinícius Júnior",
-    "Lamine Yamal",
-    "Raphinha",
-    "Harry Kane",
-    "Ousmane Dembélé",
-    "Jamal Musiala",
-    "Pedri",
-    "Kevin De Bruyne",
-    "Thibaut Courtois",
-    "Julián Álvarez",
-    "Lautaro Martínez",
-    "Trent Alexander-Arnold",
-    "Federico Valverde",
-    "Rodrygo",
-    "Gavi",
-    "Frenkie de Jong",
-    "Joshua Kimmich",
-    "Luis Díaz",
-    "Scott McTominay",
-    "Victor Osimhen",
-    "Achraf Hakimi",
-    "Rodri",
-    "Bernardo Silva",
-    "Anthony Gordon",
-    "John Stones",
-    "Ibrahima Konaté",
-    "Paul Pogba",
-    "Cristian Romero"
+    {
+      "name": "Kylian Mbappé",
+      "hint": "lightning"
+    },
+    {
+      "name": "Jude Bellingham",
+      "hint": "swagger"
+    },
+    {
+      "name": "Vinícius Júnior",
+      "hint": "flair"
+    },
+    {
+      "name": "Lamine Yamal",
+      "hint": "generational"
+    },
+    {
+      "name": "Raphinha",
+      "hint": "workrate"
+    },
+    {
+      "name": "Harry Kane",
+      "hint": "complete"
+    },
+    {
+      "name": "Ousmane Dembélé",
+      "hint": "two-footed"
+    },
+    {
+      "name": "Jamal Musiala",
+      "hint": "weaves"
+    },
+    {
+      "name": "Pedri",
+      "hint": "orchestrator"
+    },
+    {
+      "name": "Kevin De Bruyne",
+      "hint": "crosser"
+    },
+    {
+      "name": "Thibaut Courtois",
+      "hint": "wall"
+    },
+    {
+      "name": "Julián Álvarez",
+      "hint": "tireless"
+    },
+    {
+      "name": "Lautaro Martínez",
+      "hint": "predator"
+    },
+    {
+      "name": "Trent Alexander-Arnold",
+      "hint": "pinpoint"
+    },
+    {
+      "name": "Federico Valverde",
+      "hint": "lungs"
+    },
+    {
+      "name": "Rodrygo",
+      "hint": "understudy"
+    },
+    {
+      "name": "Gavi",
+      "hint": "terrier"
+    },
+    {
+      "name": "Frenkie de Jong",
+      "hint": "carrier"
+    },
+    {
+      "name": "Joshua Kimmich",
+      "hint": "everywhere"
+    },
+    {
+      "name": "Luis Díaz",
+      "hint": "smile"
+    },
+    {
+      "name": "Scott McTominay",
+      "hint": "timing"
+    },
+    {
+      "name": "Victor Osimhen",
+      "hint": "explosive"
+    },
+    {
+      "name": "Achraf Hakimi",
+      "hint": "rampaging"
+    },
+    {
+      "name": "Rodri",
+      "hint": "metronome"
+    },
+    {
+      "name": "Bernardo Silva",
+      "hint": "nutmegs"
+    },
+    {
+      "name": "Anthony Gordon",
+      "hint": "pest"
+    },
+    {
+      "name": "John Stones",
+      "hint": "ball-playing"
+    },
+    {
+      "name": "Ibrahima Konaté",
+      "hint": "quick"
+    },
+    {
+      "name": "Paul Pogba",
+      "hint": "flamboyant"
+    },
+    {
+      "name": "Cristian Romero",
+      "hint": "snarling"
+    }
   ],
   "ball_aware": [
-    "Vitinha",
-    "Désiré Doué",
-    "Khvicha Kvaratskhelia",
-    "Marquinhos",
-    "Nuno Mendes",
-    "João Neves",
-    "Michael Olise",
-    "Dayot Upamecano",
-    "Alphonso Davies",
-    "Leroy Sané",
-    "Serge Gnabry",
-    "Aurélien Tchouaméni",
-    "Eduardo Camavinga",
-    "Arda Güler",
-    "Antonio Rüdiger",
-    "Jules Koundé",
-    "Dani Olmo",
-    "Ferran Torres",
-    "Nicolò Barella",
-    "Hakan Çalhanoğlu",
-    "Marcus Thuram",
-    "Alessandro Bastoni",
-    "Kenan Yıldız",
-    "Dušan Vlahović",
-    "Marc-André ter Stegen",
-    "Denzel Dumfries",
-    "Karim Adeyemi",
-    "Randal Kolo Muani",
-    "Rasmus Højlund",
-    "Curtis Jones"
+    {
+      "name": "Vitinha",
+      "hint": "tiny"
+    },
+    {
+      "name": "Désiré Doué",
+      "hint": "fearless"
+    },
+    {
+      "name": "Khvicha Kvaratskhelia",
+      "hint": "mazy"
+    },
+    {
+      "name": "Marquinhos",
+      "hint": "captain"
+    },
+    {
+      "name": "Nuno Mendes",
+      "hint": "turbo"
+    },
+    {
+      "name": "João Neves",
+      "hint": "scurrying"
+    },
+    {
+      "name": "Michael Olise",
+      "hint": "wand"
+    },
+    {
+      "name": "Dayot Upamecano",
+      "hint": "rash"
+    },
+    {
+      "name": "Alphonso Davies",
+      "hint": "rocket"
+    },
+    {
+      "name": "Leroy Sané",
+      "hint": "streaky"
+    },
+    {
+      "name": "Serge Gnabry",
+      "hint": "cutting"
+    },
+    {
+      "name": "Aurélien Tchouaméni",
+      "hint": "shield"
+    },
+    {
+      "name": "Eduardo Camavinga",
+      "hint": "elastic"
+    },
+    {
+      "name": "Arda Güler",
+      "hint": "whip"
+    },
+    {
+      "name": "Antonio Rüdiger",
+      "hint": "menace"
+    },
+    {
+      "name": "Jules Koundé",
+      "hint": "dapper"
+    },
+    {
+      "name": "Dani Olmo",
+      "hint": "clever"
+    },
+    {
+      "name": "Ferran Torres",
+      "hint": "willing"
+    },
+    {
+      "name": "Nicolò Barella",
+      "hint": "fiery"
+    },
+    {
+      "name": "Hakan Çalhanoğlu",
+      "hint": "dead-ball"
+    },
+    {
+      "name": "Marcus Thuram",
+      "hint": "bloodline"
+    },
+    {
+      "name": "Alessandro Bastoni",
+      "hint": "cultured"
+    },
+    {
+      "name": "Kenan Yıldız",
+      "hint": "heir"
+    },
+    {
+      "name": "Dušan Vlahović",
+      "hint": "brooding"
+    },
+    {
+      "name": "Marc-André ter Stegen",
+      "hint": "shot-stopper"
+    },
+    {
+      "name": "Denzel Dumfries",
+      "hint": "galloping"
+    },
+    {
+      "name": "Karim Adeyemi",
+      "hint": "blistering"
+    },
+    {
+      "name": "Randal Kolo Muani",
+      "hint": "gangly"
+    },
+    {
+      "name": "Rasmus Højlund",
+      "hint": "patient"
+    },
+    {
+      "name": "Curtis Jones",
+      "hint": "tidy"
+    }
   ],
   "you_know_ball": [
-    "Dean Huijsen",
-    "Álvaro Carreras",
-    "Franco Mastantuono",
-    "Fermín López",
-    "Marc Casadó",
-    "Alejandro Balde",
-    "Joan García",
-    "Pau Cubarsí",
-    "Marcos Llorente",
-    "Pablo Barrios",
-    "Giuliano Simeone",
-    "Jan Oblak",
-    "Alexander Sørloth",
-    "Alejandro Grimaldo",
-    "Morten Hjulmand",
-    "Lee Kang-in",
-    "Yan Diomande",
-    "Jonathan Tah",
-    "Aleksandar Pavlović",
-    "Lennart Karl",
-    "Ismael Saibari",
-    "Jobe Bellingham",
-    "Serhou Guirassy",
-    "Nico Schlotterbeck",
-    "Patrik Schick",
-    "Illia Zabarnyi",
-    "Lucas Chevalier",
-    "Warren Zaïre-Emery",
-    "Senny Mayulu",
-    "Federico Dimarco",
-    "Yann Sommer",
-    "Strahinja Pavlović",
-    "Alessandro Buongiorno",
-    "Matteo Politano",
-    "Vangelis Pavlidis",
-    "Samu Aghehowa",
-    "Pedro Gonçalves",
-    "Barış Alper Yılmaz",
-    "Ricardo Pepi",
-    "Mika Biereth"
+    {
+      "name": "Dean Huijsen",
+      "hint": "composed"
+    },
+    {
+      "name": "Álvaro Carreras",
+      "hint": "overlapping"
+    },
+    {
+      "name": "Franco Mastantuono",
+      "hint": "prodigy"
+    },
+    {
+      "name": "Fermín López",
+      "hint": "energy"
+    },
+    {
+      "name": "Marc Casadó",
+      "hint": "unfussy"
+    },
+    {
+      "name": "Alejandro Balde",
+      "hint": "nippy"
+    },
+    {
+      "name": "Joan García",
+      "hint": "reflexes"
+    },
+    {
+      "name": "Pau Cubarsí",
+      "hint": "mature"
+    },
+    {
+      "name": "Marcos Llorente",
+      "hint": "engine"
+    },
+    {
+      "name": "Pablo Barrios",
+      "hint": "combative"
+    },
+    {
+      "name": "Giuliano Simeone",
+      "hint": "running"
+    },
+    {
+      "name": "Jan Oblak",
+      "hint": "veteran"
+    },
+    {
+      "name": "Alexander Sørloth",
+      "hint": "towering"
+    },
+    {
+      "name": "Alejandro Grimaldo",
+      "hint": "whipped"
+    },
+    {
+      "name": "Morten Hjulmand",
+      "hint": "anchor"
+    },
+    {
+      "name": "Lee Kang-in",
+      "hint": "crafty"
+    },
+    {
+      "name": "Yan Diomande",
+      "hint": "raw"
+    },
+    {
+      "name": "Jonathan Tah",
+      "hint": "imposing"
+    },
+    {
+      "name": "Aleksandar Pavlović",
+      "hint": "neat"
+    },
+    {
+      "name": "Lennart Karl",
+      "hint": "fledgling"
+    },
+    {
+      "name": "Ismael Saibari",
+      "hint": "box-to-box"
+    },
+    {
+      "name": "Jobe Bellingham",
+      "hint": "shadow"
+    },
+    {
+      "name": "Serhou Guirassy",
+      "hint": "prolific"
+    },
+    {
+      "name": "Nico Schlotterbeck",
+      "hint": "adventurous"
+    },
+    {
+      "name": "Patrik Schick",
+      "hint": "finisher"
+    },
+    {
+      "name": "Illia Zabarnyi",
+      "hint": "stoic"
+    },
+    {
+      "name": "Lucas Chevalier",
+      "hint": "newcomer"
+    },
+    {
+      "name": "Warren Zaïre-Emery",
+      "hint": "precocious"
+    },
+    {
+      "name": "Senny Mayulu",
+      "hint": "emerging"
+    },
+    {
+      "name": "Federico Dimarco",
+      "hint": "curler"
+    },
+    {
+      "name": "Yann Sommer",
+      "hint": "agile"
+    },
+    {
+      "name": "Strahinja Pavlović",
+      "hint": "rugged"
+    },
+    {
+      "name": "Alessandro Buongiorno",
+      "hint": "dependable"
+    },
+    {
+      "name": "Matteo Politano",
+      "hint": "inverted"
+    },
+    {
+      "name": "Vangelis Pavlidis",
+      "hint": "poacher"
+    },
+    {
+      "name": "Samu Aghehowa",
+      "hint": "rising"
+    },
+    {
+      "name": "Pedro Gonçalves",
+      "hint": "understated"
+    },
+    {
+      "name": "Barış Alper Yılmaz",
+      "hint": "bustling"
+    },
+    {
+      "name": "Ricardo Pepi",
+      "hint": "super-sub"
+    },
+    {
+      "name": "Mika Biereth",
+      "hint": "hat-tricks"
+    }
   ]
 }

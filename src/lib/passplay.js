@@ -1,4 +1,5 @@
 import { playersFor, DEFAULT_PACK_ID, DEFAULT_DIFFICULTY_ID } from '../data/packs'
+import { NO_LIMIT } from './clocks'
 
 /**
  * Pass & Play: Football Imposter on one phone, with nobody online.
@@ -21,8 +22,10 @@ import { playersFor, DEFAULT_PACK_ID, DEFAULT_DIFFICULTY_ID } from '../data/pack
 export const MIN_PLAYERS = 3
 export const MAX_PLAYERS = 12
 
-/** 0 means no limit — the table talks until someone says stop. */
-export const NO_LIMIT = 0
+/** 0 means no limit — the table talks until someone says stop. Defined in
+ *  lib/clocks.js, which the online lobby uses too, and re-exported here so
+ *  Pass & Play's callers have one place to import from. */
+export { NO_LIMIT }
 
 export const DEFAULT_SETTINGS = {
   players: 5,

@@ -297,6 +297,63 @@ check(`a surname guess ("${surname}") steals the win`, /Stolen/i.test(end2) && e
 await civ2[0].page.screenshot({ path: `${OUT}/10-full-time-stolen.png`, fullPage: true })
 
 for (const p of trio) await p.ctx.close()
+
+// ============================================================================
+// GAME 3: both clocks wound down to no limit
+// ============================================================================
+console.log('\n=== Game 3: three players, no clocks at all ===')
+const h3 = await phone('Chair')
+const ivy = await phone('Ivy')
+const jon = await phone('Jon')
+const three = [h3, ivy, jon]
+const code3 = await createLobby(h3)
+for (const p of [ivy, jon]) await join(p, code3)
+await h3.page.waitForFunction(() => document.body.innerText.includes('Jon'))
+
+// Wind both clocks all the way down. The key disables itself at the bottom.
+const windDown = async (label) => {
+  const key = h3.page.getByRole('button', { name: `Decrease ${label}` })
+  for (let i = 0; i < 30 && (await key.isEnabled()); i += 1) await key.click()
+}
+await windDown('Discussion timer')
+await windDown('Voting timer')
+const readouts = await h3.page.locator('output').allInnerTexts()
+check('both clocks read No limit once wound down', readouts.filter((t) => t === 'No limit').length === 2, readouts.join(' | '))
+await h3.page.waitForTimeout(1200) // debounced save
+
+const joinerSettings = (await ivy.page.locator('dd').allInnerTexts()).join('|')
+check('the waiting room says No limit too', (joinerSettings.match(/No limit/g) || []).length === 2, joinerSettings)
+await h3.page.screenshot({ path: `${OUT}/11-no-limit-setup.png`, fullPage: true })
+
+await h3.page.getByRole('button', { name: 'Start game' }).click()
+await Promise.all(three.map((p) => waitPhase(p, /Round 1 · Peek/)))
+for (const p of three) await peek(p)
+await Promise.all(three.map((p) => waitPhase(p, /Round 1 · Discuss/, 20000)))
+
+const clock3 = await h3.page.getByRole('timer').getAttribute('aria-label')
+check('an unlimited discussion counts up instead of down', /no limit/i.test(clock3), clock3)
+await h3.page.waitForTimeout(1600)
+const clock3b = await h3.page.getByRole('timer').getAttribute('aria-label')
+check('and it is ticking', clock3b !== clock3, `${clock3} -> ${clock3b}`)
+check('only the host is offered the way out', (await h3.page.getByRole('button', { name: 'Open the vote' }).count()) === 1 && (await ivy.page.getByRole('button', { name: 'Open the vote' }).count()) === 0)
+await h3.page.screenshot({ path: `${OUT}/12-no-limit-discussion.png`, fullPage: true })
+
+await h3.page.getByRole('button', { name: 'Open the vote' }).click()
+await Promise.all(three.map((p) => waitPhase(p, /Round 1 · Vote/)))
+check('the host opened the vote with no clock to wait for', true)
+const voteClock3 = await h3.page.getByRole('timer').getAttribute('aria-label')
+check('the vote has no clock either', /no limit/i.test(voteClock3), voteClock3)
+
+// One vote of three: not a majority, so nothing closes it but the host.
+await voteFor(ivy, jon.name)
+await h3.page.waitForFunction(() => /1 of 3/i.test(document.querySelector('[data-testid="vote-count"]')?.textContent || ''))
+check('one vote of three leaves the vote open', (await phaseOf(h3)).includes('Vote'))
+await h3.page.getByRole('button', { name: 'Close the vote' }).click()
+await Promise.all(three.map((p) => waitPhase(p, /Reveal|Discuss/, 15000)))
+check('the host closed it and the one vote was counted', true)
+await h3.page.screenshot({ path: `${OUT}/13-no-limit-closed.png`, fullPage: true })
+
+for (const p of three) await p.ctx.close()
 await browser.close()
 
 check('no unexpected console errors', consoleErrors.length === 0, consoleErrors.join(' || '))

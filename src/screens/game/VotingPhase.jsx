@@ -5,14 +5,20 @@ import TimerDisplay from "../../ui/TimerDisplay";
 import PlayerRoster from "../../ui/PlayerRoster";
 import VoteSheet from "../../ui/VoteSheet";
 import MyCard from "./MyCard";
-import { useCountdown } from "../../hooks/useCountdown";
+import Button from "../../ui/Button";
+import { useCountdown, useElapsed } from "../../hooks/useCountdown";
 import { activePlayers, phaseRound, voteBy, tallyView } from "../../lib/game";
+import { isUnlimited } from "../../lib/clocks";
 
 /*
  * Section 5, voting. One vote each, for another player still in or a skip.
  * The count of votes cast is always shown; who voted for whom only if the
  * host turned that on. The server closes the vote the moment the result
  * cannot change, or when the clock runs out.
+ *
+ * With the clock set to no limit there is nothing to run out, so the host can
+ * close the vote and have whatever is in counted. Without that, a vote where
+ * no majority forms and one player never votes would never end.
  */
 export default function VotingPhase({
   session,
@@ -20,6 +26,7 @@ export default function VotingPhase({
   rounds,
   votes,
   me,
+  isHost,
   card,
   loadCard,
   call,
@@ -34,7 +41,9 @@ export default function VotingPhase({
   const active = activePlayers(players);
   const mine = voteBy(votes, round, me.id);
   const tally = tallyView(votes, round, players);
-  const secondsLeft = useCountdown(round?.ends_at, clockOffset, nudge);
+  const unlimited = isUnlimited(session.voting_seconds);
+  const secondsLeft = useCountdown(unlimited ? null : round?.ends_at, clockOffset, nudge);
+  const elapsed = useElapsed(unlimited ? round?.started_at : null, clockOffset);
   const canVote = me.is_active && !mine;
 
   return (
@@ -47,8 +56,9 @@ export default function VotingPhase({
     >
       <TimerDisplay
         label="Voting"
-        secondsLeft={secondsLeft}
-        total={session.voting_seconds}
+        secondsLeft={unlimited ? elapsed : secondsLeft}
+        total={unlimited ? 0 : session.voting_seconds}
+        countUp={unlimited}
       />
 
       {canVote && (
@@ -123,6 +133,23 @@ export default function VotingPhase({
           )}
         </Panel>
       </div>
+
+      {unlimited && isHost && (
+        <div className="mt-5">
+          <Button
+            size="lg"
+            variant="secondary"
+            fullWidth
+            disabled={busy}
+            onClick={() => call("host_advance", {}, "Could not close the vote.")}
+          >
+            Close the vote
+          </Button>
+          <p className="mt-2 text-center text-footnote text-text-3">
+            No clock on this one. Closing it counts whatever votes are in.
+          </p>
+        </div>
+      )}
 
       <div className="mt-7">
         <PlayerRoster

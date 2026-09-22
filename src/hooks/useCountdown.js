@@ -2,6 +2,31 @@ import { useEffect, useRef, useState } from 'react'
 import { secondsUntil } from '../lib/game'
 
 /**
+ * Seconds since a moment, ticking upwards. The other side of the same coin:
+ * a phase the host set to "no limit" has no deadline to count down to, so the
+ * clock shows how long it has been going instead.
+ *
+ * `startedAt` is the server's timestamp and `clockOffset` corrects this phone
+ * against it, exactly as the countdown does, so every phone at the table reads
+ * the same number. Pass & Play leaves the offset at zero: there is only one
+ * clock in that mode, and it is the one in your hand.
+ */
+export function useElapsed(startedAt, clockOffset = 0) {
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    if (!startedAt) return undefined
+    setNow(Date.now())
+    const id = setInterval(() => setNow(Date.now()), 250)
+    return () => clearInterval(id)
+  }, [startedAt])
+
+  if (!startedAt) return 0
+  const serverNow = now + clockOffset
+  return Math.max(0, Math.floor((serverNow - new Date(startedAt).getTime()) / 1000))
+}
+
+/**
  * Counts down to a server deadline and calls `onExpire` when it passes.
  *
  * The deadline is the server's, and `clockOffset` (from useLobby) corrects

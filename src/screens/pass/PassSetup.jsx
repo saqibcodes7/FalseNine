@@ -5,24 +5,13 @@ import Stepper from '../../ui/Stepper'
 import Toggle from '../../ui/Toggle'
 import Segmented from '../../ui/Segmented'
 import { PACKS, DIFFICULTIES, getDifficulty, playersFor } from '../../data/packs'
-import {
-  MIN_PLAYERS,
-  MAX_PLAYERS,
-  NO_LIMIT,
-  maxImpostersFor,
-  settingsAreValid,
-} from '../../lib/passplay'
+import { MIN_PLAYERS, MAX_PLAYERS, maxImpostersFor, settingsAreValid } from '../../lib/passplay'
+import { DISCUSSION_STEPS, VOTING_STEPS, formatClock } from '../../lib/clocks'
 
 /*
  * The only setup screen in the mode. Nobody types a name and nobody types a
  * code: how many of you there are, how hard you want it, and how long you get.
  */
-function clock(seconds) {
-  if (seconds === NO_LIMIT) return 'No limit'
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${String(s).padStart(2, '0')}`
-}
 
 export default function PassSetup({ settings, onChange, onDeal }) {
   const set = (patch) => onChange({ ...settings, ...patch })
@@ -129,24 +118,20 @@ export default function PassSetup({ settings, onChange, onDeal }) {
         <Panel title="Clocks" bodyClassName="space-y-6">
           <Stepper
             label="Discussion"
-            hint="Wind it to zero for no limit"
+            hint="Wind it down for no limit"
             value={settings.discussionSeconds}
             onChange={(v) => set({ discussionSeconds: v })}
-            min={NO_LIMIT}
-            max={600}
-            step={30}
-            format={clock}
+            steps={DISCUSSION_STEPS}
+            format={formatClock}
           />
 
           <Stepper
             label="Voting"
-            hint="Wind it to zero for no limit"
+            hint="Wind it down for no limit"
             value={settings.votingSeconds}
             onChange={(v) => set({ votingSeconds: v })}
-            min={NO_LIMIT}
-            max={180}
-            step={15}
-            format={clock}
+            steps={VOTING_STEPS}
+            format={formatClock}
           />
 
           <Toggle

@@ -15,14 +15,9 @@ import Game from './Game'
 import { supabase, readableError } from '../lib/supabase'
 import { loadIdentity, clearIdentity } from '../lib/identity'
 import { PACKS, DIFFICULTIES, getPack, getDifficulty, playersFor, candidatesFor } from '../data/packs'
+import { DISCUSSION_STEPS, VOTING_STEPS, formatClock } from '../lib/clocks'
 
 const MIN_PLAYERS = 3
-
-function formatSeconds(total) {
-  const m = Math.floor(total / 60)
-  const s = total % 60
-  return `${m}:${String(s).padStart(2, '0')}`
-}
 
 function LiveChip({ live }) {
   return live ? <Chip tone="go">Live</Chip> : <Chip tone="neutral">Reconnecting</Chip>
@@ -216,8 +211,8 @@ export default function Lobby() {
               ['Pack', pack.name],
               ['Mode', difficulty.name],
               ['Imposters', String(session.num_imposters)],
-              ['Discussion', formatSeconds(session.discussion_seconds)],
-              ['Voting', formatSeconds(session.voting_seconds)],
+              ['Discussion', formatClock(session.discussion_seconds)],
+              ['Voting', formatClock(session.voting_seconds)],
               ['Hints for imposters', session.hints_enabled ? 'On' : 'Off'],
               ['Live votes', session.votes_visible ? 'Shown' : 'Hidden'],
             ].map(([k, v]) => (
@@ -333,24 +328,20 @@ export default function Lobby() {
 
           <Stepper
             label="Discussion timer"
-            hint="60s to 5 min"
+            hint="Wind it down for no limit"
             value={draft?.discussion_seconds ?? 180}
             onChange={(v) => set({ discussion_seconds: v })}
-            min={60}
-            max={300}
-            step={30}
-            format={formatSeconds}
+            steps={DISCUSSION_STEPS}
+            format={formatClock}
           />
 
           <Stepper
             label="Voting timer"
-            hint="30s minimum"
+            hint="Wind it down for no limit"
             value={draft?.voting_seconds ?? 60}
             onChange={(v) => set({ voting_seconds: v })}
-            min={30}
-            max={180}
-            step={15}
-            format={formatSeconds}
+            steps={VOTING_STEPS}
+            format={formatClock}
           />
 
           <Toggle

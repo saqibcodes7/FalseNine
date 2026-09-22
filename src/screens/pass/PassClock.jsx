@@ -1,28 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Screen from '../../ui/Screen'
 import Button from '../../ui/Button'
 import Panel from '../../ui/Panel'
 import TimerDisplay from '../../ui/TimerDisplay'
-import { NO_LIMIT } from '../../lib/passplay'
+import { useElapsed } from '../../hooks/useCountdown'
+import { isUnlimited } from '../../lib/clocks'
 import PassTable from './PassTable'
-
-/**
- * Seconds since a moment, ticking. The phone is the only clock in this mode,
- * so there is nothing to correct against; it counts from the timestamp the
- * phase recorded, which means a refresh picks the clock up where it was rather
- * than giving the table a fresh three minutes.
- */
-function useElapsed(since) {
-  const [now, setNow] = useState(() => Date.now())
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 250)
-    return () => clearInterval(id)
-  }, [since])
-
-  if (!since) return 0
-  return Math.max(0, Math.floor((now - since) / 1000))
-}
 
 /*
  * The discussion and the vote are the same screen: a clock, who is still in,
@@ -35,7 +18,7 @@ function useElapsed(since) {
 export default function PassClock({ game, onAdvance, onQuit }) {
   const voting = game.phase === 'voting'
   const total = voting ? game.settings.votingSeconds : game.settings.discussionSeconds
-  const unlimited = total === NO_LIMIT
+  const unlimited = isUnlimited(total)
 
   const elapsed = useElapsed(game.phaseStartedAt)
   const secondsLeft = unlimited ? elapsed : Math.max(0, total - elapsed)

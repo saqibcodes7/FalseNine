@@ -80,9 +80,10 @@ check('the discussion key stops at the bottom', !(await minus('Discussion').isEn
 const discussionReadout = await page.getByText('No limit', { exact: true }).first().innerText()
 check('a clock wound to zero reads as no limit', discussionReadout === 'No limit', discussionReadout)
 
-// Voting clock down to 15s so the suite can watch it expire on its own.
-for (let i = 0; i < 3; i += 1) {
-  await page.getByRole('button', { name: 'Decrease Voting' }).click()
+// Voting down to its shortest real setting, 30s, so the suite can watch a
+// clock expire on its own without sitting through three minutes.
+for (let i = 0; i < 2; i += 1) {
+  await minus('Voting').click()
 }
 await page.getByText('Hints for imposters').click()
 await page.screenshot({ path: `${OUT}/02-setup-filled.png`, fullPage: true })
@@ -150,11 +151,11 @@ check('the table can move on early', true)
 // ---------------------------------------------------------------------------
 console.log('\n=== Voting: a real clock, which runs out by itself ===')
 const voteLabel = await page.locator('[role="timer"]').getAttribute('aria-label')
-check('the voting clock counts down from its setting', /Voting, 0:1\d remaining/.test(voteLabel), voteLabel)
+check('the voting clock counts down from its setting', /Voting, 0:30 remaining/.test(voteLabel), voteLabel)
 await page.screenshot({ path: `${OUT}/05-voting.png`, fullPage: true })
 
 // Nobody presses anything: the clock should take the game on.
-await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Who went out?', null, { timeout: 25000 })
+await page.waitForFunction(() => document.querySelector('h1')?.textContent === 'Who went out?', null, { timeout: 45000 })
 check('the clock running out moved the game on with nobody pressing anything', true)
 await page.screenshot({ path: `${OUT}/06-who-went-out.png`, fullPage: true })
 

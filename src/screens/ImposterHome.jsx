@@ -70,7 +70,17 @@ export default function ImposterHome() {
         >
           Join game
         </Button>
+      </div>
 
+      {/* Everything above needs a phone each and a connection. Everything below
+          needs neither, which is a big enough difference to draw a line at. */}
+      <div className="my-6 flex items-center gap-3.5" aria-hidden="true">
+        <span className="hairline flex-1" />
+        <span className="eyebrow">Or one phone</span>
+        <span className="hairline flex-1" />
+      </div>
+
+      <div className="space-y-3">
         {/* Not disabled by the config notice: this one needs no backend. */}
         <Button
           size="lg"
@@ -81,7 +91,7 @@ export default function ImposterHome() {
           Pass &amp; Play
         </Button>
         <p className="px-1 text-center text-footnote leading-snug text-text-3">
-          One phone, no codes. Pass it round the table.
+          No codes, nobody online. Pass it round the table.
         </p>
       </div>
 

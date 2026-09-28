@@ -8,6 +8,7 @@ const TONES = {
   go: 'accent-go',
   flag: 'accent-flag',
   crimson: 'accent-crimson',
+  teal: 'accent-teal',
   royal: 'accent-royal',
   neutral: 'accent-neutral',
 }

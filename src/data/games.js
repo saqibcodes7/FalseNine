@@ -6,7 +6,10 @@
  * part in white, the last part in gold. `accent` is the hue the whole card
  * sits in, one per game, taken from that card's ground.
  *
- * Flip `status` to 'live' and give the card a `path` when a game ships.
+ * Flip `status` to 'live' and give the card a `path` when a game ships. Any
+ * number of games can be live at once: the one marked `featured` gets the big
+ * card on the home screen, every other live game gets a playable row under
+ * it, and the rest wait under "More to come".
  */
 export const GAMES = [
   {
@@ -19,6 +22,7 @@ export const GAMES = [
     players: '3–12 players',
     accent: 'accent-crimson',
     status: 'live',
+    featured: true,
     path: '/imposter',
     art: 'imposter',
   },

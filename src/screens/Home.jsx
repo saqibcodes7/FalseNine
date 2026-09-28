@@ -5,18 +5,26 @@ import { GAMES } from '../data/games'
 
 /*
  * The collection. The brand sits in a slim bar at the top rather than a block
- * of its own, so the one card you can actually play is in the first viewport
- * on a phone with the next two peeking underneath, inviting the scroll.
+ * of its own, so the featured game is in the first viewport on a phone with
+ * the rest peeking underneath, inviting the scroll.
  *
- * On a wide screen the three cards lay out as a row, the playable one first
- * and twice the width.
+ * Which card is big comes from the registry, not from the order of the list:
+ * the live game marked `featured` gets the big card, every other live game a
+ * playable row, and anything still to come a dimmed row under "More to come".
+ *
+ * On a wide screen the featured card sits on the left at twice the width and
+ * the rows stack beside it.
  */
+const live = GAMES.filter((game) => game.status === 'live')
+const featured = live.find((game) => game.featured) ?? live[0] ?? null
+const alsoLive = live.filter((game) => game !== featured)
+const comingSoon = GAMES.filter((game) => game.status !== 'live')
+
 export default function Home() {
-  const [featured, ...rest] = GAMES
 
   return (
     <div className="min-h-dvh">
-      <Backdrop accent={featured.accent} />
+      <Backdrop accent={featured?.accent} />
 
       <div
         className="mx-auto w-full max-w-5xl px-5 pb-20"
@@ -42,15 +50,30 @@ export default function Home() {
 
         {/* ---- the collection ---- */}
         <div className="md:grid md:grid-cols-[minmax(0,26rem)_1fr] md:items-start md:gap-8">
-          <GameCard game={featured} layout="featured" />
+          {featured && <GameCard game={featured} layout="featured" />}
 
-          <div className="mt-8 md:mt-0 md:max-w-lg">
-            <h2 className="eyebrow mb-3">More to come</h2>
-            <div className="grid gap-3">
-              {rest.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
+          <div className="mt-8 space-y-8 md:mt-0 md:max-w-lg">
+            {alsoLive.length > 0 && (
+              <section>
+                <h2 className="eyebrow mb-3">Also live</h2>
+                <div className="grid gap-3">
+                  {alsoLive.map((game) => (
+                    <GameCard key={game.id} game={game} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {comingSoon.length > 0 && (
+              <section>
+                <h2 className="eyebrow mb-3">More to come</h2>
+                <div className="grid gap-3">
+                  {comingSoon.map((game) => (
+                    <GameCard key={game.id} game={game} />
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         </div>
 

@@ -3,13 +3,16 @@ import { useState } from 'react'
 /*
  * The join code, set as five cells so it can be read out across a table and
  * typed in without ambiguity. Tabular figures, gold, one recess per letter.
+ *
+ * `joinPath` is the game's own join screen, which the invite link opens. It
+ * defaults to Football Imposter's.
  */
-export default function JoinCodeDisplay({ code }) {
+export default function JoinCodeDisplay({ code, joinPath = '/imposter/join' }) {
   const [copied, setCopied] = useState(false)
   const chars = String(code).split('')
 
   async function copy() {
-    const url = `${window.location.origin}/imposter/join?code=${code}`
+    const url = `${window.location.origin}${joinPath}?code=${code}`
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)

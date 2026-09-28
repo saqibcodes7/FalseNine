@@ -6,15 +6,20 @@ import { Link } from 'react-router-dom'
  * the title, the player count and the button are live text in the game's own
  * accent, so none of it has to be re-exported to change.
  *
- *   layout 'featured'  the playable one: big square art and a filled pill
- *   layout 'row'       a game still to come: a thumbnail and its name, at a
- *                      height that lets several sit under the featured card
- *                      without burying it
+ *   layout 'featured'  the headline game: big square art and a filled pill
+ *   layout 'row'       a thumbnail and its name, at a height that lets several
+ *                      sit under the featured card without burying it. A live
+ *                      row is a link with a small Play pill; a game still to
+ *                      come keeps the "Coming soon" badge and is not a link.
+ *
+ * Layout and status are separate: whether a card is big or small has nothing
+ * to do with whether it can be played. A featured card that is not live yet
+ * falls back to a row, so it can never render as a link to nowhere.
  *
  * A locked game keeps its shape and loses its colour. It should still look
  * like something worth waiting for, so it is dimmed, never greyed out.
  */
-function Art({ game, live, className, sizes }) {
+function Art({ game, live, eager = false, className, sizes }) {
   return (
     <div className={`art ${live ? '' : 'art-locked'} ${className}`}>
       <picture>
@@ -25,9 +30,9 @@ function Art({ game, live, className, sizes }) {
           width="720"
           height="736"
           sizes={sizes}
-          loading={live ? 'eager' : 'lazy'}
+          loading={eager ? 'eager' : 'lazy'}
           decoding="async"
-          fetchPriority={live ? 'high' : 'auto'}
+          fetchPriority={eager ? 'high' : 'auto'}
         />
       </picture>
     </div>
@@ -47,13 +52,10 @@ export default function GameCard({ game, layout = 'row', className = '' }) {
   const live = game.status === 'live'
   const accent = live ? game.accent : 'accent-neutral'
 
-  /* ---- a game still to come: art on the left, name beside it ---- */
-  if (layout === 'row') {
-    return (
-      <div
-        className={`surface ${accent} flex items-center gap-4 p-3 ${className}`}
-        aria-disabled={live ? undefined : 'true'}
-      >
+  /* ---- a row: art on the left, name beside it ---- */
+  if (layout === 'row' || !live) {
+    const body = (
+      <>
         <Art
           game={game}
           live={live}
@@ -64,14 +66,51 @@ export default function GameCard({ game, layout = 'row', className = '' }) {
           <Title game={game} live={live} className="text-callout leading-tight" />
           <p className="mt-1 text-footnote text-text-3">{game.players}</p>
         </div>
-        <span className="pill fill-soft shrink-0 px-3 py-1.5 text-caption font-semibold text-text-2">
-          Coming soon
+      </>
+    )
+
+    if (!live) {
+      return (
+        <div
+          className={`surface ${accent} flex items-center gap-4 p-3 ${className}`}
+          aria-disabled="true"
+        >
+          {body}
+          <span className="pill fill-soft shrink-0 px-3 py-1.5 text-caption font-semibold text-text-2">
+            Coming soon
+          </span>
+        </div>
+      )
+    }
+
+    return (
+      <Link
+        to={game.path}
+        className={[
+          'surface pressable flex items-center gap-4 p-3 text-left',
+          accent,
+          'transition-[transform,box-shadow] duration-[var(--dur-state)] ease-[var(--ease-out)]',
+          'hover:-translate-y-0.5 focus-visible:-translate-y-0.5 active:translate-y-0',
+          className,
+        ].join(' ')}
+        style={{ '--tint': '9%' }}
+        aria-label={`${game.name}. ${game.players}. Play now.`}
+      >
+        {body}
+        <span
+          className="pill fill-accent inline-flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-caption font-semibold"
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 12 14" className="h-[10px] w-[10px]" fill="currentColor">
+            <path d="M11.2 6.13a1 1 0 0 1 0 1.74l-9.7 5.6A1 1 0 0 1 0 12.6V1.4A1 1 0 0 1 1.5.53l9.7 5.6Z" />
+          </svg>
+          Play
         </span>
-      </div>
+      </Link>
     )
   }
 
-  /* ---- the playable one ---- */
+  /* ---- the featured one ---- */
   return (
     <Link
       to={game.path}
@@ -89,6 +128,7 @@ export default function GameCard({ game, layout = 'row', className = '' }) {
         <Art
           game={game}
           live={live}
+          eager
           className="aspect-square rounded-t-[calc(var(--radius-card)-1px)] md:aspect-[5/4]"
           sizes="(min-width: 768px) 420px, 100vw"
         />

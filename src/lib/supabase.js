@@ -37,9 +37,10 @@ export function readableError(error, fallback = 'Something went wrong.') {
   if (!message) return fallback
 
   // The app is ahead of the database: a migration has not been run yet.
-  // PostgREST reports this as a missing function, which is not what the person
-  // holding the phone needs to hear.
-  if (/could not find the function public\.(create_session|update_session_settings|start_game)/i.test(message)) {
+  // PostgREST reports this as a missing function (or a function without the
+  // arguments the app now sends), which is not what the person holding the
+  // phone needs to hear. Any RPC can be the one that is behind.
+  if (/could not find the function public\.\w+/i.test(message)) {
     return 'The database is a step behind the app. Run the newest file in supabase/migrations in the Supabase SQL editor, then try again.'
   }
 

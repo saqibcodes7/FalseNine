@@ -45,6 +45,48 @@ export function refuse(message) {
   process.exit(2)
 }
 
+// Every flag any integration script accepts. They are written into the npm
+// scripts in package.json, one script per mode, and are never meant to be
+// typed after "npm run ... --".
+const INTEGRATION_FLAGS = ['--plan', '--apply', '--export-sql', '--continue', '--wait-for-expiry']
+
+export const COMMANDS = [
+  'npm run integration:dev:check          (no network)',
+  'npm run integration:dev:plan           (read-only)',
+  'npm run integration:dev:migrate        (writes, after you type the project ref)',
+  'npm run integration:dev:migrate:continue',
+  'npm run integration:dev:export-sql     (no network)',
+  'npm run integration:dev:gate',
+  'npm run integration:dev:gate:expiry',
+  'npm run integration:dev:verify         (read-only)',
+].map((c) => `  ${c}`).join('\n')
+
+/**
+ * The command line a script was started with, checked strictly.
+ *
+ * "npm run x -- --flag" is not safe to rely on. On Windows, PowerShell's npm
+ * shim drops the "--", and npm then takes the flag as its own: it reads an
+ * unknown long flag such as --plan or --apply as a bundle of one-letter
+ * options (-p -l -a -n: parseable, long, all, yes) and passes nothing on, and
+ * it turns others (--continue, --export-sql) into npm_config_* variables. The
+ * script would run as if the flag had never been typed. So each script accepts
+ * only the exact flags listed, refuses anything else, and refuses when it sees
+ * the traces npm leaves when it has swallowed one.
+ */
+export function parseArgs(allowed) {
+  const args = process.argv.slice(2)
+  const unknown = args.filter((a) => !allowed.includes(a))
+  if (unknown.length) {
+    refuse(`unexpected ${unknown.join(' ')}. Nothing was done. The integration commands take no extra flags; each mode has its own command:\n\n${COMMANDS}`)
+  }
+  const named = INTEGRATION_FLAGS.filter((f) => process.env[`npm_config_${f.slice(2).replace(/-/g, '_')}`] !== undefined)
+  const bundled = ['parseable', 'long', 'all'].every((k) => process.env[`npm_config_${k}`] === 'true')
+  if (named.length || bundled) {
+    refuse(`npm swallowed a flag (${named.length ? named.join(', ') : 'it looks like --plan or --apply'}) instead of passing it to this script. That happens with "npm run ... -- --flag", especially on Windows. Nothing was done. Use the command for the mode you want:\n\n${COMMANDS}`)
+  }
+  return new Set(args)
+}
+
 /** KEY=VALUE lines, # comments, optional single or double quotes. No expansion. */
 export function parseEnvText(text) {
   const out = {}

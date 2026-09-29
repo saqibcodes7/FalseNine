@@ -37,7 +37,11 @@ export function migrationFiles() {
     .map((file) => ({ version: file.slice(0, 4), file: `${MIGRATIONS_DIR}/${file}` }))
 }
 
-export async function connect(config) {
+/**
+ * With readOnly, the session is switched to read-only before anything else
+ * runs, so the database itself refuses any write, whatever the code does.
+ */
+export async function connect(config, { readOnly = false } = {}) {
   const { db } = config
   const ssl =
     config.mode === 'local'
@@ -58,6 +62,15 @@ export async function connect(config) {
   client.notices = []
   client.on('notice', (msg) => client.notices.push(msg.message))
   await client.connect()
+  if (readOnly) {
+    await client.query('set default_transaction_read_only = on')
+    const on = await scalar(client, 'show default_transaction_read_only')
+    if (on !== 'on') {
+      await client.end().catch(() => {})
+      throw new Error('could not make the session read-only, so nothing was run')
+    }
+  }
+  client.readOnly = readOnly
   return client
 }
 

@@ -121,7 +121,7 @@ export async function wholeMatch(g) {
   g.refused('the guest cannot start the game', await g.call(B, 'ttt_start_game', { p_session_id: L.sid }), 'ttt_not_host')
   const started = await g.call(A, 'ttt_start_game', { p_session_id: L.sid })
   if (started.error?.hint === 'ttt_no_board_found') {
-    throw new Stop("no board could be made: the development project is still on the 'standard' difficulty profile, which the small fixture cannot satisfy. Run npm run integration:dev:migrate, which switches it to 'dev'.")
+    throw new Stop("no board could be made: the development project is still on the 'standard' difficulty profile, which the small fixture cannot satisfy. Run npm run integration:dev:migrate (or the last file from integration:dev:export-sql), which switches it to 'dev'.")
   }
   g.ok('the host starts board 1 with ttt_start_game', started)
 

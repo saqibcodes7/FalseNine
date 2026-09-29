@@ -5,18 +5,19 @@
  *
  * See db-checks.mjs for what is checked. Nothing here writes to the database.
  */
-import { describeTarget, loadConfig } from './config.mjs'
+import { describeTarget, loadConfig, parseArgs } from './config.mjs'
 import { connect, identifySupabase } from './db.mjs'
 import { runVerify } from './db-checks.mjs'
 import { createReport } from './report.mjs'
 
 async function main() {
+  parseArgs([])
   const config = loadConfig({ needApi: false, needDb: true })
   console.log(`\nintegration:dev:verify (read-only)\n\n${describeTarget(config)}\n`)
   const report = createReport('verify')
   let client
   try {
-    client = await connect(config)
+    client = await connect(config, { readOnly: true })
     const who = await identifySupabase(client)
     const supabase = who.api_roles === 3 && who.has_auth && who.has_auth_users && who.has_auth_uid && who.has_realtime && who.has_publication
     report.section('Target')

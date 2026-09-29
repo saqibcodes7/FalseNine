@@ -24,9 +24,10 @@ import { spawnSync } from 'node:child_process'
 import { readdirSync, writeFileSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
 import path from 'node:path'
-import { ROOT } from './config.mjs'
+import { ROOT, parseArgs } from './config.mjs'
 import { ORACLE_SQL, POLICIES_SQL, PRIVILEGES_SQL, PUBLICATION_SQL, RLS_SQL, SCHEMA_USAGE_SQL } from './sql.mjs'
 
+parseArgs([])
 const guard = spawnSync(process.execPath, [path.join(ROOT, 'scripts/test-db.mjs'), '--check'], {
   cwd: ROOT,
   env: process.env,

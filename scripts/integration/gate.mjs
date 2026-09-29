@@ -4,7 +4,7 @@
  * public API with the publishable key, exactly as the browser will use it.
  *
  *   npm run integration:dev:gate
- *   npm run integration:dev:gate -- --wait-for-expiry   also outlive an access token
+ *   npm run integration:dev:gate:expiry   also outlive an access token (--wait-for-expiry)
  *
  * Sections:
  *   0. the development project answers, with Anonymous Sign-ins on
@@ -24,7 +24,7 @@
  * integration:dev:verify to inspect, and writes .integration/last-run.json.
  * It never uses a secret key and never connects to the database.
  */
-import { describeTarget, loadConfig } from './config.mjs'
+import { describeTarget, loadConfig, parseArgs } from './config.mjs'
 import { createReport } from './report.mjs'
 import { Gate, Stop } from './gate/kit.mjs'
 import { anonymousAuth, leaving, nobodyActsForAnyoneElse, preflight, wholeMatch, whoCanRead } from './gate/ttt.mjs'
@@ -32,13 +32,14 @@ import { imposter } from './gate/imposter.mjs'
 import { realtime } from './gate/realtime.mjs'
 import { races } from './gate/races.mjs'
 
+const args = parseArgs(['--wait-for-expiry'])
 const config = loadConfig({ needApi: true, needDb: false })
 console.log(`\nintegration:dev:gate\n\n${describeTarget(config)}\n`)
 const report = createReport('gate')
 const gate = new Gate(config, report)
 // Off by default: with Supabase's default one-hour access token it would wait
 // an hour. See scripts/integration/README.md.
-gate.waitForExpiry = process.argv.includes('--wait-for-expiry')
+gate.waitForExpiry = args.has('--wait-for-expiry')
 const startedAt = new Date().toISOString()
 
 const sections = [

@@ -22,7 +22,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { OUTPUT_DIR, ROOT } from './config.mjs'
 import { migrationState, scalar } from './db.mjs'
-import { DEFAULT_ACL_SQL, ORACLE_SQL, POLICIES_SQL, PRIVILEGES_SQL, PUBLICATION_SQL, RLS_SQL, SCHEMA_USAGE_SQL } from './sql.mjs'
+import { COLLATION_SQL, DEFAULT_ACL_SQL, FIXTURE_IDS_SQL, ORACLE_SQL, POLICIES_SQL, PRIVILEGES_SQL, PUBLICATION_SQL, RLS_SQL, SCHEMA_USAGE_SQL } from './sql.mjs'
 
 const readJson = (file) => JSON.parse(readFileSync(path.join(ROOT, file), 'utf8'))
 
@@ -30,6 +30,73 @@ const readJson = (file) => JSON.parse(readFileSync(path.join(ROOT, file), 'utf8'
 const GUARDED_TABLES = ['sessions', 'players', 'seat_owners', 'ttt_settings', 'ttt_boards', 'ttt_board_axes', 'ttt_games', 'ttt_moves', 'ttt_board_cells', 'ttt_move_checks']
 
 const normaliseQual = (q) => String(q ?? '').toLowerCase().replace(/::text/g, '').replace(/[\s()]/g, '')
+
+// Codepoint order: the same on every machine and in every database.
+const byCodepoint = (a, b) => (a < b ? -1 : a > b ? 1 : 0)
+const sorted = (list) => [...list].sort(byCodepoint)
+
+/**
+ * Compare the fictional fixture as the database sees it with
+ * fixture-oracle.json, as sets: which footballers, which criteria, and who
+ * fits each one. Order is not part of the meaning, so an order-only
+ * difference is reported separately and does not fail. Every difference names
+ * the rows it concerns, with the database's ids where the row exists there.
+ */
+export function compareOracle(expected, live, ids = { players: {}, categories: {} }) {
+  const differences = []
+  const pid = (name) => (ids.players?.[name] ? ` [${ids.players[name]}]` : ' [not in the database]')
+  const cid = (key) => (ids.categories?.[key] ? ` [${ids.categories[key]}]` : '')
+  const livePlayers = live.players ?? []
+  const liveCategories = live.categories ?? []
+
+  for (const [label, list] of [['the oracle', expected.players], ['the database', livePlayers]]) {
+    const dupes = sorted(new Set(list.filter((n, i) => list.indexOf(n) !== i)))
+    if (dupes.length) differences.push(`${label} lists these footballers more than once: ${dupes.join(', ')}`)
+  }
+  const expPlayers = new Set(expected.players)
+  const hasPlayer = new Set(livePlayers)
+  for (const n of sorted(expPlayers)) if (!hasPlayer.has(n)) differences.push(`footballer missing from the database: ${n}`)
+  for (const n of sorted(hasPlayer)) if (!expPlayers.has(n)) differences.push(`footballer in the database but not in the oracle: ${n}${pid(n)}`)
+
+  const expCats = new Map(expected.categories.map((c) => [c.key, c]))
+  const liveCats = new Map(liveCategories.map((c) => [c.key, c]))
+  for (const key of sorted(new Set([...expCats.keys(), ...liveCats.keys()]))) {
+    const e = expCats.get(key)
+    const l = liveCats.get(key)
+    if (!l) {
+      differences.push(`criterion missing from the database: ${key}`)
+      continue
+    }
+    if (!e) {
+      differences.push(`criterion in the database but not in the oracle: ${key}${cid(key)}, members ${sorted(l.members).join(', ') || 'none'}`)
+      continue
+    }
+    if (e.active !== l.active) differences.push(`${key}${cid(key)}: active is ${l.active} in the database, ${e.active} in the oracle`)
+    const em = new Set(e.members)
+    const lm = new Set(l.members)
+    const missing = sorted([...em].filter((n) => !lm.has(n)))
+    const extra = sorted([...lm].filter((n) => !em.has(n)))
+    if (missing.length) differences.push(`${key}${cid(key)}: the oracle says these fit, the database says they do not: ${missing.map((n) => `${n}${pid(n)}`).join(', ')}`)
+    if (extra.length) differences.push(`${key}${cid(key)}: the database says these fit, the oracle says they do not: ${extra.map((n) => `${n}${pid(n)}`).join(', ')}`)
+  }
+
+  const orderOnly = []
+  if (!differences.length) {
+    const firstMove = (a, b) => {
+      const i = a.findIndex((x, k) => x !== b[k])
+      return i < 0 ? null : `position ${i}: ${JSON.stringify(b[i])} in the database, ${JSON.stringify(a[i])} in the oracle`
+    }
+    const p = firstMove(expected.players, livePlayers)
+    if (p) orderOnly.push(`footballers (${p})`)
+    const c = firstMove(expected.categories.map((x) => x.key), liveCategories.map((x) => x.key))
+    if (c) orderOnly.push(`criteria (${c})`)
+    for (const e of expected.categories) {
+      const m = firstMove(e.members, liveCats.get(e.key).members)
+      if (m) orderOnly.push(`members of ${e.key} (${m})`)
+    }
+  }
+  return { differences, orderOnly }
+}
 
 async function json(client, sql) {
   return scalar(client, sql)
@@ -109,7 +176,7 @@ export async function runVerify(client, report, config, { withEvidence = true } 
   report.section('Realtime publication')
   const pub = await json(client, PUBLICATION_SQL)
   report.check('supabase_realtime publishes exactly the tables the migrations add',
-    JSON.stringify(pub.tables) === JSON.stringify(expectations.publication.tables), `${pub.tables.join(', ')}`)
+    JSON.stringify(sorted(pub.tables)) === JSON.stringify(sorted(expectations.publication.tables)), `${sorted(pub.tables).join(', ')}`)
   const notFull = Object.entries(pub.replica_identity).filter(([, v]) => v !== 'f').map(([t]) => t)
   report.check('every published table has REPLICA IDENTITY FULL', notFull.length === 0, notFull.join(', '))
 
@@ -118,8 +185,19 @@ export async function runVerify(client, report, config, { withEvidence = true } 
   const nonFixture = await scalar(client, "select count(*)::int from public.football_players where source <> 'fixture'")
   report.check(`the fictional fixture is loaded (${liveOracle.players?.length ?? 0} footballers)`, (liveOracle.players?.length ?? 0) === oracle.players.length)
   report.check('there are no non-fixture footballers', nonFixture === 0, `${nonFixture} found`)
-  const same = JSON.stringify({ p: liveOracle.players, c: liveOracle.categories }) === JSON.stringify({ p: oracle.players, c: oracle.categories })
-  report.check('who fits each criterion matches scripts/integration/fixture-oracle.json, which the gate relies on', same)
+  const collation = await json(client, COLLATION_SQL)
+  report.info('how this database sorts text', `collation ${collation.collate}, ctype ${collation.ctype}, provider ${collation.provider}, Postgres ${collation.server_version}`)
+  const ids = await json(client, FIXTURE_IDS_SQL)
+  const { differences, orderOnly } = compareOracle(oracle, liveOracle, ids)
+  report.check(
+    `who fits each criterion matches scripts/integration/fixture-oracle.json, which the gate relies on (${oracle.players.length} footballers, ${oracle.categories.length} criteria, compared as sets)`,
+    differences.length === 0,
+    differences.length ? `${differences.length} differences, listed below` : 'same footballers, same criteria, same members',
+  )
+  for (const d of differences) report.note(d)
+  if (orderOnly.length) {
+    report.info('the database returned some of those lists in a different order, which changes nothing (order follows collation)', orderOnly.join('; '))
+  }
   const profile = await scalar(client, 'select active_profile from public.ttt_config')
   report.check('boards are generated with the dev difficulty profile, which the small fixture needs', profile === 'dev', `active_profile = ${profile}`)
   const uidDef = await scalar(client, "select pg_get_functiondef('auth.uid()'::regprocedure)")

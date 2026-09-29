@@ -9,12 +9,13 @@
  */
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
-import { ROOT, describeTarget, loadConfig, parseEnvText } from './config.mjs'
+import { COMMANDS, ROOT, describeTarget, loadConfig, parseArgs, parseEnvText } from './config.mjs'
 
+parseArgs([])
 const config = loadConfig({ needApi: true, needDb: false })
 const envPath = path.join(ROOT, config.envFile)
 const fileVars = existsSync(envPath) ? parseEnvText(readFileSync(envPath, 'utf8')) : {}
-let dbLine = 'Database:   FN_DEV_DB_URL not set (only integration:dev:migrate and integration:dev:verify need it)'
+let dbLine = 'Database:   FN_DEV_DB_URL not set (only integration:dev:plan, migrate and verify need it)'
 if (process.env.FN_DEV_DB_URL || fileVars.FN_DEV_DB_URL) {
   // Exits with a refusal if the connection string is not acceptable.
   const withDb = loadConfig({ needApi: true, needDb: true })
@@ -29,3 +30,4 @@ for (const file of ['scripts/integration/expectations.json', 'scripts/integratio
   }
 }
 console.log('\nConfiguration accepted. No network request was made.\n')
+console.log(`The integration commands, one per mode (never add flags after "npm run ... --"):\n\n${COMMANDS}\n`)

@@ -2,14 +2,19 @@
  * Applies the repository's migrations (0001 to 0010) and the fictional football
  * fixture to the DEVELOPMENT Supabase project, then runs the read-only checks.
  *
- *   npm run integration:dev:migrate -- --plan         connect, look, change nothing
- *   npm run integration:dev:migrate                   apply what is missing
- *   npm run integration:dev:migrate -- --continue     carry on after a run that
- *       stopped part-way (refused if the database holds any lobbies)
- *   npm run integration:dev:migrate -- --export-sql   no connection at all: write
- *       the same steps as files to paste into the Supabase SQL editor instead,
+ *   npm run integration:dev:plan               (--plan) connect, look, change nothing
+ *   npm run integration:dev:migrate            (--apply) show the plan, then apply
+ *       what is missing once you type the project ref to confirm
+ *   npm run integration:dev:migrate:continue   (--apply --continue) carry on after
+ *       a run that stopped part-way (refused if the database holds any lobbies)
+ *   npm run integration:dev:export-sql         (--export-sql) no connection at all:
+ *       write the same steps as files to paste into the Supabase SQL editor,
  *       under .integration/sql-editor/ (for anyone who would rather not put a
  *       database password in .env.integration.local)
+ *
+ * The mode is written into each npm script and is required: run with no mode,
+ * this refuses rather than defaulting to anything. Never type the flags after
+ * "npm run ... --"; npm can drop them (see parseArgs in config.mjs).
  *
  * Safety, on top of the target checks in config.mjs:
  *
@@ -37,14 +42,39 @@
  */
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { OUTPUT_DIR, ROOT, describeTarget, loadConfig } from './config.mjs'
+import { createInterface } from 'node:readline/promises'
+import { COMMANDS, OUTPUT_DIR, ROOT, describeTarget, loadConfig, parseArgs, refuse } from './config.mjs'
 import { FIXTURE_FILE, connect, identifySupabase, migrationFiles, migrationState, publicTables, readSqlFile, runSqlFile, scalar } from './db.mjs'
 import { runVerify } from './db-checks.mjs'
 import { createReport } from './report.mjs'
 
-const PLAN_ONLY = process.argv.includes('--plan')
-const EXPORT_SQL = process.argv.includes('--export-sql')
-const CONTINUE = process.argv.includes('--continue')
+const args = parseArgs(['--plan', '--apply', '--export-sql', '--continue'])
+const modes = ['--plan', '--apply', '--export-sql'].filter((m) => args.has(m))
+if (modes.length !== 1) {
+  refuse(`${modes.length ? `conflicting modes ${modes.join(' and ')}` : 'no mode given'}. Nothing was done. Use one of:\n\n${COMMANDS}`)
+}
+if (args.has('--continue') && !args.has('--apply')) refuse('--continue only goes with --apply (npm run integration:dev:migrate:continue).')
+const PLAN_ONLY = args.has('--plan')
+const APPLY = args.has('--apply')
+const EXPORT_SQL = args.has('--export-sql')
+const CONTINUE = args.has('--continue')
+const COMMAND = PLAN_ONLY ? 'integration:dev:plan' : EXPORT_SQL ? 'integration:dev:export-sql' : CONTINUE ? 'integration:dev:migrate:continue' : 'integration:dev:migrate'
+
+/**
+ * Nothing is written until a person types the project ref. Without a terminal
+ * to type into, FN_DEV_CONFIRM_APPLY has to hold the ref instead.
+ */
+async function confirmApply(config) {
+  if (process.env.FN_DEV_CONFIRM_APPLY !== undefined) return process.env.FN_DEV_CONFIRM_APPLY === config.ref
+  if (!process.stdin.isTTY) return false
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  try {
+    const answer = await rl.question(`\nThis CHANGES the database of project ${config.ref}. Type the project ref to go ahead, or anything else to stop: `)
+    return answer.trim() === config.ref
+  } finally {
+    rl.close()
+  }
+}
 
 /** The same steps as SQL editor files. Reads the repository only; no network, no config. */
 function exportSql() {
@@ -135,8 +165,16 @@ async function migrate(client, report, config) {
   report.info('migrations to apply', pending.length ? pending.map((m) => m.file).join(', ') : 'none: all ten are applied')
   report.info('fictional fixture', fixturePlayers > 0 ? `already loaded (${fixturePlayers} footballers); it will be re-applied, which changes nothing` : `load ${FIXTURE_FILE}`)
   report.info('difficulty profile', "set ttt_config.active_profile to 'dev' for this project")
-  if (PLAN_ONLY) {
-    report.note('--plan: nothing was changed.')
+  if (!APPLY) {
+    report.note('Read-only: nothing was changed.')
+    return
+  }
+  if (!pending.length && fixturePlayers > 0 && !CONTINUE) {
+    report.note('Everything is already applied. Re-applying the fixture and the dev profile, which changes nothing.')
+  }
+  if (!(await confirmApply(config))) {
+    report.note('Not confirmed: nothing was changed.')
+    report.info('stopped before changing anything', 'the project ref was not typed')
     return
   }
 
@@ -179,11 +217,12 @@ async function main() {
     return
   }
   const config = loadConfig({ needApi: false, needDb: true })
-  console.log(`\nintegration:dev:migrate${PLAN_ONLY ? ' --plan (changes nothing)' : ''}\n\n${describeTarget(config)}\n`)
-  const report = createReport(PLAN_ONLY ? 'migrate-plan' : 'migrate')
+  const banner = PLAN_ONLY ? 'READ-ONLY: changes nothing' : 'APPLIES CHANGES to the database named below, once you confirm'
+  console.log(`\n${COMMAND} (${banner})\n\n${describeTarget(config)}\n`)
+  const report = createReport(PLAN_ONLY ? 'plan' : 'migrate')
   let client
   try {
-    client = await connect(config)
+    client = await connect(config, { readOnly: !APPLY })
     await migrate(client, report, config)
   } catch (error) {
     report.fail('migrate could not finish', error.message)

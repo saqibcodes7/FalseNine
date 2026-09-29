@@ -4,9 +4,12 @@
 -- Run against a THROWAWAY database, after all the migrations. The easy way is
 -- `npm run test:db`, which builds one, runs every smoke file and drops it.
 --
--- Nothing can create a Tic-Tac-Toe session through the API until that game's
--- own migration lands, so these tests make one directly, the way its create
--- RPC will.
+-- These tests make Tic-Tac-Toe lobbies directly rather than through that
+-- game's own create RPC, so they stay about what 0008 changed. Once 0010 is
+-- applied, a Tic-Tac-Toe seat must belong to a signed-in user, so the tests
+-- sign in the way the SQL sees it: by setting request.jwt.claims, the setting
+-- Supabase fills from the caller's JWT, and switching to the authenticated
+-- role. That mocks Supabase Auth for the SQL only; it is not an Auth test.
 --
 -- Every check prints PASS or FAIL.
 -- ============================================================================
@@ -16,20 +19,30 @@
 
 delete from sessions;
 
--- A Tic-Tac-Toe lobby and its host. Runs as the owner, not as anon.
+-- A Tic-Tac-Toe lobby and its host. Runs as the owner, not as anon. When 0010
+-- is applied, the host's seat also gets an owner, a made-up signed-in user
+-- returned as owner_id.
 create or replace function pg_temp.ttt_lobby(p_host text)
-returns table (session_id uuid, code text, player_id uuid)
+returns table (session_id uuid, code text, player_id uuid, owner_id uuid)
 language plpgsql as $$
 declare
   v_session uuid;
   v_code    text := public.generate_session_code();
   v_player  uuid;
+  v_owner   uuid := gen_random_uuid();
 begin
   insert into public.sessions (code, game_mode) values (v_code, 'tic_tac_toe') returning id into v_session;
   insert into public.players (session_id, display_name, is_host) values (v_session, p_host, true) returning id into v_player;
   update public.sessions set host_player_id = v_player where id = v_session;
-  return query select v_session, v_code, v_player;
+  if to_regclass('public.seat_owners') is not null then
+    execute 'insert into public.seat_owners (player_id, session_id, auth_user_id) values ($1, $2, $3)'
+      using v_player, v_session, v_owner;
+  end if;
+  return query select v_session, v_code, v_player, v_owner;
 end $$;
+
+-- Three more made-up signed-in users, for the Tic-Tac-Toe seats joined below.
+select gen_random_uuid() as ivo_uid, gen_random_uuid() as jo_uid, gen_random_uuid() as oli_uid \gset
 
 -- ============================================================================
 \echo '=== 1. The registry ==='
@@ -141,7 +154,8 @@ select case when count(*) = 1 then 'PASS: none of those refusals left a seat beh
        else 'FAIL: ' || count(*) || ' seats' end
 from players where session_id = :'ttt_session_id';
 
-set role anon;
+select set_config('request.jwt.claims', json_build_object('sub', :'ivo_uid', 'role', 'authenticated')::text, false) \gset
+set role authenticated;
 select player_id from join_session(p_code => :'ttt_code', p_display_name => 'Ivo', p_game_mode => 'tic_tac_toe') \gset ttt_opp_
 reset role;
 
@@ -153,7 +167,8 @@ select case when not exists (select 1 from player_secrets where player_id = :'tt
   then 'PASS: a Tic-Tac-Toe seat gets no hidden role row'
   else 'FAIL: a role row was created for Tic-Tac-Toe' end;
 
-set role anon;
+select set_config('request.jwt.claims', json_build_object('sub', :'jo_uid', 'role', 'authenticated')::text, false) \gset
+set role authenticated;
 do $$ begin
   perform join_session(current_setting('fn.ttt_code'), 'Jo', 'tic_tac_toe');
   raise notice 'FAIL: a third player got into Tic-Tac-Toe';
@@ -161,7 +176,10 @@ exception when check_violation then
   if sqlerrm = 'That game is full (2 players max)' then raise notice 'PASS: Tic-Tac-Toe seats two';
   else raise notice 'FAIL: %', sqlerrm; end if;
 end $$;
+reset role;
+select set_config('request.jwt.claims', '', false) \gset
 
+set role anon;
 do $$ begin
   perform join_session(current_setting('fn.imp_code'), 'Kit', 'tic_tac_toe');
   raise notice 'FAIL: an Imposter code opened for Tic-Tac-Toe';
@@ -285,7 +303,8 @@ from sessions s where s.id = :'ttt_session_id';
 -- ============================================================================
 
 select * from pg_temp.ttt_lobby('Nia') \gset w_
-set role anon;
+select set_config('request.jwt.claims', json_build_object('sub', :'oli_uid', 'role', 'authenticated')::text, false) \gset
+set role authenticated;
 select player_id from join_session(p_code => :'w_code', p_display_name => 'Oli', p_game_mode => 'tic_tac_toe') \gset w_opp_
 select leave_session(:'w_session_id', :'w_opp_player_id');
 reset role;
@@ -293,9 +312,11 @@ select case when count(*) = 1 then 'PASS: Tic-Tac-Toe opponent leaving the lobby
        else 'FAIL: ' || count(*) || ' seats' end
 from players where session_id = :'w_session_id';
 
-set role anon;
+select set_config('request.jwt.claims', json_build_object('sub', :'w_owner_id', 'role', 'authenticated')::text, false) \gset
+set role authenticated;
 select leave_session(:'w_session_id', :'w_player_id');
 reset role;
+select set_config('request.jwt.claims', '', false) \gset
 select case when not exists (select 1 from sessions where id = :'w_session_id')
   then 'PASS: Tic-Tac-Toe host leaving the lobby closes it' else 'FAIL: the lobby is still there' end;
 

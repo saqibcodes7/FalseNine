@@ -1,12 +1,19 @@
 /**
  * Gate section 7: Supabase Realtime, with separately signed-in clients.
  *
- * Every subscriber listens the way the app does (useLiveSession: one
+ * Every subscriber listens with the app's filters (useLiveSession: one
  * postgres_changes binding per table, filtered to the lobby), except two that
- * listen to whole tables with no filter at all. Realtime checks each change
- * against the subscriber's own read policies, so the seated players should
- * hear their lobby and nobody else should hear anything but a bare DELETE,
- * which Realtime cannot check.
+ * listen to whole tables with no filter at all. Each table is on a channel of
+ * its own, so the report can say which subscription Realtime accepted or
+ * refused. Realtime checks each change against the subscriber's own read
+ * policies, so the seated players should hear their lobby and nobody else
+ * should hear anything but a bare DELETE, which Realtime cannot check.
+ *
+ * A signed-out subscriber (the anon role) has no SELECT on ttt_settings,
+ * ttt_games or ttt_moves, and Realtime refuses those Postgres Changes
+ * subscriptions outright. The app must therefore never put a Tic-Tac-Toe
+ * table on a channel for a signed-out browser: Realtime creates a channel's
+ * subscriptions together, so the refusal would take the others down with it.
  */
 import { Stop, aboutLobby, decodeJwt, describeError, sleep } from './kit.mjs'
 
@@ -23,6 +30,25 @@ async function waitFor(predicate, ms = 10000) {
 
 const summarise = (events) => events.map((e) => `${e.table} ${e.type}`).join(', ') || 'nothing'
 
+// Listeners with no signed-in user, and the tables only signed-in users may read.
+const SIGNED_OUT = new Set(['out', 'outWide'])
+const GAME_TABLES = new Set(['ttt_settings', 'ttt_games', 'ttt_moves'])
+
+const describe = (list) =>
+  list.map((b) => `${b.label} ${b.table}: channel ${b.channelJoined ? 'joined' : b.statuses.join(' > ') || 'no status'}, Postgres Changes ${b.pgStatus}`).join('; ')
+
+/** One INFO line per attempted subscription, and Realtime's full answer whenever it was not "ok". */
+function reportSubscriptions(r, subsList) {
+  r.note('Subscriptions attempted: who | table | event | filter -> channel status; Postgres Changes answer')
+  for (const s of subsList) {
+    for (const b of s.bindings) {
+      r.info(`subscription ${s.label} | ${b.table} | ${b.event} | ${b.filter ?? 'no filter'}`,
+        `channel ${b.statuses.join(' > ') || 'no status'}; Postgres Changes ${b.pgStatus}${b.pgStatus === 'ok' ? '' : ' (full answer below)'}`)
+      if (b.pgStatus !== 'ok') r.note(`      Realtime said: ${b.pgMessage}`)
+    }
+  }
+}
+
 export async function realtime(g) {
   const { r } = g
   const { A, B, C, D } = g.users
@@ -38,16 +64,28 @@ export async function realtime(g) {
   subs.out = await g.subscribe(out, R, 'signed out')
   subs.Cwide = await g.subscribe(C, null, 'C, whole tables')
   subs.outWide = await g.subscribe(out, null, 'signed out, whole tables')
-  const statuses = Object.values(subs).map((s) => `${s.label}: ${s.statuses.join(' > ')}; ${s.pgMessage}`)
-  // Accepted means SUBSCRIBED and no error from Realtime's Postgres side. A
-  // missing confirmation is reported, not failed: the positive checks below
-  // show whether changes actually arrive.
-  const refusedByPostgres = Object.values(subs).filter((s) => s.system.some((m) => m?.extension === 'postgres_changes' && m.status !== 'ok'))
-  const allUp = Object.values(subs).every((s) => s.statuses.includes('SUBSCRIBED')) && refusedByPostgres.length === 0
-  r.check('all seven subscriptions are accepted', allUp, statuses.join(' | '))
-  const unconfirmed = Object.values(subs).filter((s) => !s.pgReady && !refusedByPostgres.includes(s))
-  if (unconfirmed.length) r.info('subscriptions Realtime did not confirm within 10 s (not a failure by itself)', unconfirmed.map((s) => s.label).join(', '))
-  if (!allUp) throw new Stop('Realtime subscriptions were not accepted; check the Realtime settings for the development project')
+  // Every attempted subscription, one line each: who, table, event, filter,
+  // the channel status (joined over the WebSocket or not) and Realtime's
+  // answer about the Postgres Changes subscription itself.
+  reportSubscriptions(r, Object.values(subs))
+  const all = Object.entries(subs).flatMap(([k, s]) => s.bindings.map((b) => ({ ...b, key: k, label: s.label })))
+  const signedIn = all.filter((b) => !SIGNED_OUT.has(b.key))
+  const outShared = all.filter((b) => SIGNED_OUT.has(b.key) && !GAME_TABLES.has(b.table))
+  const outGame = all.filter((b) => SIGNED_OUT.has(b.key) && GAME_TABLES.has(b.table))
+  const badIn = signedIn.filter((b) => !b.accepted)
+  r.check(`every signed-in subscription is accepted by Postgres Changes (${signedIn.length - badIn.length} of ${signedIn.length})`, badIn.length === 0, describe(badIn))
+  const badShared = outShared.filter((b) => !b.accepted)
+  r.check(`signed out, subscriptions to sessions and players are accepted, which Football Imposter needs (${outShared.length - badShared.length} of ${outShared.length})`, badShared.length === 0, describe(badShared))
+  const refused = outGame.filter((b) => b.channelJoined && b.pgStatus === 'error')
+  if (refused.length === outGame.length) {
+    r.pass(`signed out, Postgres Changes refuses all ${outGame.length} subscriptions to ttt_settings, ttt_games and ttt_moves: the channel joins, the subscription is refused. That is expected: the anon role has no SELECT on those tables`)
+  } else {
+    r.info('signed out, subscriptions to ttt_settings, ttt_games and ttt_moves were not all refused (the checks below still make sure nothing arrives on them)',
+      `refused ${refused.length}; ${describe(outGame.filter((b) => !refused.includes(b)))}`)
+  }
+  if (badIn.length || badShared.length) {
+    throw new Stop('a subscription that should have been accepted was not; see the subscription lines above for which one, and what Realtime said')
+  }
   await sleep(SETTLE_MS)
 
   const mark = () => Object.fromEntries(Object.entries(subs).map(([k, s]) => [k, s.events.length]))
@@ -211,6 +249,7 @@ export async function realtime(g) {
   const imp = { sid: I.session_id }
   const impOut = await g.subscribe(out, imp, 'signed out, Imposter lobby')
   const impSigned = await g.subscribe(C, imp, 'C, Imposter lobby')
+  reportSubscriptions(r, [impOut, impSigned])
   await sleep(SETTLE_MS)
   const guest = g.signedOut('Imposter guest')
   g.ok('someone joins the Imposter lobby', await g.call(guest, 'join_session', { p_code: I.code, p_display_name: 'Quin' }))

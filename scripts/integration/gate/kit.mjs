@@ -310,29 +310,50 @@ export class Gate {
   // ---- Realtime --------------------------------------------------------------
 
   /**
-   * Subscribe `who` to a lobby's changes the way the app does (one filter per
-   * table), or with no filters at all when `lobby` is null, to see whether
-   * anything leaks to someone listening to everything.
+   * Subscribe `who` to a lobby's changes, one table at a time, or to whole
+   * tables with no filter when `lobby` is null (to see whether anything leaks
+   * to someone listening to everything).
+   *
+   * Each table gets a channel of its own. Realtime creates a channel's Postgres
+   * Changes subscriptions together, so one table the caller may not read would
+   * otherwise sink the others on the same channel, and the report could not say
+   * which table it was. For every table this records two separate things: the
+   * channel status (the channel joined over the WebSocket: SUBSCRIBED), and
+   * Realtime's own answer about the Postgres Changes subscription (its system
+   * message: "Subscribed to PostgreSQL", or the error).
    */
   async subscribe(who, lobby, label = who.label) {
     const events = []
+    const tables = [
+      ['sessions', lobby ? `id=eq.${lobby.sid}` : null],
+      ['players', lobby ? `session_id=eq.${lobby.sid}` : null],
+      ['ttt_settings', lobby ? `session_id=eq.${lobby.sid}` : null],
+      ['ttt_games', lobby ? `session_id=eq.${lobby.sid}` : null],
+      ['ttt_moves', lobby ? `session_id=eq.${lobby.sid}` : null],
+    ]
+    const bindings = await Promise.all(tables.map(([table, filter]) => this.subscribeOne(who, label, table, filter, events)))
+    const sub = {
+      label,
+      who,
+      events,
+      bindings,
+      channels: bindings.map((b) => b.channel),
+      statuses: bindings.flatMap((b) => b.statuses.map((st) => `${b.table} ${st}`)),
+      system: bindings.flatMap((b) => b.system),
+    }
+    this.channels.push(sub)
+    return sub
+  }
+
+  async subscribeOne(who, label, table, filter, events) {
     const statuses = []
     const system = []
-    const channel = who.client.channel(`fn-int-${label.replace(/\W+/g, '-')}-${randomUUID().slice(0, 8)}`)
-    const tables = [
-      ['sessions', lobby ? `id=eq.${lobby.sid}` : undefined],
-      ['players', lobby ? `session_id=eq.${lobby.sid}` : undefined],
-      ['ttt_settings', lobby ? `session_id=eq.${lobby.sid}` : undefined],
-      ['ttt_games', lobby ? `session_id=eq.${lobby.sid}` : undefined],
-      ['ttt_moves', lobby ? `session_id=eq.${lobby.sid}` : undefined],
-    ]
-    for (const [table, filter] of tables) {
-      const spec = { event: '*', schema: 'public', table }
-      if (filter) spec.filter = filter
-      channel.on('postgres_changes', spec, (p) => {
-        events.push({ table: p.table, type: p.eventType, new: p.new ?? {}, old: p.old ?? {}, at: Date.now(), errors: p.errors ?? null })
-      })
-    }
+    const channel = who.client.channel(`fn-int-${label.replace(/\W+/g, '-')}-${table}-${randomUUID().slice(0, 8)}`)
+    const spec = { event: '*', schema: 'public', table }
+    if (filter) spec.filter = filter
+    channel.on('postgres_changes', spec, (p) => {
+      events.push({ table: p.table, type: p.eventType, new: p.new ?? {}, old: p.old ?? {}, at: Date.now(), errors: p.errors ?? null })
+    })
     channel.on('system', {}, (m) => system.push(m))
     await new Promise((resolve) => {
       const timer = setTimeout(resolve, 20000)
@@ -344,21 +365,32 @@ export class Gate {
         }
       })
     })
-    // Realtime confirms separately, with a system message, once the database
-    // side of the subscription is in place. Changes made before that are not
-    // delivered, so wait for it (or for an error) before relying on silence.
-    const pgStatus = () => system.find((m) => m?.extension === 'postgres_changes')
+    // Realtime answers about the Postgres Changes side separately, with a
+    // system message, once it has tried to create the subscription in the
+    // database. Changes made before that are not delivered, so wait for it.
+    const answer = () => system.find((m) => m?.extension === 'postgres_changes')
     const until = Date.now() + 10000
-    while (statuses.includes('SUBSCRIBED') && !pgStatus() && Date.now() < until) await sleep(100)
-    const confirmation = pgStatus()
-    const pgReady = confirmation?.status === 'ok'
-    const sub = { label, who, channel, events, statuses, system, pgReady, pgMessage: confirmation?.message ?? 'no confirmation within 10 s' }
-    this.channels.push(sub)
-    return sub
+    while (statuses.includes('SUBSCRIBED') && !answer() && Date.now() < until) await sleep(100)
+    const confirmation = answer()
+    return {
+      who: label,
+      table,
+      event: '*',
+      filter,
+      channel,
+      statuses,
+      system,
+      channelJoined: statuses.includes('SUBSCRIBED'),
+      pgStatus: confirmation?.status ?? 'none',
+      pgMessage: confirmation?.message ?? 'no answer from Postgres Changes within 10 s',
+      accepted: statuses.includes('SUBSCRIBED') && confirmation?.status === 'ok',
+    }
   }
 
   async cleanup() {
-    for (const sub of this.channels) await sub.who.client.removeChannel(sub.channel).catch(() => {})
+    for (const sub of this.channels) {
+      for (const channel of sub.channels) await sub.who.client.removeChannel(channel).catch(() => {})
+    }
     for (const lobby of this.lobbies) {
       if (!lobby.closed && !lobby.kept) await this.close(lobby).catch(() => {})
     }

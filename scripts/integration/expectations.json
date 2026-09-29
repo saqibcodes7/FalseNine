@@ -1,0 +1,1438 @@
+{
+  "generated_from": "supabase/migrations 0001 to 0010, applied to a plain Postgres with no default grants",
+  "privileges": [
+    {
+      "kind": "function",
+      "name": "advance_peeking(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "advance_peeking(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "arm_peek(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "arm_peek(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "begin_discussion(p_session_id uuid, p_round integer)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "begin_discussion(p_session_id uuid, p_round integer)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "begin_voting(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "begin_voting(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "cast_vote(p_session_id uuid, p_player_id uuid, p_voted_for_id uuid, p_is_skip boolean)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "cast_vote(p_session_id uuid, p_player_id uuid, p_voted_for_id uuid, p_is_skip boolean)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "continue_round(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "continue_round(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "create_session(p_display_name text, p_player_pack text, p_difficulty text, p_num_imposters integer, p_hints_enabled boolean, p_votes_visible boolean, p_discussion_seconds integer, p_voting_seconds integer)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "create_session(p_display_name text, p_player_pack text, p_difficulty text, p_num_imposters integer, p_hints_enabled boolean, p_votes_visible boolean, p_discussion_seconds integer, p_voting_seconds integer)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "end_game(p_session_id uuid, p_winner text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "end_game(p_session_id uuid, p_winner text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_intersection_size(p_category_a uuid, p_category_b uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_intersection_size(p_category_a uuid, p_category_b uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_players_before_write()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "football_players_before_write()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "football_satisfies(p_player_id uuid, p_category_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_satisfies(p_player_id uuid, p_category_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_search_players(p_query text, p_limit integer)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "football_search_players(p_query text, p_limit integer)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "generate_session_code()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "generate_session_code()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "get_my_card(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "get_my_card(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "give_up_seat(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "give_up_seat(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "guess_matches(p_guess text, p_target text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "guess_matches(p_guess text, p_target text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "host_advance(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "host_advance(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "imposter_leave_in_play(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "imposter_leave_in_play(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "join_session(p_code text, p_display_name text, p_game_mode text)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "join_session(p_code text, p_display_name text, p_game_mode text)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "leave_session(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "leave_session(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "normalise_name(p_name text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "normalise_name(p_name text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "peek_grace()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "peek_grace()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "play_again(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "play_again(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ready_to_vote(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ready_to_vote(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "resolve_reveal(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "resolve_reveal(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "reveal_grace()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "reveal_grace()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "salvage_guess(p_session_id uuid, p_player_id uuid, p_guess text)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "salvage_guess(p_session_id uuid, p_player_id uuid, p_guess text)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "server_now()",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "server_now()",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "session_counts(p_session_id uuid, OUT civilians integer, OUT imposters integer)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "session_counts(p_session_id uuid, OUT civilians integer, OUT imposters integer)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "session_visible(p_session_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "session_visible(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "start_game(p_session_id uuid, p_player_id uuid, p_candidates text[], p_hints text[])",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "start_game(p_session_id uuid, p_player_id uuid, p_candidates text[], p_hints text[])",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tally_votes(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tally_votes(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tick(p_session_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tick(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tie_grace()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "tie_grace()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_acting_seat(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_acting_seat(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_active_profile()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_active_profile()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_begin_board(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_begin_board(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_board_has_answers(p_board_id uuid, p_claimed smallint[], p_used uuid[])",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_board_has_answers(p_board_id uuid, p_claimed smallint[], p_used uuid[])",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_board_meets(p_counts integer[], p_difficulty text, p_profile text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_board_meets(p_counts integer[], p_difficulty text, p_profile text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_build_board(p_rows uuid[], p_cols uuid[], p_difficulty text, p_profile text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_build_board(p_rows uuid[], p_cols uuid[], p_difficulty text, p_profile text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_can_see_board(p_board_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_can_see_board(p_board_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_cell_accepts(p_board_id uuid, p_cell integer, p_football_player_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_cell_accepts(p_board_id uuid, p_cell integer, p_football_player_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_board_complete()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_board_complete()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_game_seated()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_game_seated()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_seat_owned()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_check_seat_owned()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_create_session(p_display_name text, p_difficulty text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_create_session(p_display_name text, p_difficulty text)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_forbid_change()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_forbid_change()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_games_after_delete()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_games_after_delete()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_generate_board(p_difficulty text, p_profile text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_generate_board(p_difficulty text, p_profile text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_is_seated(p_session_id uuid)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_is_seated(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_keep_board_whole()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_keep_board_whole()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_leave(p_session_id uuid, p_player_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_leave(p_session_id uuid, p_player_id uuid)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_moves_before_update()",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_moves_before_update()",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": true
+    },
+    {
+      "kind": "function",
+      "name": "ttt_my_seat(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_my_seat(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_pass(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_pass(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_rematch(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_rematch(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_settle(p_game_id uuid, p_mark text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_settle(p_game_id uuid, p_mark text)",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_start_game(p_session_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_start_game(p_session_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_submit_move(p_session_id uuid, p_cell integer, p_football_player_id uuid)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_submit_move(p_session_id uuid, p_cell integer, p_football_player_id uuid)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_update_settings(p_session_id uuid, p_difficulty text)",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_update_settings(p_session_id uuid, p_difficulty text)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_winning_line(p_cells smallint[])",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "ttt_winning_line(p_cells smallint[])",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "update_session_settings(p_session_id uuid, p_player_id uuid, p_player_pack text, p_difficulty text, p_num_imposters integer, p_hints_enabled boolean, p_votes_visible boolean, p_discussion_seconds integer, p_voting_seconds integer)",
+      "role": "anon",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "function",
+      "name": "update_session_settings(p_session_id uuid, p_player_id uuid, p_player_pack text, p_difficulty text, p_num_imposters integer, p_hints_enabled boolean, p_votes_visible boolean, p_discussion_seconds integer, p_voting_seconds integer)",
+      "role": "authenticated",
+      "privs": "execute",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_categories",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_categories",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_category_members",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_category_members",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_clubs",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_clubs",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_competitions",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_competitions",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_countries",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_countries",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_external_refs",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_external_refs",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_national_teams",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_national_teams",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_clubs",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_clubs",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_national_teams",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_national_teams",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_trophies",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_player_trophies",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_players",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_players",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_trophies",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "football_trophies",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "game_modes",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "game_modes",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "player_secrets",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "player_secrets",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "players",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "players",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "rounds",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "rounds",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "seat_owners",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "seat_owners",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "session_secrets",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "session_secrets",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "sessions",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "sessions",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_board_axes",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_board_axes",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_board_cells",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_board_cells",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_boards",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_boards",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_config",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_config",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_difficulty_bands",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_difficulty_bands",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_games",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_games",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_lines",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_lines",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_move_checks",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_move_checks",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_moves",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_moves",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_settings",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_settings",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_threshold_profiles",
+      "role": "anon",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "ttt_threshold_profiles",
+      "role": "authenticated",
+      "privs": "",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "votes",
+      "role": "anon",
+      "privs": "select",
+      "trigger_function": false
+    },
+    {
+      "kind": "table",
+      "name": "votes",
+      "role": "authenticated",
+      "privs": "select",
+      "trigger_function": false
+    }
+  ],
+  "policies": [
+    {
+      "table": "game_modes",
+      "policy": "game modes are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "true"
+    },
+    {
+      "table": "players",
+      "policy": "players are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "session_visible(session_id)"
+    },
+    {
+      "table": "rounds",
+      "policy": "rounds are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "true"
+    },
+    {
+      "table": "sessions",
+      "policy": "sessions are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "((game_mode <> 'tic_tac_toe'::text) OR ttt_is_seated(id))"
+    },
+    {
+      "table": "ttt_board_axes",
+      "policy": "board axes: from a seat",
+      "cmd": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "qual": "ttt_can_see_board(board_id)"
+    },
+    {
+      "table": "ttt_boards",
+      "policy": "boards: from a seat",
+      "cmd": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "qual": "ttt_can_see_board(id)"
+    },
+    {
+      "table": "ttt_games",
+      "policy": "games: from a seat",
+      "cmd": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "qual": "ttt_is_seated(session_id)"
+    },
+    {
+      "table": "ttt_lines",
+      "policy": "lines are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "true"
+    },
+    {
+      "table": "ttt_moves",
+      "policy": "moves: from a seat",
+      "cmd": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "qual": "ttt_is_seated(session_id)"
+    },
+    {
+      "table": "ttt_settings",
+      "policy": "settings: from a seat",
+      "cmd": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "qual": "ttt_is_seated(session_id)"
+    },
+    {
+      "table": "votes",
+      "policy": "votes are readable",
+      "cmd": "SELECT",
+      "roles": [
+        "public"
+      ],
+      "qual": "true"
+    }
+  ],
+  "rls": {
+    "without_rls": [],
+    "tables": 30
+  },
+  "publication": {
+    "tables": [
+      "players",
+      "rounds",
+      "sessions",
+      "ttt_games",
+      "ttt_moves",
+      "ttt_settings",
+      "votes"
+    ],
+    "replica_identity": {
+      "players": "f",
+      "rounds": "f",
+      "sessions": "f",
+      "ttt_games": "f",
+      "ttt_moves": "f",
+      "ttt_settings": "f",
+      "votes": "f"
+    }
+  },
+  "schema_usage": {
+    "anon_usage": true,
+    "authenticated_usage": true,
+    "anon_create": false,
+    "authenticated_create": false
+  }
+}

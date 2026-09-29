@@ -1,0 +1,297 @@
+{
+  "generated_from": "supabase/fixtures/football_fixture.sql (fictional)",
+  "players": [
+    "Ade Kolawe",
+    "Aldo Fellarino",
+    "Anders Kvell",
+    "Arlo Venn",
+    "Bram Olvedo",
+    "Ciaran Moldry",
+    "Danilo Arvelo",
+    "Danilo Moretzo",
+    "Eli Morrowin",
+    "Emil Strandvik",
+    "Felix Draymond",
+    "Francisco Rodero",
+    "Hugo Lindqvar",
+    "Idris Kallow",
+    "Iker Zalduen",
+    "Jonas Pellwick",
+    "Joël Åsmark",
+    "Kai Brennik",
+    "Leon Varrow",
+    "Luca Mendrel",
+    "Marco Fellari",
+    "Mateo Silvane",
+    "Nicolas Havrel",
+    "Noah Treml",
+    "Oskar Holmvik",
+    "Owen Marrick",
+    "Pavel Orskin",
+    "Rafael Quintel",
+    "Rodero Almaz Fontes",
+    "Ruben Castelmar",
+    "Samuel Oduvar",
+    "Stefan Dravek",
+    "Teo Vargalo",
+    "Tomas Quell"
+  ],
+  "categories": [
+    {
+      "key": "CLUB:Castellan CF",
+      "type": "CLUB",
+      "label": "Castellan CF",
+      "active": true,
+      "members": [
+        "Aldo Fellarino",
+        "Arlo Venn",
+        "Bram Olvedo",
+        "Jonas Pellwick",
+        "Kai Brennik",
+        "Rafael Quintel",
+        "Ruben Castelmar"
+      ]
+    },
+    {
+      "key": "CLUB:Harbour City FC",
+      "type": "CLUB",
+      "label": "Harbour City FC",
+      "active": true,
+      "members": [
+        "Arlo Venn",
+        "Emil Strandvik",
+        "Felix Draymond",
+        "Idris Kallow",
+        "Joël Åsmark",
+        "Marco Fellari",
+        "Mateo Silvane",
+        "Pavel Orskin"
+      ]
+    },
+    {
+      "key": "CLUB:Ironside FC",
+      "type": "CLUB",
+      "label": "Ironside FC",
+      "active": true,
+      "members": [
+        "Ade Kolawe",
+        "Leon Varrow",
+        "Noah Treml",
+        "Pavel Orskin",
+        "Stefan Dravek",
+        "Teo Vargalo"
+      ]
+    },
+    {
+      "key": "CLUB:Kestrel Rovers",
+      "type": "CLUB",
+      "label": "Kestrel Rovers",
+      "active": true,
+      "members": [
+        "Bram Olvedo",
+        "Danilo Moretzo",
+        "Eli Morrowin",
+        "Marco Fellari",
+        "Mateo Silvane",
+        "Noah Treml"
+      ]
+    },
+    {
+      "key": "CLUB:Northbridge Athletic",
+      "type": "CLUB",
+      "label": "Northbridge Athletic",
+      "active": true,
+      "members": [
+        "Ade Kolawe",
+        "Ciaran Moldry",
+        "Felix Draymond",
+        "Jonas Pellwick",
+        "Kai Brennik",
+        "Nicolas Havrel"
+      ]
+    },
+    {
+      "key": "CLUB:Port Aldry",
+      "type": "CLUB",
+      "label": "Port Aldry",
+      "active": true,
+      "members": [
+        "Danilo Moretzo",
+        "Iker Zalduen",
+        "Owen Marrick",
+        "Samuel Oduvar",
+        "Stefan Dravek"
+      ]
+    },
+    {
+      "key": "CLUB:Redmoor United",
+      "type": "CLUB",
+      "label": "Redmoor United",
+      "active": true,
+      "members": [
+        "Danilo Arvelo",
+        "Hugo Lindqvar",
+        "Leon Varrow",
+        "Owen Marrick",
+        "Samuel Oduvar",
+        "Teo Vargalo",
+        "Tomas Quell"
+      ]
+    },
+    {
+      "key": "CLUB:Vale Albion",
+      "type": "CLUB",
+      "label": "Vale Albion",
+      "active": true,
+      "members": [
+        "Anders Kvell",
+        "Eli Morrowin",
+        "Emil Strandvik",
+        "Hugo Lindqvar",
+        "Joël Åsmark",
+        "Oskar Holmvik",
+        "Teo Vargalo"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Carvania",
+      "type": "NATIONALITY",
+      "label": "Carvania",
+      "active": true,
+      "members": [
+        "Danilo Arvelo",
+        "Iker Zalduen",
+        "Kai Brennik",
+        "Rafael Quintel",
+        "Ruben Castelmar"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Dunmere",
+      "type": "NATIONALITY",
+      "label": "Dunmere",
+      "active": true,
+      "members": [
+        "Ade Kolawe",
+        "Ciaran Moldry",
+        "Felix Draymond",
+        "Jonas Pellwick",
+        "Nicolas Havrel",
+        "Samuel Oduvar"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Estrana",
+      "type": "NATIONALITY",
+      "label": "Estrana",
+      "active": true,
+      "members": [
+        "Aldo Fellarino",
+        "Bram Olvedo",
+        "Danilo Moretzo",
+        "Marco Fellari",
+        "Mateo Silvane"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Norhaven",
+      "type": "NATIONALITY",
+      "label": "Norhaven",
+      "active": true,
+      "members": [
+        "Anders Kvell",
+        "Eli Morrowin",
+        "Emil Strandvik",
+        "Hugo Lindqvar",
+        "Joël Åsmark",
+        "Oskar Holmvik"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Solvara",
+      "type": "NATIONALITY",
+      "label": "Solvara",
+      "active": true,
+      "members": [
+        "Francisco Rodero",
+        "Noah Treml",
+        "Pavel Orskin",
+        "Rodero Almaz Fontes",
+        "Stefan Dravek",
+        "Teo Vargalo"
+      ]
+    },
+    {
+      "key": "NATIONALITY:Veloria",
+      "type": "NATIONALITY",
+      "label": "Veloria",
+      "active": true,
+      "members": [
+        "Arlo Venn",
+        "Idris Kallow",
+        "Leon Varrow",
+        "Luca Mendrel",
+        "Owen Marrick",
+        "Tomas Quell"
+      ]
+    },
+    {
+      "key": "TROPHY:Continental Cup",
+      "type": "TROPHY",
+      "label": "Continental Cup",
+      "active": true,
+      "members": [
+        "Aldo Fellarino",
+        "Bram Olvedo",
+        "Danilo Moretzo",
+        "Marco Fellari",
+        "Rafael Quintel",
+        "Ruben Castelmar"
+      ]
+    },
+    {
+      "key": "TROPHY:Dunmere Super Cup",
+      "type": "TROPHY",
+      "label": "Dunmere Super Cup",
+      "active": false,
+      "members": []
+    },
+    {
+      "key": "TROPHY:Golden Boot of the Isles",
+      "type": "TROPHY",
+      "label": "Golden Boot of the Isles",
+      "active": true,
+      "members": [
+        "Arlo Venn",
+        "Iker Zalduen",
+        "Pavel Orskin"
+      ]
+    },
+    {
+      "key": "TROPHY:Veloria Premier Division",
+      "type": "TROPHY",
+      "label": "Veloria Premier Division",
+      "active": true,
+      "members": [
+        "Arlo Venn",
+        "Idris Kallow",
+        "Mateo Silvane",
+        "Owen Marrick",
+        "Samuel Oduvar",
+        "Tomas Quell"
+      ]
+    },
+    {
+      "key": "TROPHY:World Shield",
+      "type": "TROPHY",
+      "label": "World Shield",
+      "active": true,
+      "members": [
+        "Emil Strandvik",
+        "Hugo Lindqvar",
+        "Joël Åsmark",
+        "Oskar Holmvik"
+      ]
+    }
+  ]
+}

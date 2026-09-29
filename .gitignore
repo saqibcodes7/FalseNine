@@ -7,6 +7,9 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+# Stage 5A integration gate: its settings (development project only) and output
+.env.integration.local
+.integration/
 
 # Editors / OS
 .vscode/*

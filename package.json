@@ -15,6 +15,7 @@
     "lint:changed": "node scripts/lint-changed.mjs",
     "test:db": "node scripts/test-db.mjs",
     "test:concurrency": "node scripts/test-ttt-concurrency.mjs",
+    "test:ttt": "node scripts/e2e-ttt/run.mjs",
     "integration:build-expectations": "node scripts/integration/build-expectations.mjs",
     "integration:dev:check": "node scripts/integration/check-config.mjs",
     "integration:dev:plan": "node scripts/integration/migrate.mjs --plan",
@@ -43,6 +44,7 @@
     "pg": "^8.23.0",
     "playwright": "^1.63.0",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "ws": "^8.22.0"
   }
 }

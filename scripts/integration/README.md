@@ -30,6 +30,7 @@ and refuses when it sees the traces npm leaves when it has swallowed a flag.
 | `npm run integration:dev:gate` | the development project's public API, with the publishable key | yes. Creates about six anonymous users and some test lobbies, and closes the lobbies afterwards (one is kept for `verify`) |
 | `npm run integration:dev:gate:expiry` | the same | the same, and also waits out an access token (see below) |
 | `npm run integration:dev:verify` | the development database, in a read-only session | no |
+| `npm run integration:dev:frontend` | nothing itself; starts the app at `http://localhost:5180`, pointed at the development project | not by starting. What you do in the app changes the development project, exactly as the app would |
 | `npm run integration:build-expectations` | a local throwaway Postgres only (same rules as `test:db`) | no. Regenerates `expectations.json` and `fixture-oracle.json` after a migration or fixture change |
 
 `plan`, `migrate` and `verify` are the only commands that connect to the
@@ -101,6 +102,31 @@ follows the database's collation, and a Supabase database (`en_US.UTF-8`) sorts
 "Joël Åsmark" before "Jonas Pellwick" where a `C.UTF-8` one sorts it after. The
 queries sort with `COLLATE "C"` anyway, so the file and the live result come
 out in one canonical order.
+
+## Trying the frontend against the development project
+
+```
+npm run integration:dev:frontend
+```
+
+This runs the app's dev server with the development project's URL and
+publishable key from `.env.integration.local`, for that one process only. It
+makes the same checks as every other command here first (the URL must name
+`FN_DEV_PROJECT_REF`, the key must be publishable, and a protected project,
+including whatever `.env.local` points at, is refused), prints the target, and
+serves on port 5180 rather than 5173 so the tab is easy to tell apart.
+`.env.local` is not changed. Vite gives values already in the environment
+priority over `.env` files, so the ones in `.env.local` are simply not used
+for the Supabase URL and key. Nothing else from `.env.integration.local`
+reaches Vite: not the database URL, not its password.
+
+The development project holds the fictional fixture (34 footballers, 19
+criteria) with the `dev` difficulty profile, so every difficulty makes a board.
+Each browser that plays Football Tic-Tac-Toe signs in anonymously once (twice
+for Pass & Play), which counts towards the anonymous sign-in rate limit.
+
+The Tic-Tac-Toe UI tests do not need any of this: `npm run test:ttt` runs them
+against a local stand-in (see `scripts/e2e-ttt/run.mjs`).
 
 ## Outliving an access token (optional)
 

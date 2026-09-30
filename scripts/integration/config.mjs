@@ -59,6 +59,7 @@ export const COMMANDS = [
   'npm run integration:dev:gate',
   'npm run integration:dev:gate:expiry',
   'npm run integration:dev:verify         (read-only)',
+  'npm run integration:dev:frontend       (the app on port 5180, pointed at the development project)',
 ].map((c) => `  ${c}`).join('\n')
 
 /**

@@ -41,6 +41,7 @@
   /* ---- A hue per game, from each card's ground ---- */
   --color-crimson: oklch(57.1% 0.17 28); /* Football Imposter */
   --color-teal: oklch(62.9% 0.098 184); /* Football Tic-Tac-Toe */
+  --color-teal-soft: oklch(80% 0.085 184); /* its O mark, legible on the ground */
   --color-royal: oklch(53.8% 0.185 267); /* 5 A-Side Draft */
 
   /* ---- Signals ---- */

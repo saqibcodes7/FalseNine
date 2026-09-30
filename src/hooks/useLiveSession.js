@@ -19,6 +19,14 @@ import { supabase, isSupabaseConfigured, PLAYER_COLUMNS } from '../lib/supabase'
  * of what makes a refresh, so a new array on every render would refetch on
  * every render.
  *
+ * Football Imposter reads through the shared, signed-out client. A game whose
+ * lobbies are only readable from a seat passes its own signed-in `client`,
+ * and `enabled: false` until that client has its session, so nothing is
+ * fetched or subscribed to before then: a subscription opened signed out would
+ * be refused. `playerColumns` and `measureClock` let such a game read only
+ * the seat columns it uses and skip the clock check it has no use for. Left
+ * out, all four behave exactly as they always have.
+ *
  * Every table in `tables` must have a `session_id` column: that is how rows
  * are fetched and how realtime is filtered.
  *
@@ -48,8 +56,19 @@ const EMPTY = Object.freeze({
   error: null,
 })
 
-export function useLiveSession(code, { sessionColumns, tables = NONE }) {
+export function useLiveSession(
+  code,
+  {
+    sessionColumns,
+    tables = NONE,
+    playerColumns = PLAYER_COLUMNS,
+    client = supabase,
+    enabled = true,
+    measureClock = true,
+  },
+) {
   const normalised = code ? String(code).toUpperCase() : null
+  const active = isSupabaseConfigured && Boolean(client) && enabled
 
   // Everything the screen reads lands in one piece of state, set in one go, so
   // a screen never sees a new status alongside rows from the previous fetch.
@@ -61,7 +80,7 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
   const shown = useRef(0)
 
   const refresh = useCallback(async () => {
-    if (!isSupabaseConfigured || !normalised) return
+    if (!active || !normalised) return
 
     const request = ++requested.current
     const isStale = () => request < shown.current
@@ -71,7 +90,7 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
       setView(next)
     }
 
-    const { data: sessionRow, error: sessionError } = await supabase
+    const { data: sessionRow, error: sessionError } = await client
       .from('sessions')
       .select(sessionColumns)
       .eq('code', normalised)
@@ -97,14 +116,14 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
 
     const waiting = sessionRow.status === 'waiting'
     const fetchRows = (table, columns, order) =>
-      supabase
+      client
         .from(table)
         .select(columns)
         .eq('session_id', sessionRow.id)
         .order(order, { ascending: true })
 
     const [playersRes, ...tableResults] = await Promise.all([
-      fetchRows('players', PLAYER_COLUMNS, 'joined_at'),
+      fetchRows('players', playerColumns, 'joined_at'),
       ...tables.map((t) =>
         t.skipWhileWaiting && waiting
           ? Promise.resolve({ data: [], error: null })
@@ -132,7 +151,7 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
       status: 'ready',
       error: null,
     })
-  }, [normalised, sessionColumns, tables])
+  }, [active, client, normalised, sessionColumns, playerColumns, tables])
 
   // Initial load, and again whenever the code changes.
   useEffect(() => {
@@ -141,16 +160,16 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
 
   // One clock check per page load. If it fails we assume the phone is right.
   useEffect(() => {
-    if (!isSupabaseConfigured) return
+    if (!active || !measureClock) return
     const sent = Date.now()
-    supabase.rpc('server_now').then(({ data }) => {
+    client.rpc('server_now').then(({ data }) => {
       if (!data) return
       const received = Date.now()
       const serverMs = new Date(data).getTime()
       // Assume the reply took as long to come back as the request took to go.
       setClockOffset(serverMs - (sent + received) / 2)
     })
-  }, [])
+  }, [active, client, measureClock])
 
   // Until this code's first answer arrives, whatever is in `view` belongs to
   // the previous code (or to nothing), so show loading rather than stale rows.
@@ -159,12 +178,12 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
 
   // Realtime subscription, re-established whenever the session id changes.
   useEffect(() => {
-    if (!isSupabaseConfigured || !sessionId) return undefined
+    if (!active || !sessionId) return undefined
 
     const on = (table, filter) => ({ event: '*', schema: 'public', table, filter })
     const bySession = `session_id=eq.${sessionId}`
 
-    let channel = supabase
+    let channel = client
       .channel(`lobby:${sessionId}`)
       .on('postgres_changes', on('players', bySession), () => refresh())
       .on('postgres_changes', on('sessions', `id=eq.${sessionId}`), () => refresh())
@@ -177,17 +196,17 @@ export function useLiveSession(code, { sessionColumns, tables = NONE }) {
 
     return () => {
       setLive(false)
-      supabase.removeChannel(channel)
+      client.removeChannel(channel)
     }
-  }, [sessionId, tables, refresh])
+  }, [active, client, sessionId, tables, refresh])
 
   // Polling fallback, only while the websocket is down.
   const pollable = current.status !== 'missing'
   useEffect(() => {
-    if (!isSupabaseConfigured || live || !pollable) return undefined
+    if (!active || live || !pollable) return undefined
     const id = setInterval(refresh, 3000)
     return () => clearInterval(id)
-  }, [live, pollable, refresh])
+  }, [active, live, pollable, refresh])
 
   return {
     session: current.session,

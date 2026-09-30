@@ -30,13 +30,14 @@ export const GAMES = [
     id: 'tic-tac-toe',
     name: 'Football Tic-Tac-Toe',
     lead: 'Football',
-    tail: 'Tic-Tac-Toe',
+    // Non-breaking hyphens, so a narrow row breaks after "Football", not after "Tic-".
+    tail: 'Tic\u2011Tac\u2011Toe',
     eyebrow: 'Name · Match · Win',
     tagline: 'Name a player who fits both. Three in a row wins.',
     players: '2 players',
     accent: 'accent-teal',
-    status: 'soon',
-    path: null,
+    status: 'live',
+    path: '/tic-tac-toe',
     art: 'tictactoe',
   },
   {

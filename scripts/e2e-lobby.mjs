@@ -43,13 +43,19 @@ watch(host, 'host')
 await host.goto(BASE, { waitUntil: 'networkidle' })
 await host.screenshot({ path: `${OUT}/01-home-phone.png`, fullPage: true })
 check('home renders', await host.getByText('Football Imposter').first().isVisible())
+// Football Tic-Tac-Toe went live in Stage 5B, so it is a playable row now and
+// only 5 A-Side Draft is still to come.
 check(
-  'coming-soon tiles are not links',
-  (await host.locator('a', { hasText: 'Football Tic-Tac-Toe' }).count()) === 0,
+  'Football Tic-Tac-Toe is live, and its tile is a link',
+  (await host.getByRole('link', { name: /Football Tic-Tac-Toe/ }).count()) === 1,
 )
 check(
-  'two coming-soon badges',
-  (await host.getByText('Coming soon').count()) === 2,
+  'the coming-soon tile is not a link',
+  (await host.locator('a', { hasText: '5 A-Side' }).count()) === 0,
+)
+check(
+  'one coming-soon badge',
+  (await host.getByText('Coming soon').count()) === 1,
   `found ${await host.getByText('Coming soon').count()}`,
 )
 

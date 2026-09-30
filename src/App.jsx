@@ -20,6 +20,15 @@ const Kit = lazy(() => import('./screens/Kit'))
 // never drags the Supabase client onto a phone that is playing offline.
 const PassPlay = lazy(() => import('./screens/PassPlay'))
 
+// Football Tic-Tac-Toe, in chunks of its own. Its signed-in Supabase clients
+// are only ever created by these screens, so Imposter never makes one.
+const TttHome = lazy(() => import('./screens/ttt/TttHome'))
+const TttOnline = lazy(() => import('./screens/ttt/TttOnline'))
+const TttCreate = lazy(() => import('./screens/ttt/TttCreate'))
+const TttJoin = lazy(() => import('./screens/ttt/TttJoin'))
+const TttGame = lazy(() => import('./screens/ttt/TttGame'))
+const TttPassPlay = lazy(() => import('./screens/ttt/TttPassPlay'))
+
 function ChunkFallback() {
   return (
     <div className="grid min-h-dvh place-items-center">
@@ -41,6 +50,12 @@ export default function App() {
           <Route path="/imposter/join" element={<JoinGame />} />
           <Route path="/imposter/lobby/:code" element={<Lobby />} />
           <Route path="/imposter/pass" element={<PassPlay />} />
+          <Route path="/tic-tac-toe" element={<TttHome />} />
+          <Route path="/tic-tac-toe/online" element={<TttOnline />} />
+          <Route path="/tic-tac-toe/online/create" element={<TttCreate />} />
+          <Route path="/tic-tac-toe/online/join" element={<TttJoin />} />
+          <Route path="/tic-tac-toe/game/:code" element={<TttGame />} />
+          <Route path="/tic-tac-toe/pass" element={<TttPassPlay />} />
           <Route path="/kit" element={<Kit />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
